@@ -421,10 +421,9 @@ export class GameScene extends Phaser.Scene {
 
       // Foreground hero tree -- player walks behind it.
       this.add
-        .image(850, WORLD_HEIGHT + 10, "tree-krook")
+        .image(2200, WORLD_HEIGHT + 10, "tree-krook")
         .setOrigin(0.5, 1)
-        .setScale(1.8)
-        .setAlpha(0.75)
+        .setScale(1.2)
         .setDepth(100)
         .setScrollFactor(1);
       return;
