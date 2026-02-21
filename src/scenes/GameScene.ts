@@ -5,7 +5,6 @@ import { GAME_EVENTS } from "../config/events";
 import {
   DEFAULT_DIFFICULTY,
   GAME_HEIGHT,
-  GAME_WIDTH,
   PLAYER_HIT_INVULNERABILITY_MS,
   REQUIRED_SPARKLES_TO_FINISH,
   TOTAL_SPARKLES,
@@ -43,7 +42,7 @@ export class GameScene extends Phaser.Scene {
   private critterHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private storyCat?: Phaser.Physics.Arcade.Image;
   private catStoryShown = false;
-  private catStoryBox?: Phaser.GameObjects.Rectangle;
+  private catStoryBox?: Phaser.GameObjects.Graphics;
   private catStoryText?: Phaser.GameObjects.Text;
   private catNoiseText?: Phaser.GameObjects.Text;
   private catNoiseEvent?: Phaser.Time.TimerEvent;
@@ -462,27 +461,59 @@ export class GameScene extends Phaser.Scene {
     }
     this.catStoryShown = true;
 
-    this.catStoryBox = this.add
-      .rectangle(GAME_WIDTH / 2, 98, GAME_WIDTH - 120, 120, 0x10243a, 0.88)
-      .setStrokeStyle(3, 0xb8ecff, 0.95)
-      .setScrollFactor(0)
-      .setDepth(1000);
+    if (!this.storyCat) {
+      return;
+    }
+
+    const bubbleWidth = 430;
+    const bubbleHeight = 124;
+    const bubbleCenterX = this.storyCat.x + 190;
+    const bubbleCenterY = this.storyCat.y - 112;
+    const bubbleLeft = bubbleCenterX - bubbleWidth / 2;
+    const bubbleTop = bubbleCenterY - bubbleHeight / 2;
+    const bubbleBottom = bubbleCenterY + bubbleHeight / 2;
+    const tailTipX = this.storyCat.x + 10;
+    const tailTipY = this.storyCat.y - this.storyCat.displayHeight - 5;
+
+    const bubble = this.add.graphics().setDepth(1000);
+    bubble.fillStyle(0x10243a, 0.92);
+    bubble.lineStyle(3, 0xb8ecff, 0.95);
+    bubble.fillRoundedRect(bubbleLeft, bubbleTop, bubbleWidth, bubbleHeight, 16);
+    bubble.strokeRoundedRect(bubbleLeft, bubbleTop, bubbleWidth, bubbleHeight, 16);
+    bubble.fillTriangle(
+      bubbleLeft + 64,
+      bubbleBottom - 2,
+      bubbleLeft + 104,
+      bubbleBottom - 2,
+      tailTipX,
+      tailTipY
+    );
+    bubble.strokeTriangle(
+      bubbleLeft + 64,
+      bubbleBottom - 2,
+      bubbleLeft + 104,
+      bubbleBottom - 2,
+      tailTipX,
+      tailTipY
+    );
+    this.catStoryBox = bubble;
+
     this.catStoryText = this.add
       .text(
-        GAME_WIDTH / 2,
-        98,
+        bubbleCenterX,
+        bubbleCenterY,
         "Cat: Hi, brave unicorn! The Rainbow Kingdom's colors were stolen\nby sneaky snakes. Collect sparkles to re-light the sky and open the gate!",
         {
           fontFamily: "monospace",
-          fontSize: "18px",
+          fontSize: "17px",
           color: "#e6fbff",
           align: "center",
+          wordWrap: { width: bubbleWidth - 36 },
           stroke: "#091321",
           strokeThickness: 3
         }
       )
       .setOrigin(0.5)
-      .setScrollFactor(0)
       .setDepth(1001);
 
     if (this.audioContext) {
