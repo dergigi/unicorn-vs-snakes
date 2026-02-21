@@ -6,12 +6,12 @@ import {
   GAME_WIDTH,
   type Difficulty
 } from "../config/gameConfig";
+import { spawnRainbowTrail } from "../utils/rainbowTrail";
 
 const FLOOR_Y = GAME_HEIGHT - 118;
 const UNICORN_SPEED = 3.2;
 const GATE_X = GAME_WIDTH - 100;
 const GATE_OVERLAP_DIST = 28;
-const RAINBOW_COLORS = [0xff6fa7, 0xffbf6a, 0xfff07a, 0x8ff59f, 0x7ad9ff, 0xba9bff];
 
 type MenuSnake = {
   sprite: Phaser.GameObjects.Image;
@@ -232,36 +232,13 @@ export class MenuScene extends Phaser.Scene {
     this.nextTrailAt = time + 30;
 
     const tailDir = this.unicorn.flipX ? 1 : -1;
-    const baseX = this.unicorn.x + tailDir * 16;
-    const baseY = this.unicorn.y - 24;
-
-    for (let i = 0; i < 4; i += 1) {
-      const x = baseX + Phaser.Math.Between(-2, 2);
-      const y = baseY + Phaser.Math.Between(-3, 3);
-      const sparkle = this.add
-        .rectangle(
-          x,
-          y,
-          Phaser.Math.Between(3, 5),
-          Phaser.Math.Between(3, 5)
-        )
-        .setFillStyle(RAINBOW_COLORS[Phaser.Math.Between(0, RAINBOW_COLORS.length - 1)], 1)
-        .setDepth(this.unicorn.depth + 2)
-        .setAlpha(0.95);
-
-      this.tweens.add({
-        targets: sparkle,
-        x: x + tailDir * Phaser.Math.Between(20, 34),
-        y: y + Phaser.Math.Between(-12, 14),
-        alpha: 0,
-        scaleX: 0.2,
-        scaleY: 0.2,
-        angle: Phaser.Math.Between(-70, 70),
-        duration: Phaser.Math.Between(240, 380),
-        ease: "Sine.easeOut",
-        onComplete: () => sparkle.destroy()
-      });
-    }
+    spawnRainbowTrail(
+      this,
+      this.unicorn.x + tailDir * 16,
+      this.unicorn.y - 24,
+      tailDir,
+      this.unicorn.depth + 2
+    );
   }
 
   private startGame(): void {
