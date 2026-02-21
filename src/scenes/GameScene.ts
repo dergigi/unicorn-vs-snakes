@@ -59,6 +59,9 @@ export class GameScene extends Phaser.Scene {
   private nextRainbowTrailAt = 0;
   private gateUnlocked = false;
   private perfectSparkleHeartAwarded = false;
+  private skyRelit = false;
+  private skyRelightTop?: Phaser.GameObjects.Rectangle;
+  private skyRelightGlow?: Phaser.GameObjects.Rectangle;
 
   constructor() {
     super("GameScene");
@@ -81,6 +84,7 @@ export class GameScene extends Phaser.Scene {
     this.levelData = this.cache.json.get(`level-${this.levelNumber}`) as LevelData;
     this.gateUnlocked = false;
     this.perfectSparkleHeartAwarded = false;
+    this.skyRelit = false;
     this.lavaHitbox = undefined;
     this.snakes = [];
     this.stumpHitboxes = [];
@@ -98,6 +102,10 @@ export class GameScene extends Phaser.Scene {
     this.catStoryText = undefined;
     this.catNoiseText = undefined;
     this.catNoiseEvent = undefined;
+    this.skyRelightTop?.destroy();
+    this.skyRelightGlow?.destroy();
+    this.skyRelightTop = undefined;
+    this.skyRelightGlow = undefined;
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -106,6 +114,7 @@ export class GameScene extends Phaser.Scene {
     );
 
     this.drawBackground();
+    this.createSkyRelightLayers();
     this.createLava();
     this.createControls();
 
@@ -311,6 +320,22 @@ export class GameScene extends Phaser.Scene {
 
     this.lavaHitbox = this.add.rectangle(WORLD_WIDTH / 2, WORLD_HEIGHT - 16, WORLD_WIDTH, 28, 0, 0);
     this.physics.add.existing(this.lavaHitbox, true);
+  }
+
+  private createSkyRelightLayers(): void {
+    if (this.levelData.theme !== "forest") {
+      return;
+    }
+
+    // Invisible-at-start overlays that fade in once enough sparkles are collected.
+    this.skyRelightTop = this.add
+      .rectangle(0, 0, WORLD_WIDTH, 255, 0x8ee6ff, 0)
+      .setOrigin(0, 0)
+      .setDepth(-4);
+    this.skyRelightGlow = this.add
+      .rectangle(0, 160, WORLD_WIDTH, 300, 0xbdf7ff, 0)
+      .setOrigin(0, 0)
+      .setDepth(-3);
   }
 
   private createForestPuddles(): void {
@@ -651,6 +676,31 @@ export class GameScene extends Phaser.Scene {
     this.finishGate.setTexture("finish-gate-open");
     this.finishGate.setScale(1.02);
     this.time.delayedCall(120, () => this.finishGate.setScale(1));
+    this.relightSky();
+  }
+
+  private relightSky(): void {
+    if (this.skyRelit || this.levelData.theme !== "forest") {
+      return;
+    }
+    this.skyRelit = true;
+
+    if (this.skyRelightTop) {
+      this.tweens.add({
+        targets: this.skyRelightTop,
+        alpha: 0.34,
+        duration: 1200,
+        ease: "Sine.easeOut"
+      });
+    }
+    if (this.skyRelightGlow) {
+      this.tweens.add({
+        targets: this.skyRelightGlow,
+        alpha: 0.22,
+        duration: 1600,
+        ease: "Sine.easeOut"
+      });
+    }
   }
 
   private maybeAwardPerfectSparkleHeart(): void {
