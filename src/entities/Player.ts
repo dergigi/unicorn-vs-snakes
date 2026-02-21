@@ -19,6 +19,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private lastGroundedAt = 0;
   private lastJumpPressedAt = -9999;
   private jumpsUsed = 0;
+  private airJumpUsed = false;
+  private wasGrounded = false;
   private jumpHoldUntil = 0;
   private controlsEnabled = true;
 
@@ -52,6 +54,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.clearTint();
     this.setAlpha(1);
     this.jumpsUsed = 0;
+    this.airJumpUsed = false;
+    this.wasGrounded = false;
     this.jumpHoldUntil = 0;
   }
 
@@ -61,7 +65,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     if (isGrounded) {
       this.lastGroundedAt = time;
-      this.jumpsUsed = 0;
+      if (!this.wasGrounded) {
+        this.jumpsUsed = 0;
+        this.airJumpUsed = false;
+      }
     }
 
     if (!this.controlsEnabled) {
@@ -88,13 +95,20 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const canUseCoyote = time - this.lastGroundedAt <= COYOTE_TIME_MS;
     const jumpBuffered = time - this.lastJumpPressedAt <= JUMP_BUFFER_MS;
     const canGroundJump = canUseCoyote && this.jumpsUsed === 0;
-    const canAirJump = !isGrounded && this.jumpsUsed < MAX_JUMPS;
+    const canAirJump =
+      !isGrounded &&
+      this.jumpsUsed > 0 &&
+      !this.airJumpUsed &&
+      this.jumpsUsed < MAX_JUMPS;
 
     if (jumpBuffered && (canGroundJump || canAirJump)) {
       this.setVelocityY(PLAYER_JUMP_VELOCITY);
       this.lastJumpPressedAt = -9999;
       this.lastGroundedAt = -9999;
       this.jumpsUsed += 1;
+      if (canAirJump) {
+        this.airJumpUsed = true;
+      }
       this.jumpHoldUntil = time + JUMP_HOLD_MAX_MS;
     }
 
@@ -128,5 +142,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.setFrame(0);
       this.setAngle(0);
     }
+
+    this.wasGrounded = isGrounded;
   }
 }
