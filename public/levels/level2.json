@@ -31,6 +31,13 @@
     { "x": 2820, "y": 345, "width": 140, "height": 30 },
     { "x": 3090, "y": 320, "width": 120, "height": 30 }
   ],
+  "flames": [
+    { "x": 560, "y": 478, "width": 34, "height": 34, "patrolLeft": 48, "patrolRight": 48 },
+    { "x": 1180, "y": 478, "width": 34, "height": 34, "patrolLeft": 42, "patrolRight": 42 },
+    { "x": 1740, "y": 478, "width": 34, "height": 34, "patrolLeft": 44, "patrolRight": 44 },
+    { "x": 2460, "y": 478, "width": 34, "height": 34, "patrolLeft": 42, "patrolRight": 46 },
+    { "x": 3020, "y": 478, "width": 34, "height": 34, "patrolLeft": 40, "patrolRight": 40 }
+  ],
   "snakes": [
     { "x": 820, "y": 470, "patrolWidth": 220, "speedFactor": 0.1 },
     { "x": 1500, "y": 470, "patrolWidth": 220, "speedFactor": 0.5 },

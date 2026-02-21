@@ -47,6 +47,15 @@ export type StoryCatData = {
   height: number;
 };
 
+export type FlameData = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  patrolLeft?: number;
+  patrolRight?: number;
+};
+
 export type LevelData = {
   theme: "forest" | "lava";
   spawn: { x: number; y: number };
@@ -60,4 +69,5 @@ export type LevelData = {
   treeStumps?: TreeStumpData[];
   friendlyCritters?: FriendlyCritterData[];
   storyCat?: StoryCatData;
+  flames?: FlameData[];
 };

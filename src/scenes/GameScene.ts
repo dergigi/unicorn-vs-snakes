@@ -47,6 +47,7 @@ export class GameScene extends Phaser.Scene {
   private lavaHitbox?: Phaser.GameObjects.Rectangle;
   private stumpHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private critterHitboxes: Phaser.GameObjects.Rectangle[] = [];
+  private flameHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private critterMovers: CritterMover[] = [];
   private storyCat?: Phaser.Physics.Arcade.Image;
   private wasNearStoryCat = false;
@@ -89,6 +90,7 @@ export class GameScene extends Phaser.Scene {
     this.snakes = [];
     this.stumpHitboxes = [];
     this.critterHitboxes = [];
+    this.flameHitboxes = [];
     this.critterMovers = [];
     this.storyCat = undefined;
     this.wasNearStoryCat = false;
@@ -139,6 +141,7 @@ export class GameScene extends Phaser.Scene {
     this.createForestPuddles();
     this.createForestStumps();
     this.createFriendlyCritters();
+    this.createLavaFlames();
     this.createStoryCat();
 
     this.rainbowPowerup = this.physics.add
@@ -439,6 +442,61 @@ export class GameScene extends Phaser.Scene {
           }
           critterSprite.setFlipX(current < previous);
         }
+      });
+    }
+  }
+
+  private createLavaFlames(): void {
+    if (this.levelData.theme !== "lava" || !this.levelData.flames?.length) {
+      return;
+    }
+
+    for (const flame of this.levelData.flames) {
+      const patrolLeft = flame.patrolLeft ?? Phaser.Math.Between(22, 34);
+      const patrolRight = flame.patrolRight ?? Phaser.Math.Between(22, 34);
+      const patrolStartX = flame.x - patrolLeft;
+      const patrolEndX = flame.x + patrolRight;
+
+      const flameSprite = this.add
+        .image(patrolStartX, flame.y, "lava-flame")
+        .setOrigin(0.5, 1)
+        .setDisplaySize(flame.width, flame.height)
+        .setDepth(9);
+
+      const hitbox = this.add.rectangle(
+        patrolStartX,
+        flame.y - flame.height / 2,
+        Math.max(10, flame.width - 10),
+        Math.max(14, flame.height - 6),
+        0,
+        0
+      );
+      this.physics.add.existing(hitbox, false);
+      const body = hitbox.body as Phaser.Physics.Arcade.Body;
+      body.setAllowGravity(false);
+      body.setImmovable(true);
+      this.physics.add.overlap(this.player, hitbox, this.handlePlayerHit, undefined, this);
+      this.flameHitboxes.push(hitbox);
+
+      this.tweens.add({
+        targets: [flameSprite, hitbox],
+        x: patrolEndX,
+        duration: Phaser.Math.Between(1200, 1900),
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut"
+      });
+
+      // Add a subtle flicker so static image reads like active fire.
+      this.tweens.add({
+        targets: flameSprite,
+        alpha: 0.78,
+        scaleY: 1.12,
+        scaleX: 0.92,
+        duration: Phaser.Math.Between(180, 260),
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut"
       });
     }
   }
