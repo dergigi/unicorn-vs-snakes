@@ -141,13 +141,13 @@ export class MenuScene extends Phaser.Scene {
       Phaser.Input.Keyboard.JustDown(this.jumpKey!) ||
       Phaser.Input.Keyboard.JustDown(this.cursors!.up);
     if (jumpJustPressed && this.unicornOnGround) {
-      this.unicornVY = -7;
+      this.unicornVY = -5.5;
       this.unicornOnGround = false;
       this.jumpHoldFrames = 0;
     }
 
     const GRAVITY = 0.35;
-    const MAX_HOLD_FRAMES = 20;
+    const MAX_HOLD_FRAMES = 14;
     if (!this.unicornOnGround) {
       if (jumpHeld && this.jumpHoldFrames < MAX_HOLD_FRAMES) {
         this.jumpHoldFrames++;
