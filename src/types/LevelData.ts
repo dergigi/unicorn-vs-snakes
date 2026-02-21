@@ -1,9 +1,15 @@
-export type PlatformData = {
+export type RectData = {
   x: number;
   y: number;
   width: number;
   height: number;
 };
+
+export type PlatformData = RectData;
+export type WaterPuddleData = RectData;
+export type TreeStumpData = RectData;
+export type StoryCatData = RectData;
+export type AppleData = RectData;
 
 export type SnakeData = {
   x: number;
@@ -17,50 +23,14 @@ export type SparkleData = {
   y: number;
 };
 
-export type WaterPuddleData = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-export type TreeStumpData = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-export type FriendlyCritterData = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+export type FriendlyCritterData = RectData & {
   patrolLeft?: number;
   patrolRight?: number;
 };
 
-export type StoryCatData = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-export type FlameData = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+export type FlameData = RectData & {
   patrolLeft?: number;
   patrolRight?: number;
-};
-
-export type AppleData = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
 };
 
 export type LevelData = {
