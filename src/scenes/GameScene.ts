@@ -57,7 +57,7 @@ export class GameScene extends Phaser.Scene {
   private bossWitch?: Phaser.Physics.Arcade.Sprite;
   private bossHealth = 0;
   private bossInvulnerableUntil = 0;
-  private bossHealthText?: Phaser.GameObjects.Text;
+  private bossHeartSprites: Phaser.GameObjects.Image[] = [];
   private bossBatSpawnTimer?: Phaser.Time.TimerEvent;
   private mushroomPickup?: Phaser.Physics.Arcade.Image;
   private hasMushroomPower = false;
@@ -130,8 +130,10 @@ export class GameScene extends Phaser.Scene {
     this.bossWitch = undefined;
     this.bossHealth = 0;
     this.bossInvulnerableUntil = 0;
-    this.bossHealthText?.destroy();
-    this.bossHealthText = undefined;
+    for (const heart of this.bossHeartSprites) {
+      heart.destroy();
+    }
+    this.bossHeartSprites = [];
     this.bossBatSpawnTimer?.remove(false);
     this.bossBatSpawnTimer = undefined;
     this.mushroomPickup = undefined;
@@ -1183,26 +1185,32 @@ export class GameScene extends Phaser.Scene {
 
   private updateBossHealthText(): void {
     if (!this.bossWitch || !this.bossWitch.active || this.bossHealth <= 0) {
-      this.bossHealthText?.destroy();
-      this.bossHealthText = undefined;
+      for (const heart of this.bossHeartSprites) {
+        heart.destroy();
+      }
+      this.bossHeartSprites = [];
       return;
     }
-    const label = `Witch HP: ${this.bossHealth}`;
-    if (!this.bossHealthText) {
-      this.bossHealthText = this.add
-        .text(GAME_WIDTH / 2, 44, label, {
-          fontFamily: "monospace",
-          fontSize: "20px",
-          color: "#ffd6f8",
-          stroke: "#24133d",
-          strokeThickness: 4
-        })
-        .setOrigin(0.5, 0)
+
+    while (this.bossHeartSprites.length < this.bossHealth) {
+      const heart = this.add
+        .image(0, 44, "hearts", 0)
+        .setScale(0.06)
         .setScrollFactor(0)
-        .setDepth(1002);
-      return;
+        .setDepth(1002)
+        .setTint(0xc27bff);
+      this.bossHeartSprites.push(heart);
     }
-    this.bossHealthText.setText(label);
+    while (this.bossHeartSprites.length > this.bossHealth) {
+      this.bossHeartSprites.pop()?.destroy();
+    }
+
+    const spacing = 28;
+    const totalWidth = (this.bossHeartSprites.length - 1) * spacing;
+    const startX = GAME_WIDTH / 2 - totalWidth / 2;
+    for (let i = 0; i < this.bossHeartSprites.length; i += 1) {
+      this.bossHeartSprites[i].setPosition(startX + i * spacing, 44);
+    }
   }
 
   private triggerBossDefeat(): void {
