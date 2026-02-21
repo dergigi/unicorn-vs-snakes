@@ -331,11 +331,11 @@ export class GameScene extends Phaser.Scene {
     this.skyRelightTop = this.add
       .rectangle(0, 0, WORLD_WIDTH, 255, 0x8ee6ff, 0)
       .setOrigin(0, 0)
-      .setDepth(-4);
+      .setDepth(1);
     this.skyRelightGlow = this.add
       .rectangle(0, 160, WORLD_WIDTH, 300, 0xbdf7ff, 0)
       .setOrigin(0, 0)
-      .setDepth(-3);
+      .setDepth(1);
   }
 
   private createForestPuddles(): void {
