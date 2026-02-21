@@ -497,7 +497,7 @@ export class GameScene extends Phaser.Scene {
     const bubbleWidth = 430;
     const bubbleHeight = 124;
     const bubbleCenterX = this.storyCat.x + 190;
-    const bubbleCenterY = this.storyCat.y - 112;
+    const bubbleCenterY = this.storyCat.y - 160;
     const bubbleLeft = bubbleCenterX - bubbleWidth / 2;
     const bubbleTop = bubbleCenterY - bubbleHeight / 2;
     const bubbleBottom = bubbleCenterY + bubbleHeight / 2;
@@ -531,7 +531,7 @@ export class GameScene extends Phaser.Scene {
       .text(
         bubbleCenterX,
         bubbleCenterY,
-        "Cat: Hi, brave unicorn! The Rainbow Kingdom's colors were stolen\nby sneaky snakes. Collect sparkles to re-light the sky and open the gate!",
+        "Hi, brave unicorn! The Rainbow Kingdom's colors were stolen\nby sneaky snakes. Collect sparkles to re-light the sky and open the gate!",
         {
           fontFamily: "monospace",
           fontSize: "17px",
