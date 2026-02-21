@@ -588,7 +588,7 @@ export class GameScene extends Phaser.Scene {
     const dialogWidth = GAME_WIDTH - 120;
     const dialogHeight = 102;
     const dialogX = 60;
-    const dialogY = 82;
+    const dialogY = 130;
     const portraitSize = 42;
     const portraitCenterX = dialogX + 30;
     const portraitCenterY = dialogY + dialogHeight / 2;
