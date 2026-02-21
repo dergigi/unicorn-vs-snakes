@@ -698,7 +698,7 @@ export class GameScene extends Phaser.Scene {
       .text(
         dialogX + 62,
         portraitCenterY,
-        "Hi, brave unicorn! The Rainbow Kingdom's sparkling light was stolen\nby sneaky snakes. Collect sparkles to re-light the sky and open the gate!",
+        "Hi, brave unicorn! The Rainbow Kingdom's sparkling light was stolen\nby a wicked witch, and she put sneaky snakes everywhere. Collect sparkles to re-light the sky and open the gate!",
         {
           fontFamily: "monospace",
           fontSize: "16px",
