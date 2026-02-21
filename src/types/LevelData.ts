@@ -38,6 +38,13 @@ export type FriendlyCritterData = {
   height: number;
 };
 
+export type StoryCatData = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type LevelData = {
   theme: "forest" | "lava";
   spawn: { x: number; y: number };
@@ -50,4 +57,5 @@ export type LevelData = {
   waterPuddles?: WaterPuddleData[];
   treeStumps?: TreeStumpData[];
   friendlyCritters?: FriendlyCritterData[];
+  storyCat?: StoryCatData;
 };

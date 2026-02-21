@@ -5,6 +5,7 @@ import { GAME_EVENTS } from "../config/events";
 import {
   DEFAULT_DIFFICULTY,
   GAME_HEIGHT,
+  GAME_WIDTH,
   PLAYER_HIT_INVULNERABILITY_MS,
   REQUIRED_SPARKLES_TO_FINISH,
   TOTAL_SPARKLES,
@@ -40,6 +41,10 @@ export class GameScene extends Phaser.Scene {
   private lavaHitbox?: Phaser.GameObjects.Rectangle;
   private stumpHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private critterHitboxes: Phaser.GameObjects.Rectangle[] = [];
+  private storyCat?: Phaser.Physics.Arcade.Image;
+  private catStoryShown = false;
+  private catStoryBox?: Phaser.GameObjects.Rectangle;
+  private catStoryText?: Phaser.GameObjects.Text;
   private rainbowPowerup?: Phaser.Physics.Arcade.Image;
   private nextRainbowTrailAt = 0;
   private gateUnlocked = false;
@@ -70,6 +75,12 @@ export class GameScene extends Phaser.Scene {
     this.snakes = [];
     this.stumpHitboxes = [];
     this.critterHitboxes = [];
+    this.storyCat = undefined;
+    this.catStoryShown = false;
+    this.catStoryBox?.destroy();
+    this.catStoryText?.destroy();
+    this.catStoryBox = undefined;
+    this.catStoryText = undefined;
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -102,6 +113,7 @@ export class GameScene extends Phaser.Scene {
     this.createForestPuddles();
     this.createForestStumps();
     this.createFriendlyCritters();
+    this.createStoryCat();
 
     this.rainbowPowerup = this.physics.add
       .staticImage(
@@ -359,6 +371,62 @@ export class GameScene extends Phaser.Scene {
       this.physics.add.collider(this.player, hitbox);
       this.critterHitboxes.push(hitbox);
     }
+  }
+
+  private createStoryCat(): void {
+    if (this.levelData.theme !== "forest" || !this.levelData.storyCat) {
+      return;
+    }
+
+    const cat = this.physics.add
+      .staticImage(this.levelData.storyCat.x, this.levelData.storyCat.y, "story-cat")
+      .setOrigin(0.5, 1)
+      .setDisplaySize(this.levelData.storyCat.width, this.levelData.storyCat.height)
+      .setDepth(9);
+    this.storyCat = cat;
+    this.physics.add.collider(this.player, cat);
+    this.physics.add.overlap(this.player, cat, this.handleStoryCatTouch, undefined, this);
+  }
+
+  private handleStoryCatTouch(): void {
+    if (this.catStoryShown) {
+      return;
+    }
+    this.catStoryShown = true;
+
+    this.catStoryBox = this.add
+      .rectangle(GAME_WIDTH / 2, 98, GAME_WIDTH - 120, 120, 0x10243a, 0.88)
+      .setStrokeStyle(3, 0xb8ecff, 0.95)
+      .setScrollFactor(0)
+      .setDepth(1000);
+    this.catStoryText = this.add
+      .text(
+        GAME_WIDTH / 2,
+        98,
+        "Cat: Hi, brave unicorn! The Rainbow Kingdom's colors were stolen\nby sneaky snakes. Collect sparkles to re-light the sky and open the gate!",
+        {
+          fontFamily: "monospace",
+          fontSize: "18px",
+          color: "#e6fbff",
+          align: "center",
+          stroke: "#091321",
+          strokeThickness: 3
+        }
+      )
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(1001);
+
+    if (this.audioContext) {
+      beep(this.audioContext, 620, 0.08, "triangle", 0.03);
+    }
+
+    this.time.delayedCall(6500, () => {
+      this.catStoryBox?.destroy();
+      this.catStoryText?.destroy();
+      this.catStoryBox = undefined;
+      this.catStoryText = undefined;
+    });
   }
 
   private createControls(): void {

@@ -42,6 +42,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image("tree-lpc-green", "assets/sprites/trees/extra/lpc-green-trees.png");
     this.load.image("tree-krook", "assets/sprites/trees/extra/krook-tree.png");
     this.load.image("friendly-critter", "assets/sprites/friendly-critter.png");
+    this.load.image("story-cat", "assets/sprites/story-cat.png");
     this.load.spritesheet("unicorn", "assets/sprites/unicorn.png", {
       frameWidth: 16,
       frameHeight: 16,

@@ -48,6 +48,7 @@
     { "x": 1840, "y": 478, "width": 46, "height": 44 },
     { "x": 2820, "y": 478, "width": 46, "height": 44 }
   ],
+  "storyCat": { "x": 220, "y": 478, "width": 52, "height": 52 },
   "snakes": [
     { "x": 1560, "y": 470, "patrolWidth": 180, "speedFactor": 0.22 },
     { "x": 2920, "y": 470, "patrolWidth": 180, "speedFactor": 0.18 }
