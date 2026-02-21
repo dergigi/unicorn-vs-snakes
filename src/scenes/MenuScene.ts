@@ -165,7 +165,7 @@ export class MenuScene extends Phaser.Scene {
         applyStyles();
       });
 
-      const label = difficulty === "insane" ? "☠️ INSANE-O" : difficulty.toUpperCase();
+      const label = difficulty === "insane" ? "INSANE-O ☠️" : difficulty.toUpperCase();
       this.add
         .text(cx, cy, label, {
           fontSize: "16px",
