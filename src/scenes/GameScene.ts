@@ -293,7 +293,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < 11; i += 1) {
         const key = treeKeys[(i + 1) % treeKeys.length];
         this.add
-          .image(120 + i * 330, WORLD_HEIGHT - 54 - (i % 3) * 8, key)
+          .image(120 + i * 330, WORLD_HEIGHT - 40 - (i % 3) * 8, key)
           .setOrigin(0.5, 1)
           .setScale(0.68 + (i % 3) * 0.07)
           .setAlpha(0.84)
