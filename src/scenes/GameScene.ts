@@ -77,6 +77,7 @@ export class GameScene extends Phaser.Scene {
   private levelSkipPressCount = 0;
   private levelSkipTargetLevel?: number;
   private levelSkipResetTimer?: Phaser.Time.TimerEvent;
+  private timerStartMs = 0;
 
   constructor() {
     super("GameScene");
@@ -88,10 +89,12 @@ export class GameScene extends Phaser.Scene {
     levelNumber?: number;
     currentLives?: number;
     hasRainbow?: boolean;
+    timerStartMs?: number;
   }): void {
     this.maxLives = data?.maxLives ?? 5;
     this.difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
     this.levelNumber = data?.levelNumber ?? 1;
+    this.timerStartMs = data?.timerStartMs ?? Date.now();
     this.levelComplete = false;
     this.lives = data?.currentLives ?? this.maxLives;
     this.canTakeDamageAt = 0;
@@ -307,7 +310,8 @@ export class GameScene extends Phaser.Scene {
       difficulty: this.difficulty,
       levelNumber: targetLevel,
       currentLives: this.lives,
-      hasRainbow: this.player?.hasRainbowPower() ?? false
+      hasRainbow: this.player?.hasRainbowPower() ?? false,
+      timerStartMs: this.timerStartMs
     };
     this.scene.stop("UIScene");
     this.scene.restart(sceneData);
@@ -1283,7 +1287,8 @@ export class GameScene extends Phaser.Scene {
       this.scene.start("GameOverScene", {
         maxLives: this.maxLives,
         difficulty: this.difficulty,
-        levelNumber: this.levelNumber
+        levelNumber: this.levelNumber,
+        elapsedMs: Date.now() - this.timerStartMs
       });
       return;
     }
@@ -1327,7 +1332,8 @@ export class GameScene extends Phaser.Scene {
           difficulty: this.difficulty,
           levelNumber: this.levelNumber + 1,
           currentLives: this.lives,
-          hasRainbow: this.player.hasRainbowPower()
+          hasRainbow: this.player.hasRainbowPower(),
+          timerStartMs: this.timerStartMs
         };
         // Restarting the same scene key is more reliable than start() here.
         this.scene.restart(sceneData);
@@ -1336,7 +1342,8 @@ export class GameScene extends Phaser.Scene {
       }
 
       this.scene.start("WinScene", {
-        sparkles: collected
+        sparkles: collected,
+        elapsedMs: Date.now() - this.timerStartMs
       });
     });
   }

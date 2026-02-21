@@ -1,12 +1,13 @@
 import Phaser from "phaser";
 import { GAME_HEIGHT, GAME_WIDTH } from "../config/gameConfig";
+import { formatTime } from "../utils/formatTime";
 
 export class WinScene extends Phaser.Scene {
   constructor() {
     super("WinScene");
   }
 
-  create(data: { sparkles?: number }): void {
+  create(data: { sparkles?: number; elapsedMs?: number }): void {
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x152744).setOrigin(0, 0);
     this.add.rectangle(0, GAME_HEIGHT - 180, GAME_WIDTH, 180, 0x1f4d78).setOrigin(0, 0);
 
@@ -31,10 +32,16 @@ export class WinScene extends Phaser.Scene {
       color: "#ffc9f2"
     }).setOrigin(0.5);
 
-    const again = this.add.rectangle(GAME_WIDTH / 2, 370, 320, 76, 0xfff1a6);
+    this.add.text(GAME_WIDTH / 2, 316, `Time: ${formatTime(data.elapsedMs ?? 0)}`, {
+      fontFamily: "monospace",
+      fontSize: "28px",
+      color: "#e0daf8"
+    }).setOrigin(0.5);
+
+    const again = this.add.rectangle(GAME_WIDTH / 2, 400, 320, 76, 0xfff1a6);
     again.setStrokeStyle(4, 0xffffff);
     again.setInteractive({ useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, 370, "PLAY AGAIN", {
+    this.add.text(GAME_WIDTH / 2, 400, "PLAY AGAIN", {
       fontFamily: "monospace",
       fontSize: "32px",
       color: "#37310f"

@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { GAME_EVENTS } from "../config/events";
 import { GAME_WIDTH, getRequiredSparklesToFinish } from "../config/gameConfig";
+import { formatTime } from "../utils/formatTime";
 import { beep } from "../utils/sfx";
 
 export class UIScene extends Phaser.Scene {
@@ -9,6 +10,8 @@ export class UIScene extends Phaser.Scene {
   private sparkleCountText!: Phaser.GameObjects.Text;
   private hintText!: Phaser.GameObjects.Text;
   private hideHintTimer?: Phaser.Time.TimerEvent;
+  private timerText!: Phaser.GameObjects.Text;
+  private timerStartMs = 0;
   private audioContext?: AudioContext;
   private maxLives = 5;
   private requiredSparklesToFinish = getRequiredSparklesToFinish(1);
@@ -17,12 +20,13 @@ export class UIScene extends Phaser.Scene {
     super("UIScene");
   }
 
-  create(data?: { maxLives?: number; levelNumber?: number }): void {
+  create(data?: { maxLives?: number; levelNumber?: number; timerStartMs?: number }): void {
     this.heartSprites = [];
     this.hideHintTimer?.remove(false);
     this.hideHintTimer = undefined;
 
     this.maxLives = data?.maxLives ?? 5;
+    this.timerStartMs = data?.timerStartMs ?? Date.now();
     this.requiredSparklesToFinish = getRequiredSparklesToFinish(data?.levelNumber ?? 1);
     this.audioContext = "context" in this.sound ? (this.sound.context as AudioContext) : undefined;
     for (let i = 0; i < this.maxLives; i += 1) {
@@ -40,6 +44,13 @@ export class UIScene extends Phaser.Scene {
       stroke: "#24133d",
       strokeThickness: 5
     }).setScrollFactor(0);
+    this.timerText = this.add.text(GAME_WIDTH / 2, 16, "0:00.0", {
+      fontFamily: "monospace",
+      fontSize: "20px",
+      color: "#e0daf8",
+      stroke: "#24133d",
+      strokeThickness: 4
+    }).setOrigin(0.5, 0).setScrollFactor(0);
     this.hintText = this.add.text(GAME_WIDTH - 16, 16, "Arrows/WASD + Space/W", {
       fontFamily: "monospace",
       fontSize: "20px",
@@ -71,6 +82,10 @@ export class UIScene extends Phaser.Scene {
       this.game.events.off(GAME_EVENTS.checkpointReached, this.onCheckpointReached, this);
       this.game.events.off(GAME_EVENTS.playerHit, this.onPlayerHit, this);
     });
+  }
+
+  update(): void {
+    this.timerText.setText(formatTime(Date.now() - this.timerStartMs));
   }
 
   private onLivesChanged(lives: number): void {

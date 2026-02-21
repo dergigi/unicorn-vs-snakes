@@ -388,7 +388,8 @@ export class MenuScene extends Phaser.Scene {
       difficulty: this.selectedDifficulty,
       maxLives,
       levelNumber,
-      currentLives: maxLives
+      currentLives: maxLives,
+      timerStartMs: Date.now()
     };
     this.scene.start("GameScene", sceneData);
     this.scene.launch("UIScene", sceneData);
