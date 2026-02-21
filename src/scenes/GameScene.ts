@@ -564,10 +564,11 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    const nearDistance = 180;
+    const horizontalNearDistance = 60;
+    const verticalNearDistance = 48;
     const isNearCat =
-      Phaser.Math.Distance.Between(this.player.x, this.player.y, this.storyCat.x, this.storyCat.y) <=
-      nearDistance;
+      Math.abs(this.player.x - this.storyCat.x) <= horizontalNearDistance &&
+      Math.abs(this.player.y - this.storyCat.y) <= verticalNearDistance;
 
     if (isNearCat && !this.wasNearStoryCat) {
       this.showStoryCatBubble();
