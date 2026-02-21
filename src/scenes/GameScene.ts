@@ -387,7 +387,34 @@ export class GameScene extends Phaser.Scene {
         .rectangle(0, WORLD_HEIGHT - 190, WORLD_WIDTH, 190, 0x4a4764, 0.45)
         .setOrigin(0, 0);
 
-      // Distant castle silhouettes and towers for parallax depth.
+      const castleImage = this.textures.get("castle-bg").getSourceImage() as { width: number; height: number };
+      const nearLayerHeight = 256;
+      const nearScale = nearLayerHeight / Math.max(1, castleImage.height);
+      const nearLayerWidth = Math.max(160, castleImage.width * nearScale);
+      for (let x = -40; x < WORLD_WIDTH + nearLayerWidth; x += nearLayerWidth - 30) {
+        this.add
+          .image(x, WORLD_HEIGHT - 22, "castle-bg")
+          .setOrigin(0, 1)
+          .setScale(nearScale)
+          .setAlpha(0.34)
+          .setTint(0x8f8aa8)
+          .setScrollFactor(0.22);
+      }
+
+      const farLayerHeight = 220;
+      const farScale = farLayerHeight / Math.max(1, castleImage.height);
+      const farLayerWidth = Math.max(150, castleImage.width * farScale);
+      for (let x = -60; x < WORLD_WIDTH + farLayerWidth; x += farLayerWidth - 26) {
+        this.add
+          .image(x, WORLD_HEIGHT - 78, "castle-bg")
+          .setOrigin(0, 1)
+          .setScale(farScale)
+          .setAlpha(0.22)
+          .setTint(0x6c6887)
+          .setScrollFactor(0.14);
+      }
+
+      // Extra silhouette towers for parallax depth.
       for (let i = 0; i < 9; i += 1) {
         const x = 140 + i * 420;
         const w = 170 + (i % 3) * 24;
