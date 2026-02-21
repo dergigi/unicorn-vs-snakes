@@ -477,26 +477,30 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    if (!this.anims.exists("torch-flicker")) {
-      this.anims.create({
-        key: "torch-flicker",
-        frames: this.anims.generateFrameNumbers("torch", { start: 0, end: 2 }),
-        frameRate: 6,
-        repeat: -1
-      });
-    }
-
-    for (let x = 200; x < WORLD_WIDTH; x += 340) {
+    const bottomPlatforms = this.levelData.platforms.filter(p => p.y >= 490);
+    for (const platform of bottomPlatforms) {
+      const torchY = platform.y - platform.height / 2;
       const torch = this.add
-        .sprite(x, 390, "torch", 0)
+        .image(platform.x, torchY, "torch", 0)
         .setOrigin(0.5, 1)
-        .setScale(0.35)
-        .setAlpha(0.85)
+        .setScale(0.18)
+        .setAlpha(0.9)
         .setDepth(1);
-      torch.play({ key: "torch-flicker", startFrame: Phaser.Math.Between(0, 2) });
+
+      this.tweens.add({
+        targets: torch,
+        alpha: 0.6,
+        scaleX: 0.16,
+        scaleY: 0.19,
+        duration: Phaser.Math.Between(200, 350),
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+        delay: Phaser.Math.Between(0, 400)
+      });
 
       this.add
-        .ellipse(x, 392, 50, 14, 0xffa030, 0.15)
+        .ellipse(platform.x, torchY + 2, 30, 10, 0xffa030, 0.12)
         .setDepth(0);
     }
   }
