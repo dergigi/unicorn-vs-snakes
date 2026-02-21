@@ -500,7 +500,13 @@ export class GameScene extends Phaser.Scene {
         duration: Phaser.Math.Between(1200, 1900),
         yoyo: true,
         repeat: -1,
-        ease: "Sine.easeInOut"
+        ease: "Sine.easeInOut",
+        onUpdate: (_tween, target, _key, current, previous) => {
+          if (target !== flameSprite) {
+            return;
+          }
+          flameSprite.setFlipX(current < previous);
+        }
       });
 
       // Add a subtle flicker so static image reads like active fire.
