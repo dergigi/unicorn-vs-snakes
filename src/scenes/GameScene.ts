@@ -1394,8 +1394,8 @@ export class GameScene extends Phaser.Scene {
 
   private createControls(): void {
     const baseCursors = this.input.keyboard?.createCursorKeys();
-    const jumpKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    this.fireballKey = jumpKey;
+    const jumpKey = baseCursors?.up;
+    this.fireballKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     const wasd = this.input.keyboard?.addKeys({
       w: Phaser.Input.Keyboard.KeyCodes.W,
       a: Phaser.Input.Keyboard.KeyCodes.A,
