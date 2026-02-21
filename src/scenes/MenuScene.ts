@@ -45,11 +45,11 @@ export class MenuScene extends Phaser.Scene {
     ).setOrigin(0.5);
 
     const unicornSplash = this.add
-      .sprite(GAME_WIDTH / 2 - 170, 170, "unicorn", 0)
+      .sprite(140, 96, "unicorn", 0)
       .setScale(3)
       .setFlipX(false);
     const snakeSplash = this.add
-      .image(GAME_WIDTH / 2 + 170, 178, "snake-1")
+      .image(GAME_WIDTH - 140, 102, "snake-1")
       .setScale(1.55)
       .setFlipX(true);
 
