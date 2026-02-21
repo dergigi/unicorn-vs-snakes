@@ -12,6 +12,10 @@ import {
 
 type Cursors = Phaser.Types.Input.Keyboard.CursorKeys & {
   jump: Phaser.Input.Keyboard.Key;
+  w: Phaser.Input.Keyboard.Key;
+  a: Phaser.Input.Keyboard.Key;
+  s: Phaser.Input.Keyboard.Key;
+  d: Phaser.Input.Keyboard.Key;
 };
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
@@ -86,16 +90,17 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     if (
       Phaser.Input.Keyboard.JustDown(this.cursors.jump) ||
-      Phaser.Input.Keyboard.JustDown(this.cursors.up)
+      Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
+      Phaser.Input.Keyboard.JustDown(this.cursors.w)
     ) {
       this.lastJumpPressedAt = time;
     }
 
     let velocityX = 0;
-    if (this.cursors.left?.isDown) {
+    if (this.cursors.left?.isDown || this.cursors.a.isDown) {
       velocityX = -PLAYER_MOVE_SPEED;
       this.setFlipX(true);
-    } else if (this.cursors.right?.isDown) {
+    } else if (this.cursors.right?.isDown || this.cursors.d.isDown) {
       velocityX = PLAYER_MOVE_SPEED;
       this.setFlipX(false);
     }
@@ -122,10 +127,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.jumpHoldUntil = time + JUMP_HOLD_MAX_MS;
     }
 
-    const jumpHeld = this.cursors.jump.isDown || this.cursors.up.isDown;
+    const jumpHeld = this.cursors.jump.isDown || this.cursors.up.isDown || this.cursors.w.isDown;
     const jumpReleased =
       Phaser.Input.Keyboard.JustUp(this.cursors.jump) ||
-      Phaser.Input.Keyboard.JustUp(this.cursors.up);
+      Phaser.Input.Keyboard.JustUp(this.cursors.up) ||
+      Phaser.Input.Keyboard.JustUp(this.cursors.w);
 
     if (jumpReleased && body.velocity.y < 0) {
       body.velocity.y *= 0.55;

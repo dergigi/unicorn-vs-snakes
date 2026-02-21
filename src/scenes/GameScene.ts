@@ -30,6 +30,10 @@ export class GameScene extends Phaser.Scene {
   private player!: Player;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys & {
     jump: Phaser.Input.Keyboard.Key;
+    w: Phaser.Input.Keyboard.Key;
+    a: Phaser.Input.Keyboard.Key;
+    s: Phaser.Input.Keyboard.Key;
+    d: Phaser.Input.Keyboard.Key;
   };
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
   private snakes: Snake[] = [];
@@ -972,12 +976,30 @@ export class GameScene extends Phaser.Scene {
   private createControls(): void {
     const baseCursors = this.input.keyboard?.createCursorKeys();
     const jumpKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    if (!baseCursors || !jumpKey) {
+    const wasd = this.input.keyboard?.addKeys({
+      w: Phaser.Input.Keyboard.KeyCodes.W,
+      a: Phaser.Input.Keyboard.KeyCodes.A,
+      s: Phaser.Input.Keyboard.KeyCodes.S,
+      d: Phaser.Input.Keyboard.KeyCodes.D
+    });
+    if (
+      !baseCursors ||
+      !jumpKey ||
+      !wasd ||
+      !("w" in wasd) ||
+      !("a" in wasd) ||
+      !("s" in wasd) ||
+      !("d" in wasd)
+    ) {
       throw new Error("Keyboard not available");
     }
     this.cursors = {
       ...baseCursors,
-      jump: jumpKey
+      jump: jumpKey,
+      w: wasd.w as Phaser.Input.Keyboard.Key,
+      a: wasd.a as Phaser.Input.Keyboard.Key,
+      s: wasd.s as Phaser.Input.Keyboard.Key,
+      d: wasd.d as Phaser.Input.Keyboard.Key
     };
   }
 
