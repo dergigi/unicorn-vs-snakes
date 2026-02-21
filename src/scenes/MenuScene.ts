@@ -154,7 +154,7 @@ export class MenuScene extends Phaser.Scene {
         .rectangle(x, y, 154, 56, 0x6f5cc4)
         .setStrokeStyle(2, 0xd5ccff)
         .setInteractive({ useHandCursor: true });
-      const label = difficulty === "insane" ? "INSANE-O" : difficulty.toUpperCase();
+      const label = difficulty === "insane" ? "☠️ INSANE-O" : difficulty.toUpperCase();
       this.add
         .text(x, y, label, {
           fontSize: "22px",
