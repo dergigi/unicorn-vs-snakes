@@ -64,6 +64,8 @@ export class GameScene extends Phaser.Scene {
   private skyRelit = false;
   private skyRelightTop?: Phaser.GameObjects.Rectangle;
   private skyRelightGlow?: Phaser.GameObjects.Rectangle;
+  private baseSkyLayer?: Phaser.GameObjects.Rectangle;
+  private baseHorizonLayer?: Phaser.GameObjects.Rectangle;
 
   constructor() {
     super("GameScene");
@@ -110,6 +112,8 @@ export class GameScene extends Phaser.Scene {
     this.skyRelightGlow?.destroy();
     this.skyRelightTop = undefined;
     this.skyRelightGlow = undefined;
+    this.baseSkyLayer = undefined;
+    this.baseHorizonLayer = undefined;
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -242,8 +246,12 @@ export class GameScene extends Phaser.Scene {
 
   private drawBackground(): void {
     if (this.levelData.theme === "forest") {
-      this.add.rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x21452d).setOrigin(0, 0);
-      this.add.rectangle(0, WORLD_HEIGHT - 210, WORLD_WIDTH, 210, 0x326a3f, 0.42).setOrigin(0, 0);
+      this.baseSkyLayer = this.add
+        .rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x21452d)
+        .setOrigin(0, 0);
+      this.baseHorizonLayer = this.add
+        .rectangle(0, WORLD_HEIGHT - 210, WORLD_WIDTH, 210, 0x326a3f, 0.42)
+        .setOrigin(0, 0);
 
       // Rolling hill silhouettes behind the tree layers.
       const farHillColor = 0x4f8455;
@@ -295,7 +303,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    this.add.rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x26164a).setOrigin(0, 0);
+    this.baseSkyLayer = this.add.rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x26164a).setOrigin(0, 0);
     for (let i = 0; i < 7; i += 1) {
       const baseX = 180 + i * 500;
       const baseY = 112 + (i % 3) * 22;
@@ -842,6 +850,16 @@ export class GameScene extends Phaser.Scene {
         duration: 900,
         ease: "Sine.easeOut"
       });
+    }
+
+    // Permanently brighten the actual base sky colors once gate opens.
+    if (this.levelData.theme === "forest") {
+      this.baseSkyLayer?.setFillStyle(0x4fb66b, 1);
+      this.baseHorizonLayer?.setFillStyle(0x71cc84, 0.5);
+      this.cameras.main.setBackgroundColor("#4fb66b");
+    } else {
+      this.baseSkyLayer?.setFillStyle(0x5a3a8d, 1);
+      this.cameras.main.setBackgroundColor("#5a3a8d");
     }
 
     // A short flash makes the unlock -> relight moment obvious.
