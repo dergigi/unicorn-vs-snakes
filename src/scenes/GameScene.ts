@@ -895,7 +895,7 @@ export class GameScene extends Phaser.Scene {
       | Phaser.Physics.Arcade.StaticBody
       | Phaser.Tilemaps.Tile
   ): void {
-    if (!this.player || !this.player.active) {
+    if (!this.scene.isActive() || !this.player || !this.player.active || !this.player.body) {
       return;
     }
     if (this.time.now < this.canTakeDamageAt || this.levelComplete) {
@@ -918,6 +918,10 @@ export class GameScene extends Phaser.Scene {
           ? (hazard.x as number)
           : this.player.x;
       const direction = this.player.x < hazardX ? -1 : 1;
+      const playerBody = this.player.body as Phaser.Physics.Arcade.Body | undefined;
+      if (!playerBody) {
+        return;
+      }
       this.player.setVelocityX(direction * 220);
       this.player.setVelocityY(-250);
 
@@ -946,6 +950,10 @@ export class GameScene extends Phaser.Scene {
         ? (hazard.x as number)
         : this.player.x;
     const direction = this.player.x < hazardX ? -1 : 1;
+    const playerBody = this.player.body as Phaser.Physics.Arcade.Body | undefined;
+    if (!playerBody) {
+      return;
+    }
     this.player.setVelocityX(direction * 220);
     this.player.setVelocityY(-250);
 
@@ -964,7 +972,13 @@ export class GameScene extends Phaser.Scene {
         return;
       }
 
+      if (!this.checkpointSystem) {
+        return;
+      }
       const spawn = this.checkpointSystem.getActiveSpawn();
+      if (!spawn) {
+        return;
+      }
       this.player.resetAt(spawn.x, spawn.y);
       this.player.setControlsEnabled(true);
     });
