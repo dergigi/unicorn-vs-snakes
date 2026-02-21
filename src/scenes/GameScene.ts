@@ -192,34 +192,28 @@ export class GameScene extends Phaser.Scene {
         "tree-krook"
       ] as const;
 
-      // Far parallax layer: softer trees to fill the skyline.
-      for (let i = 0; i < 18; i += 1) {
+      // Far parallax layer: lighter density for cleaner composition.
+      for (let i = 0; i < 9; i += 1) {
         const key = treeKeys[i % treeKeys.length];
         this.add
-          .image(120 + i * 220, WORLD_HEIGHT - 112 - (i % 3) * 10, key)
+          .image(220 + i * 400, WORLD_HEIGHT - 110 - (i % 2) * 12, key)
           .setOrigin(0.5, 1)
-          .setScale(0.62 + (i % 2) * 0.08)
-          .setAlpha(0.38)
+          .setScale(0.58 + (i % 2) * 0.08)
+          .setAlpha(0.28)
           .setTint(0x6aa768)
           .setScrollFactor(0.28);
       }
 
-      // Mid/near layer: brighter trees that feel lush and alive.
-      for (let i = 0; i < 22; i += 1) {
+      // Mid/near layer: fewer hero trees to avoid clutter.
+      for (let i = 0; i < 11; i += 1) {
         const key = treeKeys[(i + 1) % treeKeys.length];
         this.add
-          .image(40 + i * 170, WORLD_HEIGHT - 52 - (i % 4) * 6, key)
+          .image(120 + i * 330, WORLD_HEIGHT - 54 - (i % 3) * 8, key)
           .setOrigin(0.5, 1)
-          .setScale(0.72 + (i % 3) * 0.08)
-          .setAlpha(0.9)
+          .setScale(0.68 + (i % 3) * 0.07)
+          .setAlpha(0.84)
           .setTint(0x8fd57f)
           .setScrollFactor(0.46);
-      }
-
-      for (let i = 0; i < 10; i += 1) {
-        this.add
-          .ellipse(220 + i * 350, 100 + (i % 3) * 16, 180, 62, 0x6cb56f, 0.26)
-          .setScrollFactor(0.4);
       }
       return;
     }
