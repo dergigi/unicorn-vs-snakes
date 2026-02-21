@@ -8,8 +8,8 @@
     { "x": 640, "y": 500, "width": 1360, "height": 44 }
   ],
   "movingPlatforms": [
-    { "x": 500, "y": 340, "width": 120, "height": 28, "moveY": -58, "duration": 1800 },
-    { "x": 940, "y": 340, "width": 120, "height": 28, "moveY": -58, "duration": 1800 }
+    { "x": 380, "y": 340, "width": 120, "height": 28, "moveY": -58, "duration": 1800 },
+    { "x": 1060, "y": 300, "width": 120, "height": 28, "moveY": -62, "duration": 2400 }
   ],
   "snakes": [],
   "sparkles": [],
