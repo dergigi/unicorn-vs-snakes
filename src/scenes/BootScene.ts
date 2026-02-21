@@ -39,6 +39,10 @@ export class BootScene extends Phaser.Scene {
       frameHeight: 16,
       spacing: 1
     });
+    this.load.spritesheet("hearts", "assets/sprites/hearts.png", {
+      frameWidth: 512,
+      frameHeight: 512
+    });
   }
 
   create(): void {
@@ -90,33 +94,6 @@ export class BootScene extends Phaser.Scene {
         { x: 1, y: 2, w: 1, h: 10, c: "#9b6f4b" },
         { x: 2, y: 2, w: 5, h: 4, c: "#ff8fd3" },
         { x: 3, y: 3, w: 3, h: 2, c: "#ffc2ea" }
-      ]
-    );
-    makePixelTexture(
-      this,
-      "heart-full",
-      16,
-      14,
-      [
-        { x: 2, y: 1, w: 2, h: 2, c: "#ff6ea9" },
-        { x: 4, y: 1, w: 2, h: 2, c: "#ff6ea9" },
-        { x: 1, y: 3, w: 6, h: 2, c: "#ff6ea9" },
-        { x: 2, y: 5, w: 4, h: 1, c: "#ff6ea9" },
-        { x: 3, y: 6, w: 2, h: 1, c: "#ff6ea9" },
-        { x: 2, y: 2, w: 1, h: 1, c: "#ffc2df" }
-      ]
-    );
-    makePixelTexture(
-      this,
-      "heart-empty",
-      16,
-      14,
-      [
-        { x: 2, y: 1, w: 2, h: 2, c: "#9d86b8" },
-        { x: 4, y: 1, w: 2, h: 2, c: "#9d86b8" },
-        { x: 1, y: 3, w: 6, h: 2, c: "#9d86b8" },
-        { x: 2, y: 5, w: 4, h: 1, c: "#9d86b8" },
-        { x: 3, y: 6, w: 2, h: 1, c: "#9d86b8" }
       ]
     );
     makePixelTexture(

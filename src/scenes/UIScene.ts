@@ -30,8 +30,8 @@ export class UIScene extends Phaser.Scene {
     }).setScrollFactor(0);
     for (let i = 0; i < MAX_LIVES; i += 1) {
       const heart = this.add
-        .image(112 + i * 28, 29, "heart-full")
-        .setScale(2)
+        .image(112 + i * 30, 30, "hearts", 0)
+        .setScale(0.06)
         .setScrollFactor(0);
       this.heartSprites.push(heart);
     }
@@ -65,7 +65,15 @@ export class UIScene extends Phaser.Scene {
 
   private onLivesChanged(lives: number): void {
     for (let i = 0; i < this.heartSprites.length; i += 1) {
-      this.heartSprites[i].setTexture(i < lives ? "heart-full" : "heart-empty");
+      const heart = this.heartSprites[i];
+      heart.setTexture("hearts", 0);
+      if (i < lives) {
+        heart.clearTint();
+        heart.setAlpha(1);
+      } else {
+        heart.setTint(0x705f8c);
+        heart.setAlpha(0.45);
+      }
     }
   }
 
