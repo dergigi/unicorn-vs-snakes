@@ -63,6 +63,7 @@ export class GameScene extends Phaser.Scene {
   private fireballKey?: Phaser.Input.Keyboard.Key;
   private fireballs?: Phaser.Physics.Arcade.Group;
   private nextFireballAt = 0;
+  private skipRepositionAfterDamage = false;
   private applePickups?: Phaser.Physics.Arcade.StaticGroup;
   private critterMovers: CritterMover[] = [];
   private platformMovers: PlatformMover[] = [];
@@ -134,6 +135,7 @@ export class GameScene extends Phaser.Scene {
     this.hasMushroomPower = false;
     this.fireballs = undefined;
     this.nextFireballAt = 0;
+    this.skipRepositionAfterDamage = false;
     this.applePickups = undefined;
     this.critterMovers = [];
     this.platformMovers = [];
@@ -1056,6 +1058,7 @@ export class GameScene extends Phaser.Scene {
       .sprite(this.bossWitch.x, this.bossWitch.y + 2, "bat", 0)
       .setScale(1.05)
       .setDepth(10);
+    bat.setData("bossBat", true);
     const body = bat.body as Phaser.Physics.Arcade.Body;
     body.setAllowGravity(false);
     body.setSize(20, 18);
@@ -1571,6 +1574,14 @@ export class GameScene extends Phaser.Scene {
 
     this.lives -= 1;
     this.game.events.emit(GAME_EVENTS.livesChanged, this.lives);
+    const isBossBatHit =
+      this.levelNumber === 4 &&
+      typeof hazard === "object" &&
+      hazard !== null &&
+      "getData" in hazard &&
+      typeof (hazard as Phaser.GameObjects.GameObject).getData === "function" &&
+      Boolean((hazard as Phaser.GameObjects.GameObject).getData("bossBat"));
+    this.skipRepositionAfterDamage = isBossBatHit;
     if (this.audioContext) {
       beep(this.audioContext, 180, 0.16, "sawtooth", 0.045);
     }
@@ -1620,6 +1631,13 @@ export class GameScene extends Phaser.Scene {
         levelTimes: allTimes,
         menuTimeMs: this.menuTimeMs
       });
+      return;
+    }
+
+    if (this.skipRepositionAfterDamage) {
+      this.skipRepositionAfterDamage = false;
+      this.player.clearTint();
+      this.player.setControlsEnabled(true);
       return;
     }
 
