@@ -1,7 +1,6 @@
 {
   "theme": "castle",
   "spawn": { "x": 130, "y": 390 },
-  "rainbowPowerup": { "x": 740, "y": 364 },
   "finishGate": { "x": 3440, "y": 468 },
   "checkpoints": [
     { "x": 1240, "y": 454 },

@@ -49,7 +49,7 @@ export type BatData = {
 export type LevelData = {
   theme: "forest" | "lava" | "castle";
   spawn: { x: number; y: number };
-  rainbowPowerup: { x: number; y: number };
+  rainbowPowerup?: { x: number; y: number };
   finishGate: { x: number; y: number };
   checkpoints: { x: number; y: number }[];
   platforms: PlatformData[];

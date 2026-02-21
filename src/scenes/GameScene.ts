@@ -187,21 +187,23 @@ export class GameScene extends Phaser.Scene {
     this.createApples();
     this.createStoryCat();
 
-    this.rainbowPowerup = this.physics.add
-      .staticImage(
-        this.levelData.rainbowPowerup.x,
-        this.levelData.rainbowPowerup.y,
-        "rainbow-powerup"
-      )
-      .setOrigin(0.5, 1)
-      .setScale(1.7);
-    this.physics.add.overlap(
-      this.player,
-      this.rainbowPowerup,
-      this.handleRainbowPowerupCollect,
-      undefined,
-      this
-    );
+    if (this.levelData.rainbowPowerup) {
+      this.rainbowPowerup = this.physics.add
+        .staticImage(
+          this.levelData.rainbowPowerup.x,
+          this.levelData.rainbowPowerup.y,
+          "rainbow-powerup"
+        )
+        .setOrigin(0.5, 1)
+        .setScale(1.7);
+      this.physics.add.overlap(
+        this.player,
+        this.rainbowPowerup,
+        this.handleRainbowPowerupCollect,
+        undefined,
+        this
+      );
+    }
 
     this.checkpointSystem = new CheckpointSystem(this, this.levelData.spawn);
     for (const checkpoint of this.levelData.checkpoints) {
