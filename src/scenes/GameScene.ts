@@ -342,19 +342,19 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createSkyRelightLayers(): void {
-    if (this.levelData.theme !== "forest") {
-      return;
-    }
+    const topColor = this.levelData.theme === "forest" ? 0x8ee6ff : 0xffd7a6;
+    const glowColor = this.levelData.theme === "forest" ? 0xbdf7ff : 0xffe8bf;
 
     // Invisible-at-start overlays that fade in once enough sparkles are collected.
+    // Depth 0 keeps them above background paint but below platforms/entities (also depth 0, created later).
     this.skyRelightTop = this.add
-      .rectangle(0, 0, WORLD_WIDTH, 255, 0x8ee6ff, 0)
+      .rectangle(0, 0, WORLD_WIDTH, 300, topColor, 0)
       .setOrigin(0, 0)
-      .setDepth(1);
+      .setDepth(0);
     this.skyRelightGlow = this.add
-      .rectangle(0, 160, WORLD_WIDTH, 300, 0xbdf7ff, 0)
+      .rectangle(0, 170, WORLD_WIDTH, 340, glowColor, 0)
       .setOrigin(0, 0)
-      .setDepth(1);
+      .setDepth(0);
   }
 
   private createForestPuddles(): void {
@@ -765,7 +765,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private relightSky(): void {
-    if (this.skyRelit || this.levelData.theme !== "forest") {
+    if (this.skyRelit) {
       return;
     }
     this.skyRelit = true;
@@ -773,19 +773,22 @@ export class GameScene extends Phaser.Scene {
     if (this.skyRelightTop) {
       this.tweens.add({
         targets: this.skyRelightTop,
-        alpha: 0.34,
-        duration: 1200,
+        alpha: 0.5,
+        duration: 900,
         ease: "Sine.easeOut"
       });
     }
     if (this.skyRelightGlow) {
       this.tweens.add({
         targets: this.skyRelightGlow,
-        alpha: 0.22,
-        duration: 1600,
+        alpha: 0.36,
+        duration: 1200,
         ease: "Sine.easeOut"
       });
     }
+
+    // A short flash makes the unlock -> relight moment obvious.
+    this.cameras.main.flash(220, 255, 248, 220, false);
   }
 
   private maybeAwardPerfectSparkleHeart(): void {
