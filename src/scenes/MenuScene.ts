@@ -40,9 +40,14 @@ export class MenuScene extends Phaser.Scene {
     this.menuSnakes = [];
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1d1336).setOrigin(0, 0);
-    this.add
-      .rectangle(0, FLOOR_Y + 14, GAME_WIDTH, GAME_HEIGHT - FLOOR_Y - 14, 0x2a1e54)
-      .setOrigin(0, 0);
+    const grassTop = FLOOR_Y + 14;
+    const grassHeight = GAME_HEIGHT - grassTop;
+    for (let tx = 0; tx < GAME_WIDTH; tx += 32) {
+      for (let ty = grassTop; ty < GAME_HEIGHT; ty += 32) {
+        this.add.image(tx, ty, "grass-tile").setOrigin(0, 0).setDisplaySize(32, 32);
+      }
+    }
+    this.add.rectangle(0, grassTop, GAME_WIDTH, grassHeight, 0x000000, 0.35).setOrigin(0, 0);
 
     this.add
       .text(GAME_WIDTH / 2, 72, "UNICORNS VS SNAKES", {
