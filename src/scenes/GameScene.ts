@@ -7,6 +7,7 @@ import {
   GAME_HEIGHT,
   PLAYER_HIT_INVULNERABILITY_MS,
   REQUIRED_SPARKLES_TO_FINISH,
+  TOTAL_SPARKLES,
   WORLD_HEIGHT,
   WORLD_WIDTH,
   type Difficulty
@@ -41,6 +42,7 @@ export class GameScene extends Phaser.Scene {
   private rainbowPowerup?: Phaser.Physics.Arcade.Image;
   private nextRainbowTrailAt = 0;
   private gateUnlocked = false;
+  private perfectSparkleHeartAwarded = false;
 
   constructor() {
     super("GameScene");
@@ -62,6 +64,7 @@ export class GameScene extends Phaser.Scene {
 
     this.levelData = this.cache.json.get(`level-${this.levelNumber}`) as LevelData;
     this.gateUnlocked = false;
+    this.perfectSparkleHeartAwarded = false;
     this.lavaHitbox = undefined;
     this.snakes = [];
     this.stumpHitboxes = [];
@@ -171,6 +174,7 @@ export class GameScene extends Phaser.Scene {
     this.player.update(time, delta);
     this.emitRainbowTrail(time);
     this.updateGateUnlockState();
+    this.maybeAwardPerfectSparkleHeart();
     for (const snake of this.snakes) {
       if (!snake.active) {
         continue;
@@ -402,6 +406,23 @@ export class GameScene extends Phaser.Scene {
     this.finishGate.setTexture("finish-gate-open");
     this.finishGate.setScale(1.02);
     this.time.delayedCall(120, () => this.finishGate.setScale(1));
+  }
+
+  private maybeAwardPerfectSparkleHeart(): void {
+    if (this.perfectSparkleHeartAwarded) {
+      return;
+    }
+    if (this.collectibleSystem.getCollectedCount() < TOTAL_SPARKLES) {
+      return;
+    }
+
+    this.perfectSparkleHeartAwarded = true;
+    this.lives += 1;
+    this.game.events.emit(GAME_EVENTS.livesChanged, this.lives);
+    if (this.audioContext) {
+      beep(this.audioContext, 820, 0.09, "triangle", 0.03);
+      this.time.delayedCall(100, () => beep(this.audioContext!, 980, 0.1, "triangle", 0.03));
+    }
   }
 
   private handlePlayerHit(
