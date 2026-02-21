@@ -26,9 +26,13 @@ export class MenuScene extends Phaser.Scene {
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasdA?: Phaser.Input.Keyboard.Key;
   private wasdD?: Phaser.Input.Keyboard.Key;
+  private jumpKey?: Phaser.Input.Keyboard.Key;
   private nextTrailAt = 0;
   private started = false;
   private menuSnakes: MenuSnake[] = [];
+  private unicornVY = 0;
+  private unicornBaseY = 0;
+  private unicornOnGround = true;
 
   constructor() {
     super("MenuScene");
@@ -78,6 +82,9 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5, 1)
       .setScale(1.15);
 
+    this.unicornBaseY = FLOOR_Y;
+    this.unicornVY = 0;
+    this.unicornOnGround = true;
     this.unicorn = this.add
       .sprite(120, FLOOR_Y, "unicorn", 0)
       .setOrigin(0.5, 1)
@@ -96,6 +103,7 @@ export class MenuScene extends Phaser.Scene {
     this.cursors = this.input.keyboard?.createCursorKeys();
     this.wasdA = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     this.wasdD = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+    this.jumpKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
   }
 
   update(time: number): void {
@@ -121,7 +129,28 @@ export class MenuScene extends Phaser.Scene {
 
     this.unicorn.x = Phaser.Math.Clamp(this.unicorn.x, 40, GAME_WIDTH - 40);
 
-    if (moving) {
+    const jumpPressed =
+      Phaser.Input.Keyboard.JustDown(this.jumpKey!) ||
+      Phaser.Input.Keyboard.JustDown(this.cursors!.up) ||
+      (this.cursors!.up.isDown && this.unicornOnGround);
+    if (jumpPressed && this.unicornOnGround) {
+      this.unicornVY = -5.5;
+      this.unicornOnGround = false;
+    }
+
+    if (!this.unicornOnGround) {
+      this.unicornVY += 0.35;
+      this.unicorn.y += this.unicornVY;
+      if (this.unicorn.y >= this.unicornBaseY) {
+        this.unicorn.y = this.unicornBaseY;
+        this.unicornVY = 0;
+        this.unicornOnGround = true;
+      }
+    }
+
+    if (!this.unicornOnGround) {
+      this.unicorn.setFrame(2);
+    } else if (moving) {
       this.unicorn.setFrame(Math.floor(time / 120) % 4);
     } else {
       this.unicorn.setFrame(0);
