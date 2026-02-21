@@ -1,0 +1,38 @@
+# Unicorns vs Snakes
+
+Kid-friendly pixel sidescroller built with Phaser 3 + TypeScript.
+
+## Local development
+
+```bash
+npm install
+npm run dev
+```
+
+Open the URL from Vite in your browser.
+
+## Build for sharing
+
+```bash
+npm run build
+npm run preview
+```
+
+The production files are generated in `dist/`. You can host that folder on:
+
+- GitHub Pages
+- Netlify
+- Vercel
+- Any static file host
+
+## Gameplay goals
+
+- Move with arrow keys
+- Jump with space or ArrowUp
+- Collect at least 14 sparkles
+- Avoid snakes and keep hearts above zero
+- Reach the rainbow gate to win
+
+## Credits
+
+- Unicorn sprite: "Running unicorn" by magdum (CC-BY-SA 3.0) from OpenGameArt: [https://opengameart.org/content/running-unicorn-0](https://opengameart.org/content/running-unicorn-0)
