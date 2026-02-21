@@ -56,6 +56,13 @@ export type FlameData = {
   patrolRight?: number;
 };
 
+export type AppleData = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type LevelData = {
   theme: "forest" | "lava";
   spawn: { x: number; y: number };
@@ -70,4 +77,5 @@ export type LevelData = {
   friendlyCritters?: FriendlyCritterData[];
   storyCat?: StoryCatData;
   flames?: FlameData[];
+  apples?: AppleData[];
 };

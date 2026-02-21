@@ -8,6 +8,7 @@ Suggested files:
 - friendly-critter.png (currently used in forest level as non-damaging jump-over obstacle; source: OpenGameArt file `icon_10.png`)
 - story-cat.png (currently used at forest start as story NPC; source: OpenGameArt file `cat_5.png`)
 - flame.png (currently used in lava level as damaging moving enemy; source: OpenGameArt file `flame.png`)
+- apple.png (currently used in forest level as heart-restoring pickup; source: OpenGameArt file `apple_11.png`)
 - trees/PNG/32x32/chestnut-001.png (currently used in forest background; source: OpenGameArt "Chestnut Trees (Yar's Tree Rework)" by Yar, CC-BY 3.0)
 - trees/PNG/32x32/chestnut-002.png (currently used in forest background; source: OpenGameArt "Chestnut Trees (Yar's Tree Rework)" by Yar, CC-BY 3.0)
 - trees/PNG/32x32/chestnut-003.png (currently used in forest background; source: OpenGameArt "Chestnut Trees (Yar's Tree Rework)" by Yar, CC-BY 3.0)

@@ -48,6 +48,7 @@ export class GameScene extends Phaser.Scene {
   private stumpHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private critterHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private flameHitboxes: Phaser.GameObjects.Rectangle[] = [];
+  private applePickups?: Phaser.Physics.Arcade.StaticGroup;
   private critterMovers: CritterMover[] = [];
   private storyCat?: Phaser.Physics.Arcade.Image;
   private wasNearStoryCat = false;
@@ -91,6 +92,7 @@ export class GameScene extends Phaser.Scene {
     this.stumpHitboxes = [];
     this.critterHitboxes = [];
     this.flameHitboxes = [];
+    this.applePickups = undefined;
     this.critterMovers = [];
     this.storyCat = undefined;
     this.wasNearStoryCat = false;
@@ -143,6 +145,7 @@ export class GameScene extends Phaser.Scene {
     this.createForestStumps();
     this.createFriendlyCritters();
     this.createLavaFlames();
+    this.createApples();
     this.createStoryCat();
 
     this.rainbowPowerup = this.physics.add
@@ -521,6 +524,59 @@ export class GameScene extends Phaser.Scene {
         repeat: -1,
         ease: "Sine.easeInOut"
       });
+    }
+  }
+
+  private createApples(): void {
+    if (this.levelData.theme !== "forest" || !this.levelData.apples?.length) {
+      return;
+    }
+
+    this.applePickups = this.physics.add.staticGroup();
+    for (const appleData of this.levelData.apples) {
+      const apple = this.applePickups
+        .create(appleData.x, appleData.y, "apple-pickup")
+        .setOrigin(0.5, 1)
+        .setDisplaySize(appleData.width, appleData.height)
+        .setDepth(9);
+      (apple as Phaser.Physics.Arcade.Image).refreshBody();
+    }
+
+    this.physics.add.overlap(this.player, this.applePickups, this.handleAppleCollect, undefined, this);
+  }
+
+  private handleAppleCollect(
+    _playerObject:
+      | Phaser.Types.Physics.Arcade.GameObjectWithBody
+      | Phaser.Physics.Arcade.Body
+      | Phaser.Physics.Arcade.StaticBody
+      | Phaser.Tilemaps.Tile,
+    appleObject:
+      | Phaser.Types.Physics.Arcade.GameObjectWithBody
+      | Phaser.Physics.Arcade.Body
+      | Phaser.Physics.Arcade.StaticBody
+      | Phaser.Tilemaps.Tile
+  ): void {
+    if (!this.player || !this.player.active) {
+      return;
+    }
+    if (typeof appleObject !== "object" || appleObject === null || !("destroy" in appleObject)) {
+      return;
+    }
+
+    const apple = appleObject as Phaser.GameObjects.GameObject;
+    if (!apple.active) {
+      return;
+    }
+    apple.destroy();
+
+    const previousLives = this.lives;
+    this.lives = Math.min(this.maxLives, this.lives + 1);
+    if (this.lives !== previousLives) {
+      this.game.events.emit(GAME_EVENTS.livesChanged, this.lives);
+    }
+    if (this.audioContext) {
+      beep(this.audioContext, 760, 0.08, "triangle", 0.03);
     }
   }
 
