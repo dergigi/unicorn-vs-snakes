@@ -509,20 +509,22 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
+    // Use torches sparingly so the scene stays readable.
     const bottomPlatforms = this.levelData.platforms.filter(p => p.y >= 490);
-    for (const platform of bottomPlatforms) {
+    const torchPlatforms = bottomPlatforms.filter((_, index) => index % 3 === 1);
+    for (const platform of torchPlatforms) {
       const torchY = platform.y - platform.height / 2;
       const torch = this.add
         .sprite(platform.x, torchY, "torch", 0)
         .setOrigin(0.5, 1)
         .setScale(0.18)
         .setAlpha(0.9)
-        .setDepth(1);
+        .setDepth(-1);
       torch.play({ key: "torch-flicker", startFrame: Phaser.Math.Between(0, 2) });
 
       this.add
         .ellipse(platform.x, torchY + 2, 30, 10, 0xffa030, 0.12)
-        .setDepth(0);
+        .setDepth(-2);
     }
   }
 
