@@ -35,6 +35,9 @@ export class MenuScene extends Phaser.Scene {
   private unicornVY = 0;
   private unicornBaseY = 0;
   private unicornOnGround = true;
+  private levelSkipPressCount = 0;
+  private levelSkipTargetLevel?: number;
+  private levelSkipResetTimer?: Phaser.Time.TimerEvent;
 
   constructor() {
     super("MenuScene");
@@ -104,6 +107,7 @@ export class MenuScene extends Phaser.Scene {
     this.wasdA = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     this.wasdD = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     this.jumpKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.setupLevelSkipCheat();
   }
 
   update(time: number): void {
@@ -326,7 +330,54 @@ export class MenuScene extends Phaser.Scene {
     );
   }
 
-  private startGame(): void {
+  private setupLevelSkipCheat(): void {
+    const keyboard = this.input.keyboard;
+    if (!keyboard) {
+      return;
+    }
+    this.levelSkipPressCount = 0;
+    this.levelSkipTargetLevel = undefined;
+
+    const onTwo = (): void => this.handleLevelSkipKey(2);
+    const onThree = (): void => this.handleLevelSkipKey(3);
+    keyboard.on("keydown-TWO", onTwo, this);
+    keyboard.on("keydown-THREE", onThree, this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      keyboard.off("keydown-TWO", onTwo, this);
+      keyboard.off("keydown-THREE", onThree, this);
+      this.levelSkipResetTimer?.remove(false);
+      this.levelSkipResetTimer = undefined;
+    });
+  }
+
+  private handleLevelSkipKey(targetLevel: number): void {
+    if (this.started) {
+      return;
+    }
+    if (this.levelSkipTargetLevel !== targetLevel) {
+      this.levelSkipPressCount = 0;
+      this.levelSkipTargetLevel = targetLevel;
+    }
+    this.levelSkipPressCount += 1;
+    this.levelSkipResetTimer?.remove(false);
+    this.levelSkipResetTimer = this.time.delayedCall(1500, () => {
+      this.levelSkipPressCount = 0;
+      this.levelSkipTargetLevel = undefined;
+      this.levelSkipResetTimer = undefined;
+    });
+
+    if (this.levelSkipPressCount < 5) {
+      return;
+    }
+    this.levelSkipPressCount = 0;
+    this.levelSkipTargetLevel = undefined;
+    this.levelSkipResetTimer?.remove(false);
+    this.levelSkipResetTimer = undefined;
+
+    this.startGame(targetLevel);
+  }
+
+  private startGame(levelNumber = 1): void {
     if (this.started) {
       return;
     }
@@ -336,7 +387,7 @@ export class MenuScene extends Phaser.Scene {
     const sceneData = {
       difficulty: this.selectedDifficulty,
       maxLives,
-      levelNumber: 1,
+      levelNumber,
       currentLives: maxLives
     };
     this.scene.start("GameScene", sceneData);
