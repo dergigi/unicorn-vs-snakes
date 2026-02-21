@@ -3,7 +3,7 @@
   "spawn": { "x": 150, "y": 390 },
   "finishGate": { "x": 1180, "y": 468 },
   "checkpoints": [],
-  "bossMushroom": { "x": 260, "y": 478, "width": 58, "height": 48 },
+  "bossMushroom": { "x": 260, "y": 478, "width": 20, "height": 20 },
   "platforms": [
     { "x": 640, "y": 500, "width": 1360, "height": 44 }
   ],
