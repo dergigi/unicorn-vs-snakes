@@ -179,16 +179,35 @@ export class GameScene extends Phaser.Scene {
     if (this.levelData.theme === "forest") {
       this.add.rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x21452d).setOrigin(0, 0);
       this.add.rectangle(0, WORLD_HEIGHT - 210, WORLD_WIDTH, 210, 0x326a3f, 0.42).setOrigin(0, 0);
-      for (let i = 0; i < 24; i += 1) {
-        const x = 50 + i * 150;
-        const h = 80 + (i % 5) * 18;
-        this.add.rectangle(x, WORLD_HEIGHT - 240, 22, h, 0x2c5a35, 0.85).setOrigin(0.5, 1);
-        this.add.ellipse(x, WORLD_HEIGHT - 240 - h + 16, 58, 36, 0x66b66a, 0.95);
-        this.add.ellipse(x - 14, WORLD_HEIGHT - 240 - h + 18, 42, 28, 0x7ed27f, 0.82);
+      const treeKeys = ["tree-chestnut-1", "tree-chestnut-2", "tree-chestnut-3"] as const;
+
+      // Far parallax layer: softer trees to fill the skyline.
+      for (let i = 0; i < 18; i += 1) {
+        const key = treeKeys[i % treeKeys.length];
+        this.add
+          .image(120 + i * 220, WORLD_HEIGHT - 112 - (i % 3) * 10, key)
+          .setOrigin(0.5, 1)
+          .setScale(0.62 + (i % 2) * 0.08)
+          .setAlpha(0.38)
+          .setTint(0x6aa768)
+          .setScrollFactor(0.28);
       }
+
+      // Mid/near layer: brighter trees that feel lush and alive.
+      for (let i = 0; i < 22; i += 1) {
+        const key = treeKeys[(i + 1) % treeKeys.length];
+        this.add
+          .image(40 + i * 170, WORLD_HEIGHT - 52 - (i % 4) * 6, key)
+          .setOrigin(0.5, 1)
+          .setScale(0.72 + (i % 3) * 0.08)
+          .setAlpha(0.9)
+          .setTint(0x8fd57f)
+          .setScrollFactor(0.46);
+      }
+
       for (let i = 0; i < 10; i += 1) {
         this.add
-          .ellipse(220 + i * 350, 100 + (i % 3) * 16, 180, 62, 0x4f8f58, 0.34)
+          .ellipse(220 + i * 350, 100 + (i % 3) * 16, 180, 62, 0x6cb56f, 0.26)
           .setScrollFactor(0.4);
       }
       return;
