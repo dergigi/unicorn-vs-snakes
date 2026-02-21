@@ -125,7 +125,8 @@ export class GameScene extends Phaser.Scene {
       const tile = this.platforms.create(platform.x, platform.y, "ground");
       tile.setDisplaySize(platform.width, platform.height);
       if (this.levelData.theme === "forest") {
-        tile.setTint(0x6fbf67);
+        const isMainGroundLane = platform.y >= 500;
+        tile.setTint(isMainGroundLane ? 0x8b5a3c : 0x6f8f52);
       }
       tile.refreshBody();
     }
