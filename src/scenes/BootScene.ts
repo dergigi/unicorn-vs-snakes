@@ -34,6 +34,7 @@ export class BootScene extends Phaser.Scene {
 
   preload(): void {
     this.load.json("level-1", "levels/level1.json");
+    this.load.json("level-2", "levels/level2.json");
     this.load.spritesheet("unicorn", "assets/sprites/unicorn.png", {
       frameWidth: 16,
       frameHeight: 16,

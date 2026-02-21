@@ -16,6 +16,8 @@ import { CollectibleSystem } from "../systems/CollectibleSystem";
 import type { LevelData } from "../types/LevelData";
 import { beep } from "../utils/sfx";
 
+const LEVEL_COUNT = 2;
+
 export class GameScene extends Phaser.Scene {
   private player!: Player;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys & {
@@ -29,6 +31,7 @@ export class GameScene extends Phaser.Scene {
   private lives = 5;
   private maxLives = 5;
   private difficulty: Difficulty = DEFAULT_DIFFICULTY;
+  private levelNumber = 1;
   private canTakeDamageAt = 0;
   private levelComplete = false;
   private levelData!: LevelData;
@@ -42,29 +45,41 @@ export class GameScene extends Phaser.Scene {
     super("GameScene");
   }
 
-  create(data?: { maxLives?: number; difficulty?: Difficulty }): void {
+  create(data?: {
+    maxLives?: number;
+    difficulty?: Difficulty;
+    levelNumber?: number;
+    currentLives?: number;
+  }): void {
     this.maxLives = data?.maxLives ?? 5;
     this.difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
+    this.levelNumber = data?.levelNumber ?? 1;
     this.levelComplete = false;
-    this.lives = this.maxLives;
+    this.lives = data?.currentLives ?? this.maxLives;
     this.canTakeDamageAt = 0;
     this.audioContext = "context" in this.sound ? (this.sound.context as AudioContext) : undefined;
 
+    this.levelData = this.cache.json.get(`level-${this.levelNumber}`) as LevelData;
+    this.gateUnlocked = false;
+    this.lavaHitbox = undefined;
+
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-    this.cameras.main.setBackgroundColor("#26164a");
+    this.cameras.main.setBackgroundColor(
+      this.levelData.theme === "forest" ? "#1f3a2a" : "#26164a"
+    );
 
     this.drawBackground();
     this.createLava();
     this.createControls();
 
-    this.levelData = this.cache.json.get("level-1") as LevelData;
-    this.gateUnlocked = false;
-
     this.platforms = this.physics.add.staticGroup();
     for (const platform of this.levelData.platforms) {
       const tile = this.platforms.create(platform.x, platform.y, "ground");
       tile.setDisplaySize(platform.width, platform.height);
+      if (this.levelData.theme === "forest") {
+        tile.setTint(0x6fbf67);
+      }
       tile.refreshBody();
     }
 
@@ -161,6 +176,24 @@ export class GameScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
+    if (this.levelData.theme === "forest") {
+      this.add.rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x21452d).setOrigin(0, 0);
+      this.add.rectangle(0, WORLD_HEIGHT - 210, WORLD_WIDTH, 210, 0x326a3f, 0.42).setOrigin(0, 0);
+      for (let i = 0; i < 24; i += 1) {
+        const x = 50 + i * 150;
+        const h = 80 + (i % 5) * 18;
+        this.add.rectangle(x, WORLD_HEIGHT - 240, 22, h, 0x2c5a35, 0.85).setOrigin(0.5, 1);
+        this.add.ellipse(x, WORLD_HEIGHT - 240 - h + 16, 58, 36, 0x66b66a, 0.95);
+        this.add.ellipse(x - 14, WORLD_HEIGHT - 240 - h + 18, 42, 28, 0x7ed27f, 0.82);
+      }
+      for (let i = 0; i < 10; i += 1) {
+        this.add
+          .ellipse(220 + i * 350, 100 + (i % 3) * 16, 180, 62, 0x4f8f58, 0.34)
+          .setScrollFactor(0.4);
+      }
+      return;
+    }
+
     this.add.rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x26164a).setOrigin(0, 0);
     for (let i = 0; i < 7; i += 1) {
       const baseX = 180 + i * 500;
@@ -194,6 +227,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createLava(): void {
+    if (this.levelData.theme !== "lava") {
+      return;
+    }
     const lavaTopY = WORLD_HEIGHT - 36;
     this.add.rectangle(0, lavaTopY, WORLD_WIDTH, 36, 0xff5d4a).setOrigin(0, 0);
     this.add.rectangle(0, lavaTopY + 10, WORLD_WIDTH, 26, 0xd92f3f).setOrigin(0, 0);
@@ -344,7 +380,8 @@ export class GameScene extends Phaser.Scene {
         this.scene.stop("UIScene");
         this.scene.start("GameOverScene", {
           maxLives: this.maxLives,
-          difficulty: this.difficulty
+          difficulty: this.difficulty,
+          levelNumber: this.levelNumber
         });
         return;
       }
@@ -379,6 +416,18 @@ export class GameScene extends Phaser.Scene {
     this.game.events.emit(GAME_EVENTS.levelWon);
     this.scene.stop("UIScene");
     this.time.delayedCall(500, () => {
+      if (this.levelNumber < LEVEL_COUNT) {
+        const sceneData = {
+          maxLives: this.maxLives,
+          difficulty: this.difficulty,
+          levelNumber: this.levelNumber + 1,
+          currentLives: this.lives
+        };
+        this.scene.start("GameScene", sceneData);
+        this.scene.launch("UIScene", sceneData);
+        return;
+      }
+
       this.scene.start("WinScene", {
         sparkles: collected
       });

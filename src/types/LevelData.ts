@@ -18,6 +18,7 @@ export type SparkleData = {
 };
 
 export type LevelData = {
+  theme: "forest" | "lava";
   spawn: { x: number; y: number };
   rainbowPowerup: { x: number; y: number };
   finishGate: { x: number; y: number };

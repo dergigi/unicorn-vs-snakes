@@ -6,9 +6,10 @@ export class GameOverScene extends Phaser.Scene {
     super("GameOverScene");
   }
 
-  create(data?: { maxLives?: number; difficulty?: Difficulty }): void {
+  create(data?: { maxLives?: number; difficulty?: Difficulty; levelNumber?: number }): void {
     const maxLives = data?.maxLives ?? 5;
     const difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
+    const levelNumber = data?.levelNumber ?? 1;
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1a0f30).setOrigin(0, 0);
     this.add.text(GAME_WIDTH / 2, 150, "Oops! Try Again", {
       fontFamily: "monospace",
@@ -31,7 +32,7 @@ export class GameOverScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     retry.on("pointerdown", () => {
-      const sceneData = { maxLives, difficulty };
+      const sceneData = { maxLives, difficulty, levelNumber, currentLives: maxLives };
       this.scene.start("GameScene", sceneData);
       this.scene.launch("UIScene", sceneData);
     });
