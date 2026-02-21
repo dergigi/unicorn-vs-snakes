@@ -53,6 +53,7 @@ export class GameScene extends Phaser.Scene {
   private stumpHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private critterHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private flameHitboxes: Phaser.GameObjects.Rectangle[] = [];
+  private batSprites: Phaser.Physics.Arcade.Sprite[] = [];
   private applePickups?: Phaser.Physics.Arcade.StaticGroup;
   private critterMovers: CritterMover[] = [];
   private platformMovers: PlatformMover[] = [];
@@ -106,6 +107,7 @@ export class GameScene extends Phaser.Scene {
     this.stumpHitboxes = [];
     this.critterHitboxes = [];
     this.flameHitboxes = [];
+    this.batSprites = [];
     this.applePickups = undefined;
     this.critterMovers = [];
     this.platformMovers = [];
@@ -229,6 +231,7 @@ export class GameScene extends Phaser.Scene {
       this.physics.add.overlap(this.player, this.lavaHitbox, this.handlePlayerHit, undefined, this);
     }
     this.createMovingPlatforms();
+    this.createBats();
 
     this.finishGate = this.physics.add
       .staticImage(this.levelData.finishGate.x, this.levelData.finishGate.y, "finish-gate-closed")
@@ -823,6 +826,56 @@ export class GameScene extends Phaser.Scene {
       if (Math.abs(dy) > 0.05) {
         playerBody.y += dy;
       }
+    }
+  }
+
+  private createBats(): void {
+    if (!this.levelData.bats?.length) {
+      return;
+    }
+
+    if (!this.anims.exists("bat-fly")) {
+      this.anims.create({
+        key: "bat-fly",
+        frames: this.anims.generateFrameNumbers("bat", { start: 0, end: 3 }),
+        frameRate: 8,
+        repeat: -1
+      });
+    }
+
+    for (const batData of this.levelData.bats) {
+      const bat = this.physics.add
+        .sprite(batData.x, batData.y, "bat", 0)
+        .setScale(1.2)
+        .setDepth(8);
+      const body = bat.body as Phaser.Physics.Arcade.Body;
+      body.setAllowGravity(false);
+      body.setImmovable(true);
+      body.setSize(20, 18);
+      bat.play("bat-fly");
+
+      const halfPatrol = batData.patrolWidth / 2;
+      const speed = batData.speed ?? 1;
+      const duration = Math.abs(batData.patrolWidth / speed) * 16;
+
+      this.tweens.add({
+        targets: bat,
+        x: batData.x + halfPatrol,
+        duration,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+        onUpdate: (_tween, target, _key, current, previous) => {
+          if (target !== bat) {
+            return;
+          }
+          bat.setFlipX(current < previous);
+        }
+      });
+      bat.x = batData.x - halfPatrol;
+
+      this.physics.add.overlap(this.player, bat, this.handlePlayerHit, undefined, this);
+      this.batSprites.push(bat);
     }
   }
 

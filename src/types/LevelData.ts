@@ -39,6 +39,13 @@ export type MovingPlatformData = RectData & {
   duration?: number;
 };
 
+export type BatData = {
+  x: number;
+  y: number;
+  patrolWidth: number;
+  speed?: number;
+};
+
 export type LevelData = {
   theme: "forest" | "lava" | "castle";
   spawn: { x: number; y: number };
@@ -55,4 +62,5 @@ export type LevelData = {
   flames?: FlameData[];
   apples?: AppleData[];
   movingPlatforms?: MovingPlatformData[];
+  bats?: BatData[];
 };
