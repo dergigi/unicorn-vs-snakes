@@ -237,33 +237,37 @@ export class GameScene extends Phaser.Scene {
     if (time < this.nextRainbowTrailAt) {
       return;
     }
-    this.nextRainbowTrailAt = time + 65;
+    this.nextRainbowTrailAt = time + 42;
 
     const tailDirection = this.player.flipX ? 1 : -1;
-    const x = this.player.x + tailDirection * 14;
-    const y = this.player.y - 14 + Phaser.Math.Between(-2, 2);
+    const baseX = this.player.x + tailDirection * 16;
+    const baseY = this.player.y - 10;
     const colors = [0xff6fa7, 0xffbf6a, 0xfff07a, 0x8ff59f, 0x7ad9ff, 0xba9bff];
 
-    const sparkle = this.add
-      .image(x, y, "sparkle")
-      .setScale(Phaser.Math.FloatBetween(0.16, 0.28))
-      .setTint(colors[Phaser.Math.Between(0, colors.length - 1)])
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setAlpha(0.9)
-      .setDepth(this.player.depth - 1);
+    for (let i = 0; i < 3; i += 1) {
+      const x = baseX + Phaser.Math.Between(-2, 2);
+      const y = baseY + Phaser.Math.Between(-3, 3);
+      const sparkle = this.add
+        .image(x, y, "sparkle")
+        .setScale(Phaser.Math.FloatBetween(0.34, 0.56))
+        .setTint(colors[Phaser.Math.Between(0, colors.length - 1)])
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setAlpha(0.96)
+        .setDepth(this.player.depth - 1);
 
-    this.tweens.add({
-      targets: sparkle,
-      x: x + tailDirection * Phaser.Math.Between(14, 24),
-      y: y + Phaser.Math.Between(-8, 10),
-      alpha: 0,
-      scaleX: 0.05,
-      scaleY: 0.05,
-      angle: Phaser.Math.Between(-40, 40),
-      duration: Phaser.Math.Between(260, 420),
-      ease: "Sine.easeOut",
-      onComplete: () => sparkle.destroy()
-    });
+      this.tweens.add({
+        targets: sparkle,
+        x: x + tailDirection * Phaser.Math.Between(22, 36),
+        y: y + Phaser.Math.Between(-12, 14),
+        alpha: 0,
+        scaleX: 0.08,
+        scaleY: 0.08,
+        angle: Phaser.Math.Between(-70, 70),
+        duration: Phaser.Math.Between(300, 470),
+        ease: "Sine.easeOut",
+        onComplete: () => sparkle.destroy()
+      });
+    }
   }
 
   private handlePlayerHit(
