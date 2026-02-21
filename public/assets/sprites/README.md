@@ -11,6 +11,8 @@ Suggested files:
 - apple.png (currently used in forest level as heart-restoring pickup; source: OpenGameArt file `apple_11.png`)
 - castle_4.png (currently used in castle level background; source: OpenGameArt file `castle_4.png`)
 - bricks.brown_.png (currently used for castle level platforms; source: OpenGameArt "4-Color Dungeon Bricks Extended (16x16)", CC0)
+- towers/tower-drawing/Tower.png (currently used in castle level background parallax; source: OpenGameArt "Tower (+4 damaged versions)", CC-BY-SA 3.0)
+- towers/tower-drawing/Tower_damage3.png (currently used in castle level background parallax; source: OpenGameArt "Tower (+4 damaged versions)", CC-BY-SA 3.0)
 - trees/PNG/32x32/chestnut-001.png (currently used in forest background; source: OpenGameArt "Chestnut Trees (Yar's Tree Rework)" by Yar, CC-BY 3.0)
 - trees/PNG/32x32/chestnut-002.png (currently used in forest background; source: OpenGameArt "Chestnut Trees (Yar's Tree Rework)" by Yar, CC-BY 3.0)
 - trees/PNG/32x32/chestnut-003.png (currently used in forest background; source: OpenGameArt "Chestnut Trees (Yar's Tree Rework)" by Yar, CC-BY 3.0)

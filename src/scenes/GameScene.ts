@@ -418,6 +418,19 @@ export class GameScene extends Phaser.Scene {
           .setScrollFactor(0.14);
       }
 
+      for (let i = 0; i < 8; i += 1) {
+        const x = 220 + i * 460;
+        const towerKey = i % 3 === 1 ? "castle-tower-damaged" : "castle-tower";
+        const scale = towerKey === "castle-tower" ? 0.66 : 0.62;
+        this.add
+          .image(x, WORLD_HEIGHT - 78, towerKey)
+          .setOrigin(0.5, 1)
+          .setScale(scale)
+          .setAlpha(0.3)
+          .setTint(0x7f7a9c)
+          .setScrollFactor(0.18);
+      }
+
       // Extra silhouette towers for parallax depth.
       for (let i = 0; i < 9; i += 1) {
         const x = 140 + i * 420;
