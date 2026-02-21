@@ -160,11 +160,13 @@ export class BootScene extends Phaser.Scene {
       64,
       80,
       [
+        // Wooden support posts.
         { x: 2, y: 14, w: 2, h: 24, c: "#b98a67" },
         { x: 28, y: 14, w: 2, h: 24, c: "#b98a67" },
         { x: 1, y: 12, w: 4, h: 2, c: "#d4a786" },
         { x: 27, y: 12, w: 4, h: 2, c: "#d4a786" },
 
+        // Outer rainbow arch (more pronounced).
         { x: 3, y: 12, w: 26, h: 2, c: "#ff4b5e" },
         { x: 2, y: 10, w: 28, h: 2, c: "#ff8a3d" },
         { x: 2, y: 8, w: 28, h: 2, c: "#ffd95e" },
@@ -173,18 +175,31 @@ export class BootScene extends Phaser.Scene {
         { x: 6, y: 2, w: 20, h: 2, c: "#6f8dff" },
         { x: 9, y: 0, w: 14, h: 2, c: "#d98cff" },
 
-        // Open center passage: dark portal with subtle inner glow.
-        { x: 6, y: 16, w: 20, h: 20, c: "#201440" },
-        { x: 7, y: 17, w: 18, h: 18, c: "#2a1b54" },
-        { x: 8, y: 18, w: 16, h: 16, c: "#1a1036" },
-        { x: 9, y: 19, w: 14, h: 2, c: "#3f2b73" },
-        { x: 9, y: 22, w: 14, h: 1, c: "#4f3687" },
-        { x: 9, y: 25, w: 14, h: 1, c: "#3f2b73" },
-        { x: 9, y: 28, w: 14, h: 1, c: "#2f205f" },
+        // Vertical rainbow sides to read clearly as a rainbow gate.
+        { x: 3, y: 14, w: 1, h: 21, c: "#ff4b5e" },
+        { x: 4, y: 14, w: 1, h: 21, c: "#ff8a3d" },
+        { x: 5, y: 14, w: 1, h: 21, c: "#ffd95e" },
+        { x: 6, y: 14, w: 1, h: 21, c: "#7de86f" },
+        { x: 7, y: 14, w: 1, h: 21, c: "#66d8ff" },
+        { x: 8, y: 14, w: 1, h: 21, c: "#6f8dff" },
+        { x: 9, y: 14, w: 1, h: 21, c: "#d98cff" },
+        { x: 22, y: 14, w: 1, h: 21, c: "#d98cff" },
+        { x: 23, y: 14, w: 1, h: 21, c: "#6f8dff" },
+        { x: 24, y: 14, w: 1, h: 21, c: "#66d8ff" },
+        { x: 25, y: 14, w: 1, h: 21, c: "#7de86f" },
+        { x: 26, y: 14, w: 1, h: 21, c: "#ffd95e" },
+        { x: 27, y: 14, w: 1, h: 21, c: "#ff8a3d" },
+        { x: 28, y: 14, w: 1, h: 21, c: "#ff4b5e" },
 
-        { x: 10, y: 36, w: 5, h: 2, c: "#ffd95e" },
-        { x: 16, y: 36, w: 5, h: 2, c: "#7de86f" },
-        { x: 13, y: 36, w: 3, h: 2, c: "#66d8ff" }
+        // Open center passage.
+        { x: 10, y: 14, w: 12, h: 21, c: "#201440" },
+        { x: 11, y: 15, w: 10, h: 19, c: "#271a4d" },
+
+        // Small portal sparkle accents.
+        { x: 12, y: 19, w: 1, h: 1, c: "#fff2a8" },
+        { x: 19, y: 18, w: 1, h: 1, c: "#fff2a8" },
+        { x: 14, y: 26, w: 1, h: 1, c: "#66d8ff" },
+        { x: 18, y: 28, w: 1, h: 1, c: "#d98cff" }
       ]
     );
     makePixelTexture(
