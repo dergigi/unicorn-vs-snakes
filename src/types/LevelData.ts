@@ -24,6 +24,13 @@ export type WaterPuddleData = {
   height: number;
 };
 
+export type TreeStumpData = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type LevelData = {
   theme: "forest" | "lava";
   spawn: { x: number; y: number };
@@ -34,4 +41,5 @@ export type LevelData = {
   snakes: SnakeData[];
   sparkles: SparkleData[];
   waterPuddles?: WaterPuddleData[];
+  treeStumps?: TreeStumpData[];
 };

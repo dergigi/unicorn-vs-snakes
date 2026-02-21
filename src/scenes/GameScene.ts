@@ -38,6 +38,7 @@ export class GameScene extends Phaser.Scene {
   private audioContext?: AudioContext;
   private lavaHitbox?: Phaser.GameObjects.Rectangle;
   private waterPuddleHitboxes: Phaser.GameObjects.Rectangle[] = [];
+  private stumpHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private rainbowPowerup?: Phaser.Physics.Arcade.Image;
   private nextRainbowTrailAt = 0;
   private gateUnlocked = false;
@@ -64,6 +65,7 @@ export class GameScene extends Phaser.Scene {
     this.gateUnlocked = false;
     this.lavaHitbox = undefined;
     this.waterPuddleHitboxes = [];
+    this.stumpHitboxes = [];
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -94,6 +96,7 @@ export class GameScene extends Phaser.Scene {
     this.player.setRainbowPowerup(false);
     this.physics.add.collider(this.player, this.platforms);
     this.createForestPuddles();
+    this.createForestStumps();
 
     this.rainbowPowerup = this.physics.add
       .staticImage(
@@ -309,6 +312,32 @@ export class GameScene extends Phaser.Scene {
       this.physics.add.existing(hitbox, true);
       this.physics.add.overlap(this.player, hitbox, this.handlePlayerHit, undefined, this);
       this.waterPuddleHitboxes.push(hitbox);
+    }
+  }
+
+  private createForestStumps(): void {
+    if (this.levelData.theme !== "forest" || !this.levelData.treeStumps?.length) {
+      return;
+    }
+
+    for (const stump of this.levelData.treeStumps) {
+      this.add
+        .image(stump.x, stump.y, "tree-stump")
+        .setOrigin(0.5, 1)
+        .setDisplaySize(stump.width, stump.height)
+        .setDepth(8);
+
+      const hitbox = this.add.rectangle(
+        stump.x,
+        stump.y - stump.height / 2,
+        Math.max(8, stump.width - 6),
+        Math.max(10, stump.height - 2),
+        0,
+        0
+      );
+      this.physics.add.existing(hitbox, true);
+      this.physics.add.collider(this.player, hitbox);
+      this.stumpHitboxes.push(hitbox);
     }
   }
 

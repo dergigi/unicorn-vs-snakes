@@ -107,6 +107,20 @@ export class BootScene extends Phaser.Scene {
     );
     makePixelTexture(
       this,
+      "tree-stump",
+      28,
+      28,
+      [
+        { x: 4, y: 2, w: 6, h: 2, c: "#b88b5e" },
+        { x: 3, y: 4, w: 8, h: 2, c: "#8a5c38" },
+        { x: 2, y: 6, w: 10, h: 7, c: "#7a5031" },
+        { x: 3, y: 7, w: 8, h: 5, c: "#8a5d39" },
+        { x: 5, y: 8, w: 4, h: 3, c: "#9f734b" },
+        { x: 1, y: 13, w: 12, h: 1, c: "#5f3b24" }
+      ]
+    );
+    makePixelTexture(
+      this,
       "rainbow-powerup",
       24,
       24,

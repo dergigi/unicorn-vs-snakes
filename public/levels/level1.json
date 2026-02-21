@@ -23,6 +23,12 @@
     { "x": 2760, "y": 472, "width": 120, "height": 16 },
     { "x": 3300, "y": 472, "width": 130, "height": 16 }
   ],
+  "treeStumps": [
+    { "x": 620, "y": 478, "width": 36, "height": 30 },
+    { "x": 1360, "y": 478, "width": 34, "height": 28 },
+    { "x": 2080, "y": 478, "width": 34, "height": 30 },
+    { "x": 3020, "y": 478, "width": 36, "height": 30 }
+  ],
   "snakes": [
     { "x": 1560, "y": 470, "patrolWidth": 180, "speedFactor": 0.22 },
     { "x": 2920, "y": 470, "patrolWidth": 180, "speedFactor": 0.18 }
