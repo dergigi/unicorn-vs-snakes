@@ -185,9 +185,9 @@ export class GameScene extends Phaser.Scene {
     this.platforms = this.physics.add.staticGroup();
     for (const platform of this.levelData.platforms) {
       const tile = this.platforms.create(platform.x, platform.y, "ground");
+      const isLevel4Ground = this.levelData.theme === "castle" && this.levelNumber === 4 && platform.y >= 490;
       if (this.levelData.theme === "castle") {
-        const isLevel4Ground = this.levelNumber === 4 && platform.y >= 490;
-        tile.setTexture(isLevel4Ground ? "grass-tile" : "moldy-wall-tile");
+        tile.setTexture(isLevel4Ground ? "ground" : "moldy-wall-tile");
         tile.clearTint();
       }
       tile.setDisplaySize(platform.width, platform.height);
@@ -196,6 +196,24 @@ export class GameScene extends Phaser.Scene {
         tile.setTint(isMainGroundLane ? 0x8b5a3c : 0x6f8f52);
       }
       tile.refreshBody();
+
+      if (isLevel4Ground) {
+        const left = platform.x - platform.width / 2;
+        const top = platform.y - platform.height / 2;
+        for (let tx = left; tx < left + platform.width; tx += 32) {
+          for (let ty = top; ty < top + platform.height; ty += 32) {
+            this.add
+              .image(tx, ty, "grass-tile")
+              .setOrigin(0, 0)
+              .setDisplaySize(32, 32)
+              .setDepth(-1);
+          }
+        }
+        this.add
+          .rectangle(left, top, platform.width, platform.height, 0x000000, 0.25)
+          .setOrigin(0, 0)
+          .setDepth(-0.9);
+      }
     }
 
     this.player = new Player(
