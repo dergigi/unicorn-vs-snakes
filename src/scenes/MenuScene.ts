@@ -41,7 +41,7 @@ export class MenuScene extends Phaser.Scene {
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1d1336).setOrigin(0, 0);
     this.add
-      .rectangle(0, FLOOR_Y + 14, GAME_WIDTH, GAME_HEIGHT - FLOOR_Y - 14, 0x4d3a8c)
+      .rectangle(0, FLOOR_Y + 14, GAME_WIDTH, GAME_HEIGHT - FLOOR_Y - 14, 0x2a1e54)
       .setOrigin(0, 0);
 
     this.add
