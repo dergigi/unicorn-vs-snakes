@@ -142,7 +142,7 @@ export class GameScene extends Phaser.Scene {
     for (const platform of this.levelData.platforms) {
       const tile = this.platforms.create(platform.x, platform.y, "ground");
       if (this.levelData.theme === "castle") {
-        tile.setTexture("castle-bricks");
+        tile.setTexture("dungeon-tile");
         tile.clearTint();
       }
       tile.setDisplaySize(platform.width, platform.height);
