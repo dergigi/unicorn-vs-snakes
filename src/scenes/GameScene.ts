@@ -508,7 +508,8 @@ export class GameScene extends Phaser.Scene {
           levelNumber: this.levelNumber + 1,
           currentLives: this.lives
         };
-        this.scene.start("GameScene", sceneData);
+        // Restarting the same scene key is more reliable than start() here.
+        this.scene.restart(sceneData);
         this.scene.launch("UIScene", sceneData);
         return;
       }
