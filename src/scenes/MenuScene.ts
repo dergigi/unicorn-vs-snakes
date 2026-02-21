@@ -9,6 +9,8 @@ import {
 import { spawnRainbowTrail } from "../utils/rainbowTrail";
 
 const FLOOR_Y = GAME_HEIGHT - 118;
+const GRASS_TOP = FLOOR_Y + 20;
+const GRASS_HEIGHT = 52;
 const UNICORN_SPEED = 3.2;
 const GATE_X = GAME_WIDTH - 100;
 const GATE_OVERLAP_DIST = 28;
@@ -44,14 +46,12 @@ export class MenuScene extends Phaser.Scene {
     this.menuSnakes = [];
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1d1336).setOrigin(0, 0);
-    const grassTop = FLOOR_Y + 20;
-    const grassHeight = 52;
     for (let tx = 0; tx < GAME_WIDTH; tx += 32) {
-      for (let ty = grassTop; ty < grassTop + grassHeight; ty += 32) {
+      for (let ty = GRASS_TOP; ty < GRASS_TOP + GRASS_HEIGHT; ty += 32) {
         this.add.image(tx, ty, "grass-tile").setOrigin(0, 0).setDisplaySize(32, 32);
       }
     }
-    this.add.rectangle(0, grassTop, GAME_WIDTH, grassHeight, 0x000000, 0.25).setOrigin(0, 0);
+    this.add.rectangle(0, GRASS_TOP, GAME_WIDTH, GRASS_HEIGHT, 0x000000, 0.25).setOrigin(0, 0);
 
     this.add
       .text(GAME_WIDTH / 2, 72, "UNICORNS VS SNAKES", {
@@ -93,7 +93,7 @@ export class MenuScene extends Phaser.Scene {
     this.spawnPatrolSnakes();
 
     this.add
-      .text(GAME_WIDTH / 2, FLOOR_Y + 20 + 52 + 18, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
+      .text(GAME_WIDTH / 2, GRASS_TOP + GRASS_HEIGHT + 18, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
         fontSize: "12px",
         color: "#d0c7ff",
         fontFamily: "monospace"
@@ -183,8 +183,6 @@ export class MenuScene extends Phaser.Scene {
     difficulties.forEach((difficulty, index) => {
       const cx = 222 + index * 172;
       const cy = 262;
-      const left = cx - bw / 2;
-      const top = cy - bh / 2;
 
       const gfx = this.add.graphics();
       btnGraphics[difficulty] = gfx;
@@ -271,7 +269,7 @@ export class MenuScene extends Phaser.Scene {
 
   private spawnPatrolSnakes(): void {
     this.menuSnakes = [];
-    const snakeY = FLOOR_Y + 20 + 52;
+    const snakeY = GRASS_TOP + GRASS_HEIGHT;
     const snakeDefs = [
       { x: 80, patrol: 100, speed: 0.8 },
       { x: 260, patrol: 120, speed: -1.0 },
