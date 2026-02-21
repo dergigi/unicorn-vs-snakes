@@ -49,7 +49,7 @@ export class GameScene extends Phaser.Scene {
   private flameHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private applePickups?: Phaser.Physics.Arcade.StaticGroup;
   private critterMovers: CritterMover[] = [];
-  private storyCat?: Phaser.Physics.Arcade.Image;
+  private storyCat?: Phaser.Physics.Arcade.Sprite;
   private wasNearStoryCat = false;
   private catStoryBox?: Phaser.GameObjects.Graphics;
   private catStoryPortrait?: Phaser.GameObjects.Image;
@@ -788,11 +788,24 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    if (!this.anims.exists("cat-idle")) {
+      this.anims.create({
+        key: "cat-idle",
+        frames: this.anims.generateFrameNumbers("story-cat-idle", { start: 0, end: 3 }),
+        frameRate: 4,
+        repeat: -1
+      });
+    }
+
     const cat = this.physics.add
-      .staticImage(this.levelData.storyCat.x, this.levelData.storyCat.y, "story-cat")
+      .sprite(this.levelData.storyCat.x, this.levelData.storyCat.y, "story-cat-idle", 0)
       .setOrigin(0.5, 1)
       .setDisplaySize(this.levelData.storyCat.width, this.levelData.storyCat.height)
       .setDepth(9);
+    const catBody = cat.body as Phaser.Physics.Arcade.Body;
+    catBody.setImmovable(true);
+    catBody.setAllowGravity(false);
+    cat.play("cat-idle");
     this.storyCat = cat;
     this.physics.add.collider(this.player, cat);
 
