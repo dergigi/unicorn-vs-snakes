@@ -66,6 +66,8 @@ export class GameScene extends Phaser.Scene {
   private skyRelightGlow?: Phaser.GameObjects.Rectangle;
   private baseSkyLayer?: Phaser.GameObjects.Rectangle;
   private baseHorizonLayer?: Phaser.GameObjects.Rectangle;
+  private levelSkipPressCount = 0;
+  private levelSkipResetTimer?: Phaser.Time.TimerEvent;
 
   constructor() {
     super("GameScene");
@@ -114,6 +116,9 @@ export class GameScene extends Phaser.Scene {
     this.skyRelightGlow = undefined;
     this.baseSkyLayer = undefined;
     this.baseHorizonLayer = undefined;
+    this.levelSkipPressCount = 0;
+    this.levelSkipResetTimer?.remove(false);
+    this.levelSkipResetTimer = undefined;
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -211,9 +216,60 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.finishGate, this.tryFinishLevel, undefined, this);
 
     this.cameras.main.startFollow(this.player, true, 0.08, 0.08, -120, 40);
+    this.setupLevelSkipCheat();
 
     this.game.events.emit(GAME_EVENTS.livesChanged, this.lives);
     this.game.events.emit(GAME_EVENTS.sparkleChanged, this.collectibleSystem.getCollectedCount());
+  }
+
+  private setupLevelSkipCheat(): void {
+    const keyboard = this.input.keyboard;
+    if (!keyboard) {
+      return;
+    }
+
+    keyboard.on("keydown-TWO", this.handleLevelSkipKey, this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      keyboard.off("keydown-TWO", this.handleLevelSkipKey, this);
+      this.levelSkipResetTimer?.remove(false);
+      this.levelSkipResetTimer = undefined;
+      this.levelSkipPressCount = 0;
+    });
+  }
+
+  private handleLevelSkipKey(): void {
+    if (!this.scene.isActive()) {
+      return;
+    }
+    this.levelSkipPressCount += 1;
+    this.levelSkipResetTimer?.remove(false);
+    this.levelSkipResetTimer = this.time.delayedCall(1500, () => {
+      this.levelSkipPressCount = 0;
+      this.levelSkipResetTimer = undefined;
+    });
+
+    if (this.levelSkipPressCount < 5) {
+      return;
+    }
+    this.levelSkipPressCount = 0;
+    this.levelSkipResetTimer?.remove(false);
+    this.levelSkipResetTimer = undefined;
+
+    if (this.levelNumber >= 2) {
+      return;
+    }
+
+    this.levelComplete = true;
+    this.player?.setControlsEnabled(false);
+    const sceneData = {
+      maxLives: this.maxLives,
+      difficulty: this.difficulty,
+      levelNumber: 2,
+      currentLives: this.lives
+    };
+    this.scene.stop("UIScene");
+    this.scene.restart(sceneData);
+    this.scene.launch("UIScene", sceneData);
   }
 
   update(time: number, delta: number): void {
