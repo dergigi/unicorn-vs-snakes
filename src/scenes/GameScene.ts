@@ -20,7 +20,7 @@ import type { LevelData } from "../types/LevelData";
 import { spawnRainbowTrail } from "../utils/rainbowTrail";
 import { beep } from "../utils/sfx";
 
-const LEVEL_COUNT = 3;
+const LEVEL_COUNT = 4;
 
 type CritterMover = {
   hitbox: Phaser.GameObjects.Rectangle;
@@ -54,6 +54,9 @@ export class GameScene extends Phaser.Scene {
   private critterHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private flameHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private batSprites: Phaser.Physics.Arcade.Sprite[] = [];
+  private bossWitch?: Phaser.Physics.Arcade.Sprite;
+  private bossHealth = 0;
+  private bossInvulnerableUntil = 0;
   private applePickups?: Phaser.Physics.Arcade.StaticGroup;
   private critterMovers: CritterMover[] = [];
   private platformMovers: PlatformMover[] = [];
@@ -116,6 +119,9 @@ export class GameScene extends Phaser.Scene {
     this.critterHitboxes = [];
     this.flameHitboxes = [];
     this.batSprites = [];
+    this.bossWitch = undefined;
+    this.bossHealth = 0;
+    this.bossInvulnerableUntil = 0;
     this.applePickups = undefined;
     this.critterMovers = [];
     this.platformMovers = [];
@@ -243,6 +249,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.createMovingPlatforms();
     this.createBats();
+    this.createBossWitch();
 
     this.finishGate = this.physics.add
       .staticImage(this.levelData.finishGate.x, this.levelData.finishGate.y, "finish-gate-closed")
@@ -355,6 +362,7 @@ export class GameScene extends Phaser.Scene {
       }
       snake.update();
     }
+    this.updateBossWitch(time);
 
     if (this.player.y > GAME_HEIGHT + 200) {
       this.handlePlayerHit(
@@ -942,6 +950,129 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private createBossWitch(): void {
+    const bossData = this.levelData.bossWitch;
+    if (!bossData) {
+      return;
+    }
+
+    if (!this.anims.exists("witch-fly")) {
+      this.anims.create({
+        key: "witch-fly",
+        frames: this.anims.generateFrameNumbers("witch", { start: 0, end: 3 }),
+        frameRate: 8,
+        repeat: -1
+      });
+    }
+
+    const witch = this.physics.add
+      .sprite(bossData.x, bossData.y, "witch", 0)
+      .setScale(1.6)
+      .setDepth(12);
+    const body = witch.body as Phaser.Physics.Arcade.Body;
+    body.setAllowGravity(false);
+    body.setImmovable(true);
+    body.setSize(30, 22);
+    witch.play("witch-fly");
+
+    const halfPatrol = bossData.patrolWidth / 2;
+    const speed = bossData.speed ?? 1.1;
+    const horizontalDuration = Math.max(1500, Math.abs(bossData.patrolWidth / speed) * 18);
+    this.tweens.add({
+      targets: witch,
+      x: bossData.x + halfPatrol,
+      duration: horizontalDuration,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut",
+      onUpdate: (_tween, target, _key, current, previous) => {
+        if (target !== witch) {
+          return;
+        }
+        witch.setFlipX(current < previous);
+      }
+    });
+    witch.x = bossData.x - halfPatrol;
+
+    const verticalTravel = Math.abs(bossData.moveY ?? 38);
+    this.tweens.add({
+      targets: witch,
+      y: bossData.y - verticalTravel,
+      duration: 1300,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut"
+    });
+
+    this.bossWitch = witch;
+    this.bossHealth = bossData.health ?? 6;
+    this.bossInvulnerableUntil = 0;
+    this.physics.add.overlap(this.player, witch, this.handleBossWitchCollision, undefined, this);
+  }
+
+  private updateBossWitch(time: number): void {
+    if (!this.bossWitch || !this.bossWitch.active) {
+      return;
+    }
+    if (time < this.bossInvulnerableUntil) {
+      this.bossWitch.setAlpha(Math.sin(time / 28) > 0 ? 0.45 : 1);
+      return;
+    }
+    this.bossWitch.setAlpha(1);
+  }
+
+  private handleBossWitchCollision(
+    playerObject:
+      | Phaser.Types.Physics.Arcade.GameObjectWithBody
+      | Phaser.Physics.Arcade.Body
+      | Phaser.Physics.Arcade.StaticBody
+      | Phaser.Tilemaps.Tile,
+    witchObject:
+      | Phaser.Types.Physics.Arcade.GameObjectWithBody
+      | Phaser.Physics.Arcade.Body
+      | Phaser.Physics.Arcade.StaticBody
+      | Phaser.Tilemaps.Tile
+  ): void {
+    if (!this.scene.isActive() || !this.player.body || this.levelComplete) {
+      return;
+    }
+    if (!this.bossWitch || !this.bossWitch.active) {
+      return;
+    }
+
+    const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
+    const stompedFromAbove = playerBody.velocity.y > 110 && playerBody.bottom <= this.bossWitch.y - 8;
+    if (!stompedFromAbove) {
+      this.handlePlayerHit(playerObject, witchObject);
+      return;
+    }
+    if (this.time.now < this.bossInvulnerableUntil) {
+      return;
+    }
+
+    this.bossInvulnerableUntil = this.time.now + 420;
+    this.bossHealth -= 1;
+    this.player.setVelocityY(-420);
+    this.bossWitch.setTint(0xffd36a);
+    this.time.delayedCall(120, () => this.bossWitch?.clearTint());
+    if (this.audioContext) {
+      beep(this.audioContext, 760, 0.08, "triangle", 0.03);
+    }
+
+    if (this.bossHealth > 0) {
+      return;
+    }
+
+    this.bossWitch.destroy();
+    this.bossWitch = undefined;
+    this.bossInvulnerableUntil = 0;
+    if (this.audioContext) {
+      beep(this.audioContext, 980, 0.1, "triangle", 0.04);
+    }
+    this.cameras.main.shake(180, 0.004);
+    this.updateGateUnlockState();
+  }
+
   private createStoryCat(): void {
     if (this.levelData.theme !== "forest" || !this.levelData.storyCat) {
       return;
@@ -1163,6 +1294,9 @@ export class GameScene extends Phaser.Scene {
 
   private updateGateUnlockState(): void {
     if (this.gateUnlocked) {
+      return;
+    }
+    if (this.bossWitch?.active) {
       return;
     }
     if (this.collectibleSystem.getCollectedCount() < this.requiredSparklesToFinish) {

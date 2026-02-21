@@ -37,7 +37,8 @@ export const TOTAL_SPARKLES = 21;
 const REQUIRED_SPARKLES_BY_LEVEL: Record<number, number> = {
   1: 12,
   2: 16,
-  3: 21
+  3: 21,
+  4: 0
 };
 
 export function getRequiredSparklesToFinish(levelNumber: number): number {

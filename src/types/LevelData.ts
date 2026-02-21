@@ -46,6 +46,15 @@ export type BatData = {
   speed?: number;
 };
 
+export type BossWitchData = {
+  x: number;
+  y: number;
+  patrolWidth: number;
+  moveY?: number;
+  speed?: number;
+  health?: number;
+};
+
 export type LevelData = {
   theme: "forest" | "lava" | "castle";
   spawn: { x: number; y: number };
@@ -63,4 +72,5 @@ export type LevelData = {
   apples?: AppleData[];
   movingPlatforms?: MovingPlatformData[];
   bats?: BatData[];
+  bossWitch?: BossWitchData;
 };

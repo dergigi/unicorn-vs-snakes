@@ -36,6 +36,7 @@ export class BootScene extends Phaser.Scene {
     this.load.json("level-1", "levels/level1.json");
     this.load.json("level-2", "levels/level2.json");
     this.load.json("level-3", "levels/level3.json");
+    this.load.json("level-4", "levels/level4.json");
     this.load.image("tree-chestnut-1", "assets/sprites/trees/PNG/32x32/chestnut-001.png");
     this.load.image("tree-chestnut-2", "assets/sprites/trees/PNG/32x32/chestnut-002.png");
     this.load.image("tree-chestnut-3", "assets/sprites/trees/PNG/32x32/chestnut-003.png");
@@ -63,6 +64,10 @@ export class BootScene extends Phaser.Scene {
     this.load.spritesheet("bat", "assets/sprites/bat-sprite.png", {
       frameWidth: 32,
       frameHeight: 32
+    });
+    this.load.spritesheet("witch", "assets/sprites/witch.png", {
+      frameWidth: 58,
+      frameHeight: 46
     });
     this.load.spritesheet("unicorn", "assets/sprites/unicorn.png", {
       frameWidth: 16,
