@@ -88,7 +88,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const canUseCoyote = time - this.lastGroundedAt <= COYOTE_TIME_MS;
     const jumpBuffered = time - this.lastJumpPressedAt <= JUMP_BUFFER_MS;
     const canGroundJump = canUseCoyote && this.jumpsUsed === 0;
-    const canAirJump = !canUseCoyote && this.jumpsUsed > 0 && this.jumpsUsed < MAX_JUMPS;
+    const canAirJump = !isGrounded && this.jumpsUsed < MAX_JUMPS;
 
     if (jumpBuffered && (canGroundJump || canAirJump)) {
       this.setVelocityY(PLAYER_JUMP_VELOCITY);
