@@ -19,7 +19,7 @@ import { CollectibleSystem } from "../systems/CollectibleSystem";
 import type { LevelData } from "../types/LevelData";
 import { beep } from "../utils/sfx";
 
-const LEVEL_COUNT = 2;
+const LEVEL_COUNT = 3;
 
 type CritterMover = {
   hitbox: Phaser.GameObjects.Rectangle;
@@ -122,9 +122,12 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
-    this.cameras.main.setBackgroundColor(
-      this.levelData.theme === "forest" ? "#1f3a2a" : "#26164a"
-    );
+    const bgColorByTheme: Record<LevelData["theme"], string> = {
+      forest: "#1f3a2a",
+      lava: "#26164a",
+      castle: "#2f2b45"
+    };
+    this.cameras.main.setBackgroundColor(bgColorByTheme[this.levelData.theme]);
 
     this.drawBackground();
     this.createSkyRelightLayers();
@@ -359,6 +362,46 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    if (this.levelData.theme === "castle") {
+      this.baseSkyLayer = this.add.rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x2f2b45).setOrigin(0, 0);
+      this.baseHorizonLayer = this.add
+        .rectangle(0, WORLD_HEIGHT - 190, WORLD_WIDTH, 190, 0x4a4764, 0.45)
+        .setOrigin(0, 0);
+
+      // Distant castle silhouettes and towers for parallax depth.
+      for (let i = 0; i < 9; i += 1) {
+        const x = 140 + i * 420;
+        const w = 170 + (i % 3) * 24;
+        const h = 120 + (i % 2) * 22;
+        this.add
+          .rectangle(x, WORLD_HEIGHT - 58, w, h, 0x3c3958, 0.62)
+          .setOrigin(0.5, 1)
+          .setScrollFactor(0.24);
+        this.add
+          .rectangle(x - w * 0.26, WORLD_HEIGHT - h - 58, 30, 34, 0x4f4b73, 0.72)
+          .setOrigin(0.5, 1)
+          .setScrollFactor(0.24);
+        this.add
+          .rectangle(x + w * 0.28, WORLD_HEIGHT - h - 50, 26, 28, 0x4f4b73, 0.72)
+          .setOrigin(0.5, 1)
+          .setScrollFactor(0.24);
+      }
+
+      for (let i = 0; i < 12; i += 1) {
+        const x = 80 + i * 320;
+        const h = 86 + (i % 4) * 14;
+        this.add
+          .rectangle(x, WORLD_HEIGHT - 44, 120, h, 0x666286, 0.66)
+          .setOrigin(0.5, 1)
+          .setScrollFactor(0.4);
+        this.add
+          .rectangle(x, WORLD_HEIGHT - h - 44, 18, 22, 0x7d76a3, 0.8)
+          .setOrigin(0.5, 1)
+          .setScrollFactor(0.4);
+      }
+      return;
+    }
+
     this.baseSkyLayer = this.add.rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x26164a).setOrigin(0, 0);
     for (let i = 0; i < 7; i += 1) {
       const baseX = 180 + i * 500;
@@ -410,8 +453,18 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createSkyRelightLayers(): void {
-    const topColor = this.levelData.theme === "forest" ? 0xa8f0ff : 0xffe0b8;
-    const glowColor = this.levelData.theme === "forest" ? 0xd8fbff : 0xfff0d2;
+    const topColor =
+      this.levelData.theme === "forest"
+        ? 0xa8f0ff
+        : this.levelData.theme === "castle"
+          ? 0xd7d9ff
+          : 0xffe0b8;
+    const glowColor =
+      this.levelData.theme === "forest"
+        ? 0xd8fbff
+        : this.levelData.theme === "castle"
+          ? 0xebebff
+          : 0xfff0d2;
 
     // Invisible-at-start overlays that fade in once enough sparkles are collected.
     // Depth 0 keeps them above background paint but below platforms/entities (also depth 0, created later).
@@ -913,6 +966,10 @@ export class GameScene extends Phaser.Scene {
       this.baseSkyLayer?.setFillStyle(0x4fb66b, 1);
       this.baseHorizonLayer?.setFillStyle(0x71cc84, 0.5);
       this.cameras.main.setBackgroundColor("#4fb66b");
+    } else if (this.levelData.theme === "castle") {
+      this.baseSkyLayer?.setFillStyle(0x595f99, 1);
+      this.baseHorizonLayer?.setFillStyle(0x8288c0, 0.55);
+      this.cameras.main.setBackgroundColor("#595f99");
     } else {
       this.baseSkyLayer?.setFillStyle(0x5a3a8d, 1);
       this.cameras.main.setBackgroundColor("#5a3a8d");
