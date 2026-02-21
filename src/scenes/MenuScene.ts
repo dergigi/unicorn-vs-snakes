@@ -96,7 +96,7 @@ export class MenuScene extends Phaser.Scene {
     this.spawnPatrolSnakes();
 
     this.add
-      .text(GAME_WIDTH / 2, GRASS_TOP + GRASS_HEIGHT + 18, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
+      .text(GAME_WIDTH / 2, GRASS_TOP + GRASS_HEIGHT + 34, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
         fontSize: "12px",
         color: "#d0c7ff",
         fontFamily: "monospace"
