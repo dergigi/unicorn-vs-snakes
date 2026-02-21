@@ -25,13 +25,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
-    // The OpenGameArt sheet includes vertical padding under the hooves,
-    // so we anchor higher to visually place feet on platform surfaces.
-    this.setOrigin(0.5, 0.68);
+    this.setOrigin(0.5, 1);
     this.setScale(2);
     this.setCollideWorldBounds(true);
-    body.setSize(24, 30, true);
-    body.setOffset(4, 2);
+    // Match collisions to the visible body/hooves of the 16x16 sprite.
+    // The source frame has empty padding, so a smaller body prevents hovering.
+    body.setSize(12, 10, true);
+    body.setOffset(2, 5);
   }
 
   public setControlsEnabled(enabled: boolean): void {
