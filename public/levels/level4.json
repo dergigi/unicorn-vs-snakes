@@ -9,10 +9,11 @@
   "platforms": [
     { "x": 140, "y": 490, "width": 200, "height": 44 },
     { "x": 360, "y": 490, "width": 220, "height": 44 },
-    { "x": 580, "y": 490, "width": 180, "height": 44 },
-
-    { "x": 350, "y": 340, "width": 110, "height": 28 },
-    { "x": 520, "y": 310, "width": 110, "height": 28 }
+    { "x": 580, "y": 490, "width": 180, "height": 44 }
+  ],
+  "movingPlatforms": [
+    { "x": 360, "y": 350, "width": 110, "height": 28, "moveY": -60, "duration": 2000 },
+    { "x": 520, "y": 320, "width": 110, "height": 28, "moveY": -55, "duration": 1800 }
   ],
   "snakes": [],
   "sparkles": [],
