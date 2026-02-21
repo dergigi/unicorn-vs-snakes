@@ -13,6 +13,13 @@ const GATE_X = GAME_WIDTH - 100;
 const GATE_OVERLAP_DIST = 28;
 const RAINBOW_COLORS = [0xff6fa7, 0xffbf6a, 0xfff07a, 0x8ff59f, 0x7ad9ff, 0xba9bff];
 
+type MenuSnake = {
+  sprite: Phaser.GameObjects.Image;
+  minX: number;
+  maxX: number;
+  speed: number;
+};
+
 export class MenuScene extends Phaser.Scene {
   private selectedDifficulty: Difficulty = DEFAULT_DIFFICULTY;
   private unicorn!: Phaser.GameObjects.Sprite;
@@ -21,6 +28,7 @@ export class MenuScene extends Phaser.Scene {
   private wasdD?: Phaser.Input.Keyboard.Key;
   private nextTrailAt = 0;
   private started = false;
+  private menuSnakes: MenuSnake[] = [];
 
   constructor() {
     super("MenuScene");
@@ -29,6 +37,7 @@ export class MenuScene extends Phaser.Scene {
   create(): void {
     this.started = false;
     this.nextTrailAt = 0;
+    this.menuSnakes = [];
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1d1336).setOrigin(0, 0);
     this.add
@@ -69,27 +78,7 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5, 1)
       .setScale(3);
 
-    const snakeSplash = this.add
-      .image(GATE_X - 130, FLOOR_Y, "snake-1")
-      .setOrigin(0.5, 1)
-      .setScale(1.4)
-      .setFlipX(true);
-    this.tweens.add({
-      targets: snakeSplash,
-      angle: 5,
-      duration: 520,
-      yoyo: true,
-      repeat: -1,
-      ease: "Sine.easeInOut"
-    });
-
-    this.add
-      .text(GAME_WIDTH / 2, FLOOR_Y + 32, "Walk to the rainbow gate!", {
-        fontSize: "18px",
-        color: "#b8a8ff",
-        fontFamily: "monospace"
-      })
-      .setOrigin(0.5);
+    this.spawnPatrolSnakes();
 
     this.add
       .text(GAME_WIDTH / 2, GAME_HEIGHT - 12, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
@@ -105,6 +94,8 @@ export class MenuScene extends Phaser.Scene {
   }
 
   update(time: number): void {
+    this.updateMenuSnakes(time);
+
     if (this.started) {
       return;
     }
@@ -189,6 +180,48 @@ export class MenuScene extends Phaser.Scene {
       }
     };
     applyStyles();
+  }
+
+  private spawnPatrolSnakes(): void {
+    this.menuSnakes = [];
+    const snakeY = FLOOR_Y + 46;
+    const snakeDefs = [
+      { x: 80, patrol: 100, speed: 0.8 },
+      { x: 260, patrol: 120, speed: -1.0 },
+      { x: 420, patrol: 110, speed: 0.9 },
+      { x: 560, patrol: 100, speed: -0.7 },
+      { x: 700, patrol: 130, speed: 1.1 },
+      { x: 860, patrol: 90, speed: -0.85 },
+    ];
+
+    for (const def of snakeDefs) {
+      const sprite = this.add
+        .image(def.x, snakeY, "snake-1")
+        .setOrigin(0.5, 1)
+        .setScale(1.3)
+        .setFlipX(def.speed < 0);
+      this.menuSnakes.push({
+        sprite,
+        minX: def.x - def.patrol / 2,
+        maxX: def.x + def.patrol / 2,
+        speed: def.speed,
+      });
+    }
+  }
+
+  private updateMenuSnakes(time: number): void {
+    for (const snake of this.menuSnakes) {
+      snake.sprite.x += snake.speed;
+      if (snake.sprite.x < snake.minX) {
+        snake.sprite.x = snake.minX;
+        snake.speed = Math.abs(snake.speed);
+      } else if (snake.sprite.x > snake.maxX) {
+        snake.sprite.x = snake.maxX;
+        snake.speed = -Math.abs(snake.speed);
+      }
+      snake.sprite.setFlipX(snake.speed < 0);
+      snake.sprite.setTexture((time >> 7) % 2 === 0 ? "snake-1" : "snake-2");
+    }
   }
 
   private emitRainbowTrail(time: number): void {
