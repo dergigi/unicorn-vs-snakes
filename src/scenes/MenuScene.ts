@@ -1,7 +1,15 @@
 import Phaser from "phaser";
-import { GAME_HEIGHT, GAME_WIDTH } from "../config/gameConfig";
+import {
+  DEFAULT_DIFFICULTY,
+  DIFFICULTY_HEARTS,
+  GAME_HEIGHT,
+  GAME_WIDTH,
+  type Difficulty
+} from "../config/gameConfig";
 
 export class MenuScene extends Phaser.Scene {
+  private selectedDifficulty: Difficulty = DEFAULT_DIFFICULTY;
+
   constructor() {
     super("MenuScene");
   }
@@ -36,6 +44,45 @@ export class MenuScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
+    this.add.text(GAME_WIDTH / 2, 295, "Difficulty", {
+      fontSize: "24px",
+      color: "#fff1ff",
+      fontFamily: "monospace"
+    }).setOrigin(0.5);
+
+    const difficulties: Difficulty[] = ["easy", "normal", "hard", "insane"];
+    const buttons: Record<Difficulty, Phaser.GameObjects.Rectangle> = {
+      easy: this.add.rectangle(0, 0, 1, 1, 0),
+      normal: this.add.rectangle(0, 0, 1, 1, 0),
+      hard: this.add.rectangle(0, 0, 1, 1, 0),
+      insane: this.add.rectangle(0, 0, 1, 1, 0)
+    };
+
+    difficulties.forEach((difficulty, index) => {
+      const x = 222 + index * 172;
+      const button = this.add.rectangle(x, 336, 154, 56, 0x6f5cc4).setStrokeStyle(2, 0xd5ccff);
+      button.setInteractive({ useHandCursor: true });
+      this.add.text(x, 336, difficulty.toUpperCase(), {
+        fontSize: "22px",
+        color: "#f8f4ff",
+        fontFamily: "monospace"
+      }).setOrigin(0.5);
+      button.on("pointerdown", () => {
+        this.selectedDifficulty = difficulty;
+        updateDifficultyButtons();
+      });
+      buttons[difficulty] = button;
+    });
+
+    const updateDifficultyButtons = (): void => {
+      difficulties.forEach((difficulty) => {
+        const isSelected = difficulty === this.selectedDifficulty;
+        buttons[difficulty].setFillStyle(isSelected ? 0xff7fd9 : 0x6f5cc4);
+        buttons[difficulty].setStrokeStyle(isSelected ? 4 : 2, isSelected ? 0xffffff : 0xd5ccff);
+      });
+    };
+    updateDifficultyButtons();
+
     const startButton = this.add.rectangle(
       GAME_WIDTH / 2,
       GAME_HEIGHT - 90,
@@ -52,14 +99,22 @@ export class MenuScene extends Phaser.Scene {
       fontFamily: "monospace"
     }).setOrigin(0.5);
 
+    const startGame = (): void => {
+      const maxLives = DIFFICULTY_HEARTS[this.selectedDifficulty];
+      const sceneData = {
+        difficulty: this.selectedDifficulty,
+        maxLives
+      };
+      this.scene.start("GameScene", sceneData);
+      this.scene.launch("UIScene", sceneData);
+    };
+
     startButton.on("pointerdown", () => {
-      this.scene.start("GameScene");
-      this.scene.launch("UIScene");
+      startGame();
     });
 
     this.input.keyboard?.once("keydown-SPACE", () => {
-      this.scene.start("GameScene");
-      this.scene.launch("UIScene");
+      startGame();
     });
   }
 }
