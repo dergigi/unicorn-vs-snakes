@@ -49,6 +49,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image("princess-sera", "assets/sprites/Bushly_PrincessSera.png");
     this.load.image("castle-bg", "assets/sprites/castle_4.png");
     this.load.image("castle-bricks-source", "assets/sprites/BrickTiles.png");
+    this.load.image("pink-skull", "assets/sprites/pinkSkull1.png");
     this.load.image("castle-tower", "assets/sprites/towers/tower-drawing/Tower.png");
     this.load.image("castle-tower-damaged", "assets/sprites/towers/tower-drawing/Tower_damage3.png");
     this.load.spritesheet("unicorn", "assets/sprites/unicorn.png", {

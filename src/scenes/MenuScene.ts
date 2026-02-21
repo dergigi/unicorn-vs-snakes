@@ -169,10 +169,10 @@ export class MenuScene extends Phaser.Scene {
         easy: "🍀 EASY",
         normal: "NORMAL",
         hard: "HARD",
-        insane: "INSANE-O ☠️",
+        insane: "INSANE-O",
       };
       const label = labels[difficulty];
-      this.add
+      const text = this.add
         .text(cx, cy, label, {
           fontSize: "16px",
           color: "#ffffff",
@@ -181,6 +181,12 @@ export class MenuScene extends Phaser.Scene {
           strokeThickness: 3,
         })
         .setOrigin(0.5);
+
+      if (difficulty === "insane") {
+        this.add
+          .image(text.x + text.width / 2 + 12, cy, "pink-skull")
+          .setScale(1.4);
+      }
     });
 
     const drawButton = (d: Difficulty, selected: boolean): void => {
