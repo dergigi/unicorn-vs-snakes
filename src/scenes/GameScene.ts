@@ -36,6 +36,7 @@ export class GameScene extends Phaser.Scene {
   private lavaHitbox?: Phaser.GameObjects.Rectangle;
   private rainbowPowerup?: Phaser.Physics.Arcade.Image;
   private nextRainbowTrailAt = 0;
+  private gateUnlocked = false;
 
   constructor() {
     super("GameScene");
@@ -58,6 +59,7 @@ export class GameScene extends Phaser.Scene {
     this.createControls();
 
     this.levelData = this.cache.json.get("level-1") as LevelData;
+    this.gateUnlocked = false;
 
     this.platforms = this.physics.add.staticGroup();
     for (const platform of this.levelData.platforms) {
@@ -129,7 +131,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.finishGate = this.physics.add
-      .staticImage(this.levelData.finishGate.x, this.levelData.finishGate.y, "finish-gate")
+      .staticImage(this.levelData.finishGate.x, this.levelData.finishGate.y, "finish-gate-closed")
       .setOrigin(0.5, 1);
     this.physics.add.overlap(this.player, this.finishGate, this.tryFinishLevel, undefined, this);
 
@@ -145,6 +147,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.player.update(time, delta);
     this.emitRainbowTrail(time);
+    this.updateGateUnlockState();
     for (const snake of this.snakes) {
       snake.update();
     }
@@ -266,6 +269,19 @@ export class GameScene extends Phaser.Scene {
         onComplete: () => sparkle.destroy()
       });
     }
+  }
+
+  private updateGateUnlockState(): void {
+    if (this.gateUnlocked) {
+      return;
+    }
+    if (this.collectibleSystem.getCollectedCount() < REQUIRED_SPARKLES_TO_FINISH) {
+      return;
+    }
+    this.gateUnlocked = true;
+    this.finishGate.setTexture("finish-gate-open");
+    this.finishGate.setScale(1.02);
+    this.time.delayedCall(120, () => this.finishGate.setScale(1));
   }
 
   private handlePlayerHit(

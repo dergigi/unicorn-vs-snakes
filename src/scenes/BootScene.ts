@@ -131,7 +131,7 @@ export class BootScene extends Phaser.Scene {
     );
     makePixelTexture(
       this,
-      "finish-gate",
+      "finish-gate-open",
       64,
       80,
       [
@@ -152,6 +152,34 @@ export class BootScene extends Phaser.Scene {
         { x: 7, y: 17, w: 18, h: 18, c: "#eefbff" },
         { x: 10, y: 36, w: 5, h: 2, c: "#ffd95e" },
         { x: 16, y: 36, w: 5, h: 2, c: "#7de86f" }
+      ]
+    );
+    makePixelTexture(
+      this,
+      "finish-gate-closed",
+      64,
+      80,
+      [
+        { x: 2, y: 14, w: 2, h: 24, c: "#8f6044" },
+        { x: 28, y: 14, w: 2, h: 24, c: "#8f6044" },
+        { x: 1, y: 12, w: 4, h: 2, c: "#b07d5b" },
+        { x: 27, y: 12, w: 4, h: 2, c: "#b07d5b" },
+
+        { x: 6, y: 14, w: 20, h: 22, c: "#6e482f" },
+        { x: 7, y: 15, w: 18, h: 20, c: "#885a3b" },
+        { x: 8, y: 16, w: 3, h: 18, c: "#996742" },
+        { x: 13, y: 16, w: 3, h: 18, c: "#996742" },
+        { x: 18, y: 16, w: 3, h: 18, c: "#996742" },
+        { x: 23, y: 16, w: 2, h: 18, c: "#996742" },
+        { x: 7, y: 22, w: 18, h: 2, c: "#6b432c" },
+        { x: 7, y: 28, w: 18, h: 2, c: "#6b432c" },
+
+        { x: 5, y: 9, w: 22, h: 2, c: "#6d6358" },
+        { x: 7, y: 8, w: 18, h: 1, c: "#9f9485" },
+        { x: 8, y: 6, w: 4, h: 1, c: "#ff7f9f" },
+        { x: 12, y: 6, w: 4, h: 1, c: "#ffbc76" },
+        { x: 16, y: 6, w: 4, h: 1, c: "#a5f6a6" },
+        { x: 20, y: 6, w: 4, h: 1, c: "#89dcff" }
       ]
     );
     makePixelTexture(
