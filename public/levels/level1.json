@@ -48,7 +48,7 @@
     { "x": 1840, "y": 478, "width": 36, "height": 34 },
     { "x": 2820, "y": 478, "width": 36, "height": 34 }
   ],
-  "storyCat": { "x": 310, "y": 478, "width": 33, "height": 33 },
+  "storyCat": { "x": 310, "y": 478, "width": 40, "height": 40 },
   "apples": [
     { "x": 1920, "y": 378, "width": 17, "height": 17 }
   ],
