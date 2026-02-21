@@ -40,14 +40,14 @@ export class MenuScene extends Phaser.Scene {
     this.menuSnakes = [];
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1d1336).setOrigin(0, 0);
-    const grassTop = FLOOR_Y + 14;
-    const grassHeight = GAME_HEIGHT - grassTop;
+    const grassTop = FLOOR_Y + 20;
+    const grassHeight = 52;
     for (let tx = 0; tx < GAME_WIDTH; tx += 32) {
-      for (let ty = grassTop; ty < GAME_HEIGHT; ty += 32) {
+      for (let ty = grassTop; ty < grassTop + grassHeight; ty += 32) {
         this.add.image(tx, ty, "grass-tile").setOrigin(0, 0).setDisplaySize(32, 32);
       }
     }
-    this.add.rectangle(0, grassTop, GAME_WIDTH, grassHeight, 0x000000, 0.35).setOrigin(0, 0);
+    this.add.rectangle(0, grassTop, GAME_WIDTH, grassHeight, 0x000000, 0.25).setOrigin(0, 0);
 
     this.add
       .text(GAME_WIDTH / 2, 72, "UNICORNS VS SNAKES", {
@@ -86,7 +86,7 @@ export class MenuScene extends Phaser.Scene {
     this.spawnPatrolSnakes();
 
     this.add
-      .text(GAME_WIDTH / 2, GAME_HEIGHT - 12, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
+      .text(GAME_WIDTH / 2, FLOOR_Y + 20 + 52 + 18, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
         fontSize: "12px",
         color: "#d0c7ff",
         fontFamily: "monospace"
@@ -242,7 +242,7 @@ export class MenuScene extends Phaser.Scene {
 
   private spawnPatrolSnakes(): void {
     this.menuSnakes = [];
-    const snakeY = FLOOR_Y + 46;
+    const snakeY = FLOOR_Y + 20 + 52;
     const snakeDefs = [
       { x: 80, patrol: 100, speed: 0.8 },
       { x: 260, patrol: 120, speed: -1.0 },
@@ -257,7 +257,8 @@ export class MenuScene extends Phaser.Scene {
         .image(def.x, snakeY, "snake-1")
         .setOrigin(0.5, 1)
         .setScale(1.3)
-        .setFlipX(def.speed < 0);
+        .setFlipX(def.speed < 0)
+        .setDepth(2);
       this.menuSnakes.push({
         sprite,
         minX: def.x - def.patrol / 2,
