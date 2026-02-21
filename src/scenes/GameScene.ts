@@ -165,6 +165,9 @@ export class GameScene extends Phaser.Scene {
     if (this.levelComplete) {
       return;
     }
+    if (!this.player || !this.player.active) {
+      return;
+    }
     this.player.update(time, delta);
     this.emitRainbowTrail(time);
     this.updateGateUnlockState();
@@ -413,6 +416,9 @@ export class GameScene extends Phaser.Scene {
       | Phaser.Physics.Arcade.StaticBody
       | Phaser.Tilemaps.Tile
   ): void {
+    if (!this.player || !this.player.active) {
+      return;
+    }
     if (this.time.now < this.canTakeDamageAt || this.levelComplete) {
       return;
     }
@@ -437,6 +443,9 @@ export class GameScene extends Phaser.Scene {
       this.player.setVelocityY(-250);
 
       this.time.delayedCall(260, () => {
+        if (!this.scene.isActive() || !this.player || !this.player.active) {
+          return;
+        }
         this.player.clearTint();
         this.player.setControlsEnabled(true);
       });
@@ -462,6 +471,9 @@ export class GameScene extends Phaser.Scene {
     this.player.setVelocityY(-250);
 
     this.time.delayedCall(260, () => {
+      if (!this.scene.isActive() || !this.player || !this.player.active) {
+        return;
+      }
       if (this.lives <= 0) {
         this.game.events.emit(GAME_EVENTS.gameOver);
         this.scene.stop("UIScene");
