@@ -149,15 +149,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     if (!isGrounded) {
       this.setFrame(2);
-      this.setAngle(0);
     } else if (Math.abs(velocityX) > 0) {
-      const runFrame = Math.floor(time / 120) % 4;
-      this.setFrame(runFrame);
-      this.setAngle(0);
+      this.setFrame(Math.floor(time / 120) % 4);
     } else {
       this.setFrame(0);
-      this.setAngle(0);
     }
+    this.setAngle(0);
 
     this.wasGrounded = isGrounded;
   }
