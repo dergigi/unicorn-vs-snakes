@@ -5,6 +5,7 @@ import { GAME_EVENTS } from "../config/events";
 import {
   DEFAULT_DIFFICULTY,
   GAME_HEIGHT,
+  PLAYER_MOVE_SPEED,
   PLAYER_HIT_INVULNERABILITY_MS,
   REQUIRED_SPARKLES_TO_FINISH,
   TOTAL_SPARKLES,
@@ -18,6 +19,11 @@ import type { LevelData } from "../types/LevelData";
 import { beep } from "../utils/sfx";
 
 const LEVEL_COUNT = 2;
+
+type CritterMover = {
+  hitbox: Phaser.GameObjects.Rectangle;
+  previousX: number;
+};
 
 export class GameScene extends Phaser.Scene {
   private player!: Player;
@@ -40,6 +46,7 @@ export class GameScene extends Phaser.Scene {
   private lavaHitbox?: Phaser.GameObjects.Rectangle;
   private stumpHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private critterHitboxes: Phaser.GameObjects.Rectangle[] = [];
+  private critterMovers: CritterMover[] = [];
   private storyCat?: Phaser.Physics.Arcade.Image;
   private catStoryBox?: Phaser.GameObjects.Graphics;
   private catStoryText?: Phaser.GameObjects.Text;
@@ -75,6 +82,7 @@ export class GameScene extends Phaser.Scene {
     this.snakes = [];
     this.stumpHitboxes = [];
     this.critterHitboxes = [];
+    this.critterMovers = [];
     this.storyCat = undefined;
     this.catStoryBox?.destroy();
     this.catStoryText?.destroy();
@@ -190,6 +198,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     this.player.update(time, delta);
+    this.updateFriendlyCritterPush();
     this.emitRainbowTrail(time);
     this.updateStoryCatBubbleVisibility();
     this.updateGateUnlockState();
@@ -377,6 +386,7 @@ export class GameScene extends Phaser.Scene {
       body.setImmovable(true);
       this.physics.add.collider(this.player, hitbox);
       this.critterHitboxes.push(hitbox);
+      this.critterMovers.push({ hitbox, previousX: critter.x });
 
       // Give the critter a larger back-and-forth patrol so it feels lively.
       const patrolRange = Phaser.Math.Between(44, 58);
@@ -395,6 +405,26 @@ export class GameScene extends Phaser.Scene {
           critterSprite.setFlipX(current < previous);
         }
       });
+    }
+  }
+
+  private updateFriendlyCritterPush(): void {
+    const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
+    for (const mover of this.critterMovers) {
+      const deltaX = mover.hitbox.x - mover.previousX;
+      mover.previousX = mover.hitbox.x;
+      if (Math.abs(deltaX) < 0.08) {
+        continue;
+      }
+      if (!this.physics.overlap(this.player, mover.hitbox)) {
+        continue;
+      }
+
+      // Moving critters nudge the unicorn sideways without causing damage.
+      playerBody.x += deltaX;
+      playerBody.setVelocityX(
+        Phaser.Math.Clamp(playerBody.velocity.x + deltaX * 34, -PLAYER_MOVE_SPEED, PLAYER_MOVE_SPEED)
+      );
     }
   }
 
