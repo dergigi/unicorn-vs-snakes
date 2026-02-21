@@ -48,7 +48,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image("story-cat", "assets/sprites/story-cat.png");
     this.load.image("princess-sera", "assets/sprites/Bushly_PrincessSera.png");
     this.load.image("castle-bg", "assets/sprites/castle_4.png");
-    this.load.image("castle-bricks", "assets/sprites/BrickTiles.png");
+    this.load.image("castle-bricks-source", "assets/sprites/BrickTiles.png");
     this.load.image("castle-tower", "assets/sprites/towers/tower-drawing/Tower.png");
     this.load.image("castle-tower-damaged", "assets/sprites/towers/tower-drawing/Tower_damage3.png");
     this.load.spritesheet("unicorn", "assets/sprites/unicorn.png", {
@@ -250,7 +250,22 @@ export class BootScene extends Phaser.Scene {
       ],
       2
     );
+    this.createCastleBrickTexture();
 
     this.scene.start("MenuScene");
+  }
+
+  private createCastleBrickTexture(): void {
+    const source = this.textures.get("castle-bricks-source").getSourceImage() as CanvasImageSource;
+    const texture = this.textures.createCanvas("castle-bricks", 16, 16);
+    if (!texture) {
+      return;
+    }
+    const context = texture.context;
+    context.imageSmoothingEnabled = false;
+    context.clearRect(0, 0, 16, 16);
+    // Use one clean tile from the sheet to avoid importing its label text.
+    context.drawImage(source, 0, 0, 16, 16, 0, 0, 16, 16);
+    texture.refresh();
   }
 }
