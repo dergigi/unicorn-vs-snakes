@@ -67,6 +67,7 @@ export class GameScene extends Phaser.Scene {
   private baseSkyLayer?: Phaser.GameObjects.Rectangle;
   private baseHorizonLayer?: Phaser.GameObjects.Rectangle;
   private levelSkipPressCount = 0;
+  private levelSkipTargetLevel?: number;
   private levelSkipResetTimer?: Phaser.Time.TimerEvent;
 
   constructor() {
@@ -117,6 +118,7 @@ export class GameScene extends Phaser.Scene {
     this.baseSkyLayer = undefined;
     this.baseHorizonLayer = undefined;
     this.levelSkipPressCount = 0;
+    this.levelSkipTargetLevel = undefined;
     this.levelSkipResetTimer?.remove(false);
     this.levelSkipResetTimer = undefined;
 
@@ -231,23 +233,39 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    keyboard.on("keydown-TWO", this.handleLevelSkipKey, this);
+    keyboard.on("keydown-TWO", this.handleLevelTwoSkipKey, this);
+    keyboard.on("keydown-THREE", this.handleLevelThreeSkipKey, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      keyboard.off("keydown-TWO", this.handleLevelSkipKey, this);
+      keyboard.off("keydown-TWO", this.handleLevelTwoSkipKey, this);
+      keyboard.off("keydown-THREE", this.handleLevelThreeSkipKey, this);
       this.levelSkipResetTimer?.remove(false);
       this.levelSkipResetTimer = undefined;
       this.levelSkipPressCount = 0;
+      this.levelSkipTargetLevel = undefined;
     });
   }
 
-  private handleLevelSkipKey(): void {
+  private handleLevelTwoSkipKey(): void {
+    this.handleLevelSkipKey(2);
+  }
+
+  private handleLevelThreeSkipKey(): void {
+    this.handleLevelSkipKey(3);
+  }
+
+  private handleLevelSkipKey(targetLevel: number): void {
     if (!this.scene.isActive()) {
       return;
+    }
+    if (this.levelSkipTargetLevel !== targetLevel) {
+      this.levelSkipPressCount = 0;
+      this.levelSkipTargetLevel = targetLevel;
     }
     this.levelSkipPressCount += 1;
     this.levelSkipResetTimer?.remove(false);
     this.levelSkipResetTimer = this.time.delayedCall(1500, () => {
       this.levelSkipPressCount = 0;
+      this.levelSkipTargetLevel = undefined;
       this.levelSkipResetTimer = undefined;
     });
 
@@ -255,10 +273,11 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     this.levelSkipPressCount = 0;
+    this.levelSkipTargetLevel = undefined;
     this.levelSkipResetTimer?.remove(false);
     this.levelSkipResetTimer = undefined;
 
-    if (this.levelNumber >= 2) {
+    if (this.levelNumber >= targetLevel) {
       return;
     }
 
@@ -267,7 +286,7 @@ export class GameScene extends Phaser.Scene {
     const sceneData = {
       maxLives: this.maxLives,
       difficulty: this.difficulty,
-      levelNumber: 2,
+      levelNumber: targetLevel,
       currentLives: this.lives
     };
     this.scene.stop("UIScene");
