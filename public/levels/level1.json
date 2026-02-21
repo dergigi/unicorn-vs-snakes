@@ -50,7 +50,7 @@
   ],
   "storyCat": { "x": 310, "y": 478, "width": 33, "height": 33 },
   "apples": [
-    { "x": 1180, "y": 398, "width": 34, "height": 34 }
+    { "x": 1760, "y": 478, "width": 34, "height": 34 }
   ],
   "snakes": [
     { "x": 1560, "y": 470, "patrolWidth": 180, "speedFactor": 0.22 },
