@@ -343,8 +343,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createSkyRelightLayers(): void {
-    const topColor = this.levelData.theme === "forest" ? 0x8ee6ff : 0xffd7a6;
-    const glowColor = this.levelData.theme === "forest" ? 0xbdf7ff : 0xffe8bf;
+    const topColor = this.levelData.theme === "forest" ? 0xa8f0ff : 0xffe0b8;
+    const glowColor = this.levelData.theme === "forest" ? 0xd8fbff : 0xfff0d2;
 
     // Invisible-at-start overlays that fade in once enough sparkles are collected.
     // Depth 0 keeps them above background paint but below platforms/entities (also depth 0, created later).
@@ -774,16 +774,16 @@ export class GameScene extends Phaser.Scene {
     if (this.skyRelightTop) {
       this.tweens.add({
         targets: this.skyRelightTop,
-        alpha: 0.5,
-        duration: 900,
+        alpha: 0.68,
+        duration: 700,
         ease: "Sine.easeOut"
       });
     }
     if (this.skyRelightGlow) {
       this.tweens.add({
         targets: this.skyRelightGlow,
-        alpha: 0.36,
-        duration: 1200,
+        alpha: 0.52,
+        duration: 900,
         ease: "Sine.easeOut"
       });
     }
