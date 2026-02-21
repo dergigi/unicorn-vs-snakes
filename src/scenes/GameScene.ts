@@ -494,37 +494,33 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    const bubbleWidth = 430;
-    const bubbleHeight = 124;
-    const bubbleCenterX = this.storyCat.x + 190;
-    const bubbleCenterY = this.storyCat.y - 160;
+    const bubbleWidth = 396;
+    const bubbleHeight = 112;
+    const bubbleCenterX = this.storyCat.x + 176;
+    const bubbleCenterY = this.storyCat.y - 146;
     const bubbleLeft = bubbleCenterX - bubbleWidth / 2;
     const bubbleTop = bubbleCenterY - bubbleHeight / 2;
     const bubbleBottom = bubbleCenterY + bubbleHeight / 2;
-    const tailTipX = this.storyCat.x + 10;
-    const tailTipY = this.storyCat.y - this.storyCat.displayHeight - 5;
+    const tailBaseX = bubbleLeft + 72;
+    const tailBaseY = bubbleBottom - 1;
+    const tailMidX = this.storyCat.x + 30;
+    const tailMidY = this.storyCat.y - this.storyCat.displayHeight - 28;
+    const tailTipX = this.storyCat.x + 12;
+    const tailTipY = this.storyCat.y - this.storyCat.displayHeight - 8;
 
     const bubble = this.add.graphics().setDepth(1000);
-    bubble.fillStyle(0x10243a, 0.92);
-    bubble.lineStyle(3, 0xb8ecff, 0.95);
-    bubble.fillRoundedRect(bubbleLeft, bubbleTop, bubbleWidth, bubbleHeight, 16);
-    bubble.strokeRoundedRect(bubbleLeft, bubbleTop, bubbleWidth, bubbleHeight, 16);
-    bubble.fillTriangle(
-      bubbleLeft + 64,
-      bubbleBottom - 2,
-      bubbleLeft + 104,
-      bubbleBottom - 2,
-      tailTipX,
-      tailTipY
-    );
-    bubble.strokeTriangle(
-      bubbleLeft + 64,
-      bubbleBottom - 2,
-      bubbleLeft + 104,
-      bubbleBottom - 2,
-      tailTipX,
-      tailTipY
-    );
+    bubble.fillStyle(0x0f253d, 0.95);
+    bubble.lineStyle(3, 0xb8ecff, 1);
+    bubble.fillRoundedRect(bubbleLeft, bubbleTop, bubbleWidth, bubbleHeight, 18);
+    bubble.strokeRoundedRect(bubbleLeft, bubbleTop, bubbleWidth, bubbleHeight, 18);
+
+    // Soft comic-style tail (two circles) looks cleaner than a long sharp triangle.
+    bubble.fillCircle(tailBaseX, tailBaseY, 11);
+    bubble.strokeCircle(tailBaseX, tailBaseY, 11);
+    bubble.fillCircle(tailMidX, tailMidY, 8);
+    bubble.strokeCircle(tailMidX, tailMidY, 8);
+    bubble.fillCircle(tailTipX, tailTipY, 5);
+    bubble.strokeCircle(tailTipX, tailTipY, 5);
     this.catStoryBox = bubble;
 
     this.catStoryText = this.add
@@ -534,10 +530,10 @@ export class GameScene extends Phaser.Scene {
         "Hi, brave unicorn! The Rainbow Kingdom's colors were stolen\nby sneaky snakes. Collect sparkles to re-light the sky and open the gate!",
         {
           fontFamily: "monospace",
-          fontSize: "17px",
+          fontSize: "16px",
           color: "#e6fbff",
           align: "center",
-          wordWrap: { width: bubbleWidth - 36 },
+          wordWrap: { width: bubbleWidth - 34 },
           stroke: "#091321",
           strokeThickness: 3
         }
