@@ -36,7 +36,12 @@
     { "x": 1180, "y": 478, "width": 34, "height": 34, "patrolLeft": 42, "patrolRight": 42 },
     { "x": 1740, "y": 478, "width": 34, "height": 34, "patrolLeft": 44, "patrolRight": 44 },
     { "x": 2460, "y": 478, "width": 34, "height": 34, "patrolLeft": 42, "patrolRight": 46 },
-    { "x": 3020, "y": 478, "width": 34, "height": 34, "patrolLeft": 40, "patrolRight": 40 }
+    { "x": 3020, "y": 478, "width": 34, "height": 34, "patrolLeft": 40, "patrolRight": 40 },
+
+    { "x": 980, "y": 374, "width": 30, "height": 30, "patrolLeft": 50, "patrolRight": 50 },
+    { "x": 1560, "y": 310, "width": 30, "height": 30, "patrolLeft": 36, "patrolRight": 36 },
+    { "x": 2220, "y": 325, "width": 30, "height": 30, "patrolLeft": 40, "patrolRight": 40 },
+    { "x": 2820, "y": 330, "width": 30, "height": 30, "patrolLeft": 42, "patrolRight": 42 }
   ],
   "snakes": [
     { "x": 820, "y": 470, "patrolWidth": 220, "speedFactor": 0.1 },
