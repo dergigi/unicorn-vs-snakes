@@ -1144,6 +1144,10 @@ export class GameScene extends Phaser.Scene {
     if (this.time.now < this.canTakeDamageAt || this.levelComplete) {
       return;
     }
+    const playerBody = this.player.body as Phaser.Physics.Arcade.Body | undefined;
+    if (!playerBody) {
+      return;
+    }
 
     if (this.player.hasRainbowPower()) {
       this.player.setRainbowPowerup(false);
@@ -1161,10 +1165,6 @@ export class GameScene extends Phaser.Scene {
           ? (hazard.x as number)
           : this.player.x;
       const direction = this.player.x < hazardX ? -1 : 1;
-      const playerBody = this.player.body as Phaser.Physics.Arcade.Body | undefined;
-      if (!playerBody) {
-        return;
-      }
       this.player.setVelocityX(direction * 220);
       this.player.setVelocityY(-250);
 
@@ -1193,10 +1193,6 @@ export class GameScene extends Phaser.Scene {
         ? (hazard.x as number)
         : this.player.x;
     const direction = this.player.x < hazardX ? -1 : 1;
-    const playerBody = this.player.body as Phaser.Physics.Arcade.Body | undefined;
-    if (!playerBody) {
-      return;
-    }
     this.player.setVelocityX(direction * 220);
     this.player.setVelocityY(-250);
 
@@ -1216,10 +1212,14 @@ export class GameScene extends Phaser.Scene {
       }
 
       if (!this.checkpointSystem) {
+        this.player.clearTint();
+        this.player.setControlsEnabled(true);
         return;
       }
       const spawn = this.checkpointSystem.getActiveSpawn();
       if (!spawn) {
+        this.player.clearTint();
+        this.player.setControlsEnabled(true);
         return;
       }
       this.player.resetAt(spawn.x, spawn.y);
