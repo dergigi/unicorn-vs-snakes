@@ -397,14 +397,19 @@ export class GameScene extends Phaser.Scene {
     }
 
     for (const critter of this.levelData.friendlyCritters) {
+      const patrolLeft = critter.patrolLeft ?? Phaser.Math.Between(22, 30);
+      const patrolRight = critter.patrolRight ?? Phaser.Math.Between(22, 30);
+      const patrolStartX = critter.x - patrolLeft;
+      const patrolEndX = critter.x + patrolRight;
+
       const critterSprite = this.add
-        .image(critter.x, critter.y, "friendly-critter")
+        .image(patrolStartX, critter.y, "friendly-critter")
         .setOrigin(0.5, 1)
         .setDisplaySize(critter.width, critter.height)
         .setDepth(8);
 
       const hitbox = this.add.rectangle(
-        critter.x,
+        patrolStartX,
         critter.y - critter.height / 2,
         Math.max(12, critter.width - 8),
         Math.max(12, critter.height - 4),
@@ -417,14 +422,13 @@ export class GameScene extends Phaser.Scene {
       body.setImmovable(true);
       this.physics.add.collider(this.player, hitbox);
       this.critterHitboxes.push(hitbox);
-      this.critterMovers.push({ hitbox, previousX: critter.x });
+      this.critterMovers.push({ hitbox, previousX: patrolStartX });
 
-      // Give the critter a larger back-and-forth patrol so it feels lively.
-      const patrolRange = Phaser.Math.Between(44, 58);
-      const patrolDuration = Phaser.Math.Between(1050, 1650);
+      // Friendly critters roam back and forth, optionally with custom bounds.
+      const patrolDuration = Phaser.Math.Between(1400, 2100);
       this.tweens.add({
         targets: [critterSprite, hitbox],
-        x: critter.x + patrolRange,
+        x: patrolEndX,
         duration: patrolDuration,
         yoyo: true,
         repeat: -1,

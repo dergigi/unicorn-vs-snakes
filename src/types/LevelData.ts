@@ -36,6 +36,8 @@ export type FriendlyCritterData = {
   y: number;
   width: number;
   height: number;
+  patrolLeft?: number;
+  patrolRight?: number;
 };
 
 export type StoryCatData = {
