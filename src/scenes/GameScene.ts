@@ -222,6 +222,7 @@ export class GameScene extends Phaser.Scene {
     this.finishGate = this.physics.add
       .staticImage(this.levelData.finishGate.x, this.levelData.finishGate.y, "finish-gate-closed")
       .setOrigin(0.5, 1);
+    this.createCastlePrincess();
     this.physics.add.overlap(this.player, this.finishGate, this.tryFinishLevel, undefined, this);
 
     this.cameras.main.startFollow(this.player, true, 0.08, 0.08, -120, 40);
@@ -812,6 +813,48 @@ export class GameScene extends Phaser.Scene {
       callback: this.emitCatNoise,
       callbackScope: this
     });
+  }
+
+  private createCastlePrincess(): void {
+    if (this.levelData.theme !== "castle") {
+      return;
+    }
+
+    const princessX = this.levelData.finishGate.x - 120;
+    const princessY = this.levelData.finishGate.y;
+    const princessSheet = this.textures.get("princess-sera").getSourceImage() as {
+      width: number;
+      height: number;
+    };
+    const cropX = Math.floor(princessSheet.width / 2);
+    const cropWidth = Math.max(1, princessSheet.width - cropX);
+
+    this.add
+      .image(princessX, princessY, "princess-sera")
+      .setOrigin(0.5, 1)
+      .setDisplaySize(46, 54)
+      .setCrop(cropX, 0, cropWidth, princessSheet.height)
+      .setDepth(9);
+
+    const cage = this.add.graphics().setDepth(10);
+    const cageWidth = 64;
+    const cageHeight = 82;
+    const top = princessY - cageHeight;
+    const left = princessX - cageWidth / 2;
+
+    cage.fillStyle(0x1f2531, 0.25);
+    cage.fillRoundedRect(left, top, cageWidth, cageHeight, 5);
+    cage.lineStyle(2, 0x9ea9bd, 0.95);
+    cage.strokeRoundedRect(left, top, cageWidth, cageHeight, 5);
+    for (let i = 1; i <= 5; i += 1) {
+      const barX = left + i * (cageWidth / 6);
+      cage.lineBetween(barX, top + 4, barX, princessY - 6);
+    }
+
+    cage.fillStyle(0xcdb57b, 1);
+    cage.fillRect(princessX - 5, top + cageHeight - 14, 10, 8);
+    cage.lineStyle(2, 0x92733f, 1);
+    cage.strokeRect(princessX - 5, top + cageHeight - 14, 10, 8);
   }
 
   private emitCatNoise(): void {

@@ -38,6 +38,7 @@ The production files are generated in `dist/`. You can host that folder on:
 - Unicorn sprite: "Running unicorn" by magdum (CC-BY-SA 3.0) from OpenGameArt: [https://opengameart.org/content/running-unicorn-0](https://opengameart.org/content/running-unicorn-0)
 - Friendly critter sprite: OpenGameArt file `icon_10.png`: [https://opengameart.org/sites/default/files/styles/medium/public/icon_10.png](https://opengameart.org/sites/default/files/styles/medium/public/icon_10.png)
 - Story cat sprite: OpenGameArt file `cat_5.png`: [https://opengameart.org/sites/default/files/styles/medium/public/cat_5.png](https://opengameart.org/sites/default/files/styles/medium/public/cat_5.png)
+- Princess sprite source: "Bushly and Princess Sera" (CC0) by GrafxKid from OpenGameArt: [https://opengameart.org/content/bushly-and-princess-sera](https://opengameart.org/content/bushly-and-princess-sera)
 - Lava flame sprite: OpenGameArt file `flame.png`: [https://opengameart.org/sites/default/files/flame.png](https://opengameart.org/sites/default/files/flame.png)
 - Apple pickup sprite: OpenGameArt file `apple_11.png`: [https://opengameart.org/sites/default/files/styles/medium/public/apple_11.png](https://opengameart.org/sites/default/files/styles/medium/public/apple_11.png)
 - Castle background sprite: OpenGameArt file `castle_4.png`: [https://opengameart.org/sites/default/files/styles/medium/public/castle_4.png](https://opengameart.org/sites/default/files/styles/medium/public/castle_4.png)

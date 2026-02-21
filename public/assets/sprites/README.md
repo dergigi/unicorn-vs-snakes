@@ -7,6 +7,7 @@ Suggested files:
 - unicorn.png (currently used; source: OpenGameArt "Running unicorn" by magdum, CC-BY-SA 3.0)
 - friendly-critter.png (currently used in forest level as non-damaging jump-over obstacle; source: OpenGameArt file `icon_10.png`)
 - story-cat.png (currently used at forest start as story NPC; source: OpenGameArt file `cat_5.png`)
+- Bushly_PrincessSera.png (currently used as the castle-end locked princess sprite source; OpenGameArt "Bushly and Princess Sera", CC0)
 - flame.png (currently used in lava level as damaging moving enemy; source: OpenGameArt file `flame.png`)
 - apple.png (currently used in forest level as heart-restoring pickup; source: OpenGameArt file `apple_11.png`)
 - castle_4.png (currently used in castle level background; source: OpenGameArt file `castle_4.png`)
