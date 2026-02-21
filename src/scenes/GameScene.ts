@@ -144,6 +144,7 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(bgColorByTheme[this.levelData.theme]);
 
     this.drawBackground();
+    this.createTorches();
     this.createSkyRelightLayers();
     this.createLava();
     this.createControls();
@@ -464,6 +465,35 @@ export class GameScene extends Phaser.Scene {
       this.add
         .ellipse(baseX + 34, baseY - 14, 64, 36, 0x7f72b7, 0.28)
         .setScrollFactor(scrollFactor);
+    }
+  }
+
+  private createTorches(): void {
+    if (this.levelData.theme !== "castle") {
+      return;
+    }
+
+    if (!this.anims.exists("torch-flicker")) {
+      this.anims.create({
+        key: "torch-flicker",
+        frames: this.anims.generateFrameNumbers("torch", { start: 0, end: 2 }),
+        frameRate: 6,
+        repeat: -1
+      });
+    }
+
+    for (let x = 200; x < WORLD_WIDTH; x += 340) {
+      const torch = this.add
+        .sprite(x, 390, "torch", 0)
+        .setOrigin(0.5, 1)
+        .setScale(0.35)
+        .setAlpha(0.85)
+        .setDepth(1);
+      torch.play({ key: "torch-flicker", startFrame: Phaser.Math.Between(0, 2) });
+
+      this.add
+        .ellipse(x, 392, 50, 14, 0xffa030, 0.15)
+        .setDepth(0);
     }
   }
 
