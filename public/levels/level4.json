@@ -1,45 +1,27 @@
 {
   "theme": "castle",
-  "spawn": { "x": 130, "y": 390 },
-  "finishGate": { "x": 3440, "y": 468 },
+  "spawn": { "x": 170, "y": 390 },
+  "finishGate": { "x": 980, "y": 468 },
   "checkpoints": [
-    { "x": 1540, "y": 454 },
-    { "x": 2880, "y": 454 }
+    { "x": 600, "y": 454 }
   ],
-  "bossMushroom": { "x": 340, "y": 478, "width": 58, "height": 48 },
+  "bossMushroom": { "x": 260, "y": 478, "width": 58, "height": 48 },
   "platforms": [
-    { "x": 160, "y": 490, "width": 200, "height": 44 },
-    { "x": 470, "y": 490, "width": 200, "height": 44 },
-    { "x": 790, "y": 490, "width": 220, "height": 44 },
-    { "x": 1130, "y": 490, "width": 220, "height": 44 },
-    { "x": 1470, "y": 490, "width": 220, "height": 44 },
-    { "x": 1810, "y": 490, "width": 220, "height": 44 },
-    { "x": 2150, "y": 490, "width": 220, "height": 44 },
-    { "x": 2490, "y": 490, "width": 200, "height": 44 },
-    { "x": 2790, "y": 490, "width": 170, "height": 44 },
-    { "x": 3050, "y": 490, "width": 160, "height": 44 },
-    { "x": 3300, "y": 490, "width": 180, "height": 44 },
-    { "x": 3470, "y": 490, "width": 120, "height": 44 },
+    { "x": 150, "y": 490, "width": 220, "height": 44 },
+    { "x": 430, "y": 490, "width": 220, "height": 44 },
+    { "x": 710, "y": 490, "width": 220, "height": 44 },
+    { "x": 930, "y": 490, "width": 200, "height": 44 },
 
-    { "x": 900, "y": 370, "width": 140, "height": 28 },
-    { "x": 1220, "y": 340, "width": 130, "height": 28 },
-    { "x": 1520, "y": 310, "width": 120, "height": 28 },
-    { "x": 2080, "y": 340, "width": 130, "height": 28 },
-    { "x": 2380, "y": 310, "width": 130, "height": 28 },
-    { "x": 2660, "y": 340, "width": 120, "height": 28 },
-    { "x": 2890, "y": 310, "width": 120, "height": 28 },
-    { "x": 3140, "y": 300, "width": 120, "height": 28 }
-  ],
-  "movingPlatforms": [
-    { "x": 1780, "y": 320, "width": 120, "height": 28, "moveY": -55, "duration": 2100 },
-    { "x": 3000, "y": 280, "width": 120, "height": 28, "moveY": -50, "duration": 1900 }
+    { "x": 470, "y": 350, "width": 120, "height": 28 },
+    { "x": 700, "y": 300, "width": 120, "height": 28 },
+    { "x": 890, "y": 350, "width": 110, "height": 28 }
   ],
   "snakes": [],
   "sparkles": [],
   "bossWitch": {
-    "x": 3050,
-    "y": 250,
-    "patrolWidth": 380,
+    "x": 760,
+    "y": 240,
+    "patrolWidth": 300,
     "moveY": 42,
     "speed": 1.15,
     "health": 6
