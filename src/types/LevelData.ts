@@ -17,6 +17,13 @@ export type SparkleData = {
   y: number;
 };
 
+export type WaterPuddleData = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type LevelData = {
   theme: "forest" | "lava";
   spawn: { x: number; y: number };
@@ -26,4 +33,5 @@ export type LevelData = {
   platforms: PlatformData[];
   snakes: SnakeData[];
   sparkles: SparkleData[];
+  waterPuddles?: WaterPuddleData[];
 };

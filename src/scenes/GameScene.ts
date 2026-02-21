@@ -37,6 +37,7 @@ export class GameScene extends Phaser.Scene {
   private levelData!: LevelData;
   private audioContext?: AudioContext;
   private lavaHitbox?: Phaser.GameObjects.Rectangle;
+  private waterPuddleHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private rainbowPowerup?: Phaser.Physics.Arcade.Image;
   private nextRainbowTrailAt = 0;
   private gateUnlocked = false;
@@ -62,6 +63,7 @@ export class GameScene extends Phaser.Scene {
     this.levelData = this.cache.json.get(`level-${this.levelNumber}`) as LevelData;
     this.gateUnlocked = false;
     this.lavaHitbox = undefined;
+    this.waterPuddleHitboxes = [];
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -91,6 +93,7 @@ export class GameScene extends Phaser.Scene {
     );
     this.player.setRainbowPowerup(false);
     this.physics.add.collider(this.player, this.platforms);
+    this.createForestPuddles();
 
     this.rainbowPowerup = this.physics.add
       .staticImage(
@@ -280,6 +283,33 @@ export class GameScene extends Phaser.Scene {
 
     this.lavaHitbox = this.add.rectangle(WORLD_WIDTH / 2, WORLD_HEIGHT - 16, WORLD_WIDTH, 28, 0, 0);
     this.physics.add.existing(this.lavaHitbox, true);
+  }
+
+  private createForestPuddles(): void {
+    if (this.levelData.theme !== "forest" || !this.levelData.waterPuddles?.length) {
+      return;
+    }
+
+    for (const puddle of this.levelData.waterPuddles) {
+      this.add
+        .rectangle(puddle.x, puddle.y + 2, puddle.width, puddle.height, 0x3d8fd6, 0.95)
+        .setDepth(2);
+      this.add
+        .rectangle(puddle.x, puddle.y - 2, puddle.width * 0.84, puddle.height * 0.46, 0x9fe8ff, 0.72)
+        .setDepth(3);
+
+      const hitbox = this.add.rectangle(
+        puddle.x,
+        puddle.y,
+        puddle.width * 0.88,
+        Math.max(8, puddle.height - 4),
+        0,
+        0
+      );
+      this.physics.add.existing(hitbox, true);
+      this.physics.add.overlap(this.player, hitbox, this.handlePlayerHit, undefined, this);
+      this.waterPuddleHitboxes.push(hitbox);
+    }
   }
 
   private createControls(): void {
