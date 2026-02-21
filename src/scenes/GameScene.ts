@@ -48,6 +48,7 @@ export class GameScene extends Phaser.Scene {
   private critterHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private critterMovers: CritterMover[] = [];
   private storyCat?: Phaser.Physics.Arcade.Image;
+  private wasNearStoryCat = false;
   private catStoryBox?: Phaser.GameObjects.Graphics;
   private catStoryText?: Phaser.GameObjects.Text;
   private catNoiseText?: Phaser.GameObjects.Text;
@@ -84,6 +85,7 @@ export class GameScene extends Phaser.Scene {
     this.critterHitboxes = [];
     this.critterMovers = [];
     this.storyCat = undefined;
+    this.wasNearStoryCat = false;
     this.catStoryBox?.destroy();
     this.catStoryText?.destroy();
     this.catNoiseText?.destroy();
@@ -558,6 +560,7 @@ export class GameScene extends Phaser.Scene {
   private updateStoryCatBubbleVisibility(): void {
     if (!this.storyCat || !this.storyCat.active || !this.player || !this.player.active) {
       this.hideStoryCatBubble();
+      this.wasNearStoryCat = false;
       return;
     }
 
@@ -566,12 +569,16 @@ export class GameScene extends Phaser.Scene {
       Phaser.Math.Distance.Between(this.player.x, this.player.y, this.storyCat.x, this.storyCat.y) <=
       nearDistance;
 
-    if (isNearCat) {
+    if (isNearCat && !this.wasNearStoryCat) {
       this.showStoryCatBubble();
+      this.wasNearStoryCat = true;
       return;
     }
 
-    this.hideStoryCatBubble();
+    if (!isNearCat && this.wasNearStoryCat) {
+      this.hideStoryCatBubble();
+      this.wasNearStoryCat = false;
+    }
   }
 
   private createControls(): void {
