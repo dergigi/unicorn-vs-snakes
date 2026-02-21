@@ -165,7 +165,13 @@ export class MenuScene extends Phaser.Scene {
         applyStyles();
       });
 
-      const label = difficulty === "insane" ? "INSANE-O ☠️" : difficulty.toUpperCase();
+      const labels: Record<Difficulty, string> = {
+        easy: "🍀 EASY",
+        normal: "NORMAL",
+        hard: "HARD",
+        insane: "INSANE-O ☠️",
+      };
+      const label = labels[difficulty];
       this.add
         .text(cx, cy, label, {
           fontSize: "16px",
