@@ -41,7 +41,6 @@ export class GameScene extends Phaser.Scene {
   private stumpHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private critterHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private storyCat?: Phaser.Physics.Arcade.Image;
-  private catStoryShown = false;
   private catStoryBox?: Phaser.GameObjects.Graphics;
   private catStoryText?: Phaser.GameObjects.Text;
   private catNoiseText?: Phaser.GameObjects.Text;
@@ -77,7 +76,6 @@ export class GameScene extends Phaser.Scene {
     this.stumpHitboxes = [];
     this.critterHitboxes = [];
     this.storyCat = undefined;
-    this.catStoryShown = false;
     this.catStoryBox?.destroy();
     this.catStoryText?.destroy();
     this.catNoiseText?.destroy();
@@ -193,6 +191,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.player.update(time, delta);
     this.emitRainbowTrail(time);
+    this.updateStoryCatBubbleVisibility();
     this.updateGateUnlockState();
     this.maybeAwardPerfectSparkleHeart();
     for (const snake of this.snakes) {
@@ -410,7 +409,7 @@ export class GameScene extends Phaser.Scene {
       .setDisplaySize(this.levelData.storyCat.width, this.levelData.storyCat.height)
       .setDepth(9);
     this.storyCat = cat;
-    this.physics.add.collider(this.player, cat, this.handleStoryCatTouch, undefined, this);
+    this.physics.add.collider(this.player, cat);
 
     this.catNoiseText = this.add
       .text(cat.x, cat.y - this.levelData.storyCat.height - 6, "", {
@@ -455,13 +454,11 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  private handleStoryCatTouch(): void {
-    if (this.catStoryShown) {
+  private showStoryCatBubble(): void {
+    if (!this.storyCat) {
       return;
     }
-    this.catStoryShown = true;
-
-    if (!this.storyCat) {
+    if (this.catStoryBox || this.catStoryText) {
       return;
     }
 
@@ -519,13 +516,32 @@ export class GameScene extends Phaser.Scene {
     if (this.audioContext) {
       beep(this.audioContext, 620, 0.08, "triangle", 0.03);
     }
+  }
 
-    this.time.delayedCall(6500, () => {
-      this.catStoryBox?.destroy();
-      this.catStoryText?.destroy();
-      this.catStoryBox = undefined;
-      this.catStoryText = undefined;
-    });
+  private hideStoryCatBubble(): void {
+    this.catStoryBox?.destroy();
+    this.catStoryText?.destroy();
+    this.catStoryBox = undefined;
+    this.catStoryText = undefined;
+  }
+
+  private updateStoryCatBubbleVisibility(): void {
+    if (!this.storyCat || !this.storyCat.active || !this.player || !this.player.active) {
+      this.hideStoryCatBubble();
+      return;
+    }
+
+    const nearDistance = 180;
+    const isNearCat =
+      Phaser.Math.Distance.Between(this.player.x, this.player.y, this.storyCat.x, this.storyCat.y) <=
+      nearDistance;
+
+    if (isNearCat) {
+      this.showStoryCatBubble();
+      return;
+    }
+
+    this.hideStoryCatBubble();
   }
 
   private createControls(): void {
