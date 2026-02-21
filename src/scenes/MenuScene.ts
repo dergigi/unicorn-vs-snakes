@@ -189,8 +189,8 @@ export class MenuScene extends Phaser.Scene {
 
       if (difficulty === "insane") {
         this.add
-          .image(text.x + text.width / 2 + 12, cy, "pink-skull")
-          .setScale(1.4);
+          .image(text.x + text.width / 2 + 10, cy, "pink-skull")
+          .setScale(0.8);
       }
     });
 
