@@ -23,5 +23,5 @@ export const KNOCKBACK_Y = -260;
 export const SNAKE_SPEED = 70;
 export const SNAKE_SPEED_VARIATION = 25;
 
-export const TOTAL_SPARKLES = 20;
+export const TOTAL_SPARKLES = 21;
 export const REQUIRED_SPARKLES_TO_FINISH = 14;
