@@ -18,7 +18,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private controlsEnabled = true;
 
   constructor(scene: Phaser.Scene, x: number, y: number, cursors: Cursors) {
-    super(scene, x, y, "unicorn");
+    super(scene, x, y, "unicorn", 0);
     this.cursors = cursors;
 
     scene.add.existing(this);
@@ -26,7 +26,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     const body = this.body as Phaser.Physics.Arcade.Body;
     this.setOrigin(0.5, 1);
-    this.setScale(0.8);
+    this.setScale(2);
     this.setCollideWorldBounds(true);
     body.setSize(24, 30, true);
     body.setOffset(4, 2);
@@ -68,10 +68,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     let velocityX = 0;
     if (this.cursors.left?.isDown) {
       velocityX = -PLAYER_MOVE_SPEED;
-      this.setFlipX(false);
+      this.setFlipX(true);
     } else if (this.cursors.right?.isDown) {
       velocityX = PLAYER_MOVE_SPEED;
-      this.setFlipX(true);
+      this.setFlipX(false);
     }
     this.setVelocityX(velocityX);
 
@@ -87,10 +87,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       body.velocity.y = PLAYER_MAX_FALL_SPEED;
     }
 
-    if (Math.abs(velocityX) > 0) {
-      const gallopSway = Math.sin(time * 0.01) * 2.2;
-      this.setAngle(gallopSway);
+    if (!isGrounded) {
+      this.setFrame(2);
+      this.setAngle(0);
+    } else if (Math.abs(velocityX) > 0) {
+      const runFrame = Math.floor(time / 120) % 4;
+      this.setFrame(runFrame);
+      this.setAngle(0);
     } else {
+      this.setFrame(0);
       this.setAngle(0);
     }
   }
