@@ -35,9 +35,9 @@ export const SNAKE_SPEED_VARIATION = 25;
 
 export const TOTAL_SPARKLES = 21;
 const REQUIRED_SPARKLES_BY_LEVEL: Record<number, number> = {
-  1: 10,
-  2: 15,
-  3: 20
+  1: 12,
+  2: 16,
+  3: 21
 };
 
 export function getRequiredSparklesToFinish(levelNumber: number): number {
