@@ -1,7 +1,10 @@
 import Phaser from "phaser";
 import {
   COYOTE_TIME_MS,
+  JUMP_HOLD_BOOST_PER_FRAME,
+  JUMP_HOLD_MAX_MS,
   JUMP_BUFFER_MS,
+  MAX_JUMPS,
   PLAYER_JUMP_VELOCITY,
   PLAYER_MAX_FALL_SPEED,
   PLAYER_MOVE_SPEED
@@ -15,6 +18,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private cursors: Cursors;
   private lastGroundedAt = 0;
   private lastJumpPressedAt = -9999;
+  private jumpsUsed = 0;
+  private jumpHoldUntil = 0;
   private controlsEnabled = true;
 
   constructor(scene: Phaser.Scene, x: number, y: number, cursors: Cursors) {
@@ -46,14 +51,17 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setVelocity(0, 0);
     this.clearTint();
     this.setAlpha(1);
+    this.jumpsUsed = 0;
+    this.jumpHoldUntil = 0;
   }
 
-  public update(time: number): void {
+  public update(time: number, delta: number): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
     const isGrounded = body.blocked.down || body.touching.down;
 
     if (isGrounded) {
       this.lastGroundedAt = time;
+      this.jumpsUsed = 0;
     }
 
     if (!this.controlsEnabled) {
@@ -79,10 +87,30 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     const canUseCoyote = time - this.lastGroundedAt <= COYOTE_TIME_MS;
     const jumpBuffered = time - this.lastJumpPressedAt <= JUMP_BUFFER_MS;
-    if (canUseCoyote && jumpBuffered) {
+    const canGroundJump = canUseCoyote && this.jumpsUsed === 0;
+    const canAirJump = !canUseCoyote && this.jumpsUsed > 0 && this.jumpsUsed < MAX_JUMPS;
+
+    if (jumpBuffered && (canGroundJump || canAirJump)) {
       this.setVelocityY(PLAYER_JUMP_VELOCITY);
       this.lastJumpPressedAt = -9999;
       this.lastGroundedAt = -9999;
+      this.jumpsUsed += 1;
+      this.jumpHoldUntil = time + JUMP_HOLD_MAX_MS;
+    }
+
+    const jumpHeld = this.cursors.jump.isDown || this.cursors.up.isDown;
+    const jumpReleased =
+      Phaser.Input.Keyboard.JustUp(this.cursors.jump) ||
+      Phaser.Input.Keyboard.JustUp(this.cursors.up);
+
+    if (jumpReleased && body.velocity.y < 0) {
+      body.velocity.y *= 0.55;
+      this.jumpHoldUntil = 0;
+    }
+
+    if (jumpHeld && time < this.jumpHoldUntil && body.velocity.y < 0) {
+      const dtScale = delta / 16.6667;
+      body.velocity.y -= JUMP_HOLD_BOOST_PER_FRAME * dtScale;
     }
 
     if (body.velocity.y > PLAYER_MAX_FALL_SPEED) {

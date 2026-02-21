@@ -11,6 +11,9 @@ export const PLAYER_MAX_FALL_SPEED = 800;
 
 export const COYOTE_TIME_MS = 120;
 export const JUMP_BUFFER_MS = 140;
+export const MAX_JUMPS = 2;
+export const JUMP_HOLD_MAX_MS = 170;
+export const JUMP_HOLD_BOOST_PER_FRAME = 18;
 
 export const MAX_LIVES = 3;
 export const PLAYER_HIT_INVULNERABILITY_MS = 1100;

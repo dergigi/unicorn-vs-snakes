@@ -115,11 +115,11 @@ export class GameScene extends Phaser.Scene {
     this.game.events.emit(GAME_EVENTS.sparkleChanged, this.collectibleSystem.getCollectedCount());
   }
 
-  update(time: number): void {
+  update(time: number, delta: number): void {
     if (this.levelComplete) {
       return;
     }
-    this.player.update(time);
+    this.player.update(time, delta);
     for (const snake of this.snakes) {
       snake.update();
     }
