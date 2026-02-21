@@ -67,6 +67,7 @@ export class UIScene extends Phaser.Scene {
       this
     );
     this.game.events.on(GAME_EVENTS.rainbowPowerupLost, this.onRainbowPowerupLost, this);
+    this.game.events.on(GAME_EVENTS.mushroomPowerupCollected, this.onMushroomPowerupCollected, this);
     this.game.events.on(GAME_EVENTS.checkpointReached, this.onCheckpointReached, this);
     this.game.events.on(GAME_EVENTS.playerHit, this.onPlayerHit, this);
 
@@ -79,6 +80,11 @@ export class UIScene extends Phaser.Scene {
         this
       );
       this.game.events.off(GAME_EVENTS.rainbowPowerupLost, this.onRainbowPowerupLost, this);
+      this.game.events.off(
+        GAME_EVENTS.mushroomPowerupCollected,
+        this.onMushroomPowerupCollected,
+        this
+      );
       this.game.events.off(GAME_EVENTS.checkpointReached, this.onCheckpointReached, this);
       this.game.events.off(GAME_EVENTS.playerHit, this.onPlayerHit, this);
     });
@@ -150,6 +156,13 @@ export class UIScene extends Phaser.Scene {
     this.hintText.setText("Ouch! Rainbow power lost!");
     this.hintText.setColor("#ffd0a1");
     this.hintText.setStroke("#5a361f", 4);
+    this.resetHintSoon();
+  }
+
+  private onMushroomPowerupCollected(): void {
+    this.hintText.setText("Mushroom power! Press X to shoot fireballs!");
+    this.hintText.setColor("#ffd6a1");
+    this.hintText.setStroke("#5a2f1f", 4);
     this.resetHintSoon();
   }
 

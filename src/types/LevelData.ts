@@ -55,6 +55,8 @@ export type BossWitchData = {
   health?: number;
 };
 
+export type BossMushroomData = RectData;
+
 export type LevelData = {
   theme: "forest" | "lava" | "castle";
   spawn: { x: number; y: number };
@@ -73,4 +75,5 @@ export type LevelData = {
   movingPlatforms?: MovingPlatformData[];
   bats?: BatData[];
   bossWitch?: BossWitchData;
+  bossMushroom?: BossMushroomData;
 };

@@ -3,6 +3,7 @@ export const GAME_EVENTS = {
   sparkleChanged: "sparkleChanged",
   rainbowPowerupCollected: "rainbowPowerupCollected",
   rainbowPowerupLost: "rainbowPowerupLost",
+  mushroomPowerupCollected: "mushroomPowerupCollected",
   checkpointReached: "checkpointReached",
   playerHit: "playerHit",
   levelWon: "levelWon",

@@ -57,6 +57,12 @@ export class GameScene extends Phaser.Scene {
   private bossWitch?: Phaser.Physics.Arcade.Sprite;
   private bossHealth = 0;
   private bossInvulnerableUntil = 0;
+  private bossBatSpawnTimer?: Phaser.Time.TimerEvent;
+  private mushroomPickup?: Phaser.Physics.Arcade.Image;
+  private hasMushroomPower = false;
+  private fireballKey?: Phaser.Input.Keyboard.Key;
+  private fireballs?: Phaser.Physics.Arcade.Group;
+  private nextFireballAt = 0;
   private applePickups?: Phaser.Physics.Arcade.StaticGroup;
   private critterMovers: CritterMover[] = [];
   private platformMovers: PlatformMover[] = [];
@@ -122,6 +128,12 @@ export class GameScene extends Phaser.Scene {
     this.bossWitch = undefined;
     this.bossHealth = 0;
     this.bossInvulnerableUntil = 0;
+    this.bossBatSpawnTimer?.remove(false);
+    this.bossBatSpawnTimer = undefined;
+    this.mushroomPickup = undefined;
+    this.hasMushroomPower = false;
+    this.fireballs = undefined;
+    this.nextFireballAt = 0;
     this.applePickups = undefined;
     this.critterMovers = [];
     this.platformMovers = [];
@@ -186,6 +198,10 @@ export class GameScene extends Phaser.Scene {
     );
     this.player.setRainbowPowerup(data?.hasRainbow ?? false);
     this.physics.add.collider(this.player, this.platforms);
+    this.fireballs = this.physics.add.group({
+      allowGravity: false,
+      immovable: true
+    });
     this.createForestPuddles();
     this.createForestStumps();
     this.createFriendlyCritters();
@@ -250,6 +266,7 @@ export class GameScene extends Phaser.Scene {
     this.createMovingPlatforms();
     this.createBats();
     this.createBossWitch();
+    this.createBossMushroomPowerup();
 
     this.finishGate = this.physics.add
       .staticImage(this.levelData.finishGate.x, this.levelData.finishGate.y, "finish-gate-closed")
@@ -350,6 +367,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     this.player.update(time, delta);
+    this.tryShootFireball(time);
     this.updateFriendlyCritterPush();
     this.updateMovingPlatforms();
     this.emitRainbowTrail(time);
@@ -964,6 +982,14 @@ export class GameScene extends Phaser.Scene {
         repeat: -1
       });
     }
+    if (!this.anims.exists("bat-fly")) {
+      this.anims.create({
+        key: "bat-fly",
+        frames: this.anims.generateFrameNumbers("bat", { start: 0, end: 3 }),
+        frameRate: 8,
+        repeat: -1
+      });
+    }
 
     const witch = this.physics.add
       .sprite(bossData.x, bossData.y, "witch", 0)
@@ -1007,7 +1033,135 @@ export class GameScene extends Phaser.Scene {
     this.bossWitch = witch;
     this.bossHealth = bossData.health ?? 6;
     this.bossInvulnerableUntil = 0;
+    this.bossBatSpawnTimer = this.time.addEvent({
+      delay: 2200,
+      loop: true,
+      callback: () => this.spawnBossBat()
+    });
     this.physics.add.overlap(this.player, witch, this.handleBossWitchCollision, undefined, this);
+  }
+
+  private spawnBossBat(): void {
+    if (!this.bossWitch || !this.bossWitch.active || !this.player?.active || this.levelComplete) {
+      return;
+    }
+    const bat = this.physics.add
+      .sprite(this.bossWitch.x, this.bossWitch.y + 2, "bat", 0)
+      .setScale(1.05)
+      .setDepth(10);
+    const body = bat.body as Phaser.Physics.Arcade.Body;
+    body.setAllowGravity(false);
+    body.setSize(20, 18);
+    bat.play("bat-fly");
+
+    const dx = this.player.x - bat.x;
+    const dy = (this.player.y - 30) - bat.y;
+    const distance = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+    const speed = 175;
+    body.setVelocity((dx / distance) * speed, (dy / distance) * speed);
+    bat.setFlipX(body.velocity.x < 0);
+    this.physics.add.overlap(this.player, bat, this.handlePlayerHit, undefined, this);
+    this.time.delayedCall(3200, () => bat.destroy());
+  }
+
+  private createBossMushroomPowerup(): void {
+    const mushroomData = this.levelData.bossMushroom;
+    if (!mushroomData) {
+      return;
+    }
+    this.mushroomPickup = this.physics.add
+      .staticImage(mushroomData.x, mushroomData.y, "mushroom-powerup")
+      .setOrigin(0.5, 1)
+      .setDisplaySize(mushroomData.width, mushroomData.height)
+      .setDepth(10);
+    this.physics.add.overlap(
+      this.player,
+      this.mushroomPickup,
+      this.handleMushroomCollect,
+      undefined,
+      this
+    );
+  }
+
+  private handleMushroomCollect(): void {
+    if (!this.mushroomPickup || !this.mushroomPickup.active) {
+      return;
+    }
+    this.mushroomPickup.destroy();
+    this.mushroomPickup = undefined;
+    this.hasMushroomPower = true;
+    this.game.events.emit(GAME_EVENTS.mushroomPowerupCollected);
+    if (this.audioContext) {
+      beep(this.audioContext, 560, 0.1, "triangle", 0.03);
+    }
+  }
+
+  private tryShootFireball(time: number): void {
+    if (!this.hasMushroomPower || !this.fireballKey || !this.fireballs) {
+      return;
+    }
+    if (time < this.nextFireballAt || !Phaser.Input.Keyboard.JustDown(this.fireballKey)) {
+      return;
+    }
+    this.nextFireballAt = time + 220;
+
+    const dir = this.player.flipX ? -1 : 1;
+    const fireball = this.fireballs.create(
+      this.player.x + dir * 26,
+      this.player.y - 26,
+      "lava-flame"
+    ) as Phaser.Physics.Arcade.Image;
+    fireball
+      .setDepth(11)
+      .setScale(0.55)
+      .setFlipX(dir < 0)
+      .setTint(0xffe38a);
+    const body = fireball.body as Phaser.Physics.Arcade.Body;
+    body.setAllowGravity(false);
+    body.setVelocity(460 * dir, 0);
+    body.setSize(Math.max(10, fireball.width * 0.4), Math.max(10, fireball.height * 0.4), true);
+
+    if (this.bossWitch?.active) {
+      this.physics.add.overlap(fireball, this.bossWitch, this.handleFireballHitBoss, undefined, this);
+    }
+    this.time.delayedCall(1600, () => fireball.destroy());
+    if (this.audioContext) {
+      beep(this.audioContext, 700, 0.05, "triangle", 0.02);
+    }
+  }
+
+  private handleFireballHitBoss(
+    fireballObject:
+      | Phaser.Types.Physics.Arcade.GameObjectWithBody
+      | Phaser.Physics.Arcade.Body
+      | Phaser.Physics.Arcade.StaticBody
+      | Phaser.Tilemaps.Tile
+  ): void {
+    const fireball = fireballObject as Phaser.GameObjects.GameObject | undefined;
+    fireball?.destroy();
+    if (!this.bossWitch || !this.bossWitch.active || this.time.now < this.bossInvulnerableUntil) {
+      return;
+    }
+    this.bossInvulnerableUntil = this.time.now + 260;
+    this.bossHealth -= 1;
+    this.bossWitch.setTint(0xff956c);
+    this.time.delayedCall(100, () => this.bossWitch?.clearTint());
+    if (this.audioContext) {
+      beep(this.audioContext, 820, 0.08, "triangle", 0.03);
+    }
+    if (this.bossHealth > 0) {
+      return;
+    }
+    this.bossBatSpawnTimer?.remove(false);
+    this.bossBatSpawnTimer = undefined;
+    this.bossWitch.destroy();
+    this.bossWitch = undefined;
+    this.bossInvulnerableUntil = 0;
+    this.cameras.main.shake(220, 0.0045);
+    if (this.audioContext) {
+      beep(this.audioContext, 980, 0.1, "triangle", 0.04);
+    }
+    this.updateGateUnlockState();
   }
 
   private updateBossWitch(time: number): void {
@@ -1063,6 +1217,8 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    this.bossBatSpawnTimer?.remove(false);
+    this.bossBatSpawnTimer = undefined;
     this.bossWitch.destroy();
     this.bossWitch = undefined;
     this.bossInvulnerableUntil = 0;
@@ -1233,6 +1389,7 @@ export class GameScene extends Phaser.Scene {
   private createControls(): void {
     const baseCursors = this.input.keyboard?.createCursorKeys();
     const jumpKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.fireballKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.X);
     const wasd = this.input.keyboard?.addKeys({
       w: Phaser.Input.Keyboard.KeyCodes.W,
       a: Phaser.Input.Keyboard.KeyCodes.A,
@@ -1242,6 +1399,7 @@ export class GameScene extends Phaser.Scene {
     if (
       !baseCursors ||
       !jumpKey ||
+      !this.fireballKey ||
       !wasd ||
       !("w" in wasd) ||
       !("a" in wasd) ||
