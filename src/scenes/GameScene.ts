@@ -380,9 +380,9 @@ export class GameScene extends Phaser.Scene {
       this.physics.add.collider(this.player, hitbox);
       this.critterHitboxes.push(hitbox);
 
-      // Give the critter a clearer back-and-forth patrol so it feels alive.
-      const patrolRange = 30;
-      const patrolDuration = Phaser.Math.Between(1300, 1900);
+      // Give the critter a larger back-and-forth patrol so it feels lively.
+      const patrolRange = Phaser.Math.Between(44, 58);
+      const patrolDuration = Phaser.Math.Between(1050, 1650);
       this.tweens.add({
         targets: [critterSprite, hitbox],
         x: critter.x + patrolRange,
