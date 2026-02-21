@@ -418,6 +418,15 @@ export class GameScene extends Phaser.Scene {
           .setTint(0x8fd57f)
           .setScrollFactor(0.46);
       }
+
+      // Foreground hero tree -- player walks behind it.
+      this.add
+        .image(850, WORLD_HEIGHT + 10, "tree-krook")
+        .setOrigin(0.5, 1)
+        .setScale(1.8)
+        .setAlpha(0.75)
+        .setDepth(100)
+        .setScrollFactor(1);
       return;
     }
 
