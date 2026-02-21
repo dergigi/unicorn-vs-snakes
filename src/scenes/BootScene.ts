@@ -148,10 +148,18 @@ export class BootScene extends Phaser.Scene {
         { x: 6, y: 2, w: 20, h: 2, c: "#6f8dff" },
         { x: 9, y: 0, w: 14, h: 2, c: "#d98cff" },
 
-        { x: 6, y: 16, w: 20, h: 20, c: "#ffffff" },
-        { x: 7, y: 17, w: 18, h: 18, c: "#eefbff" },
+        // Open center passage: dark portal with subtle inner glow.
+        { x: 6, y: 16, w: 20, h: 20, c: "#201440" },
+        { x: 7, y: 17, w: 18, h: 18, c: "#2a1b54" },
+        { x: 8, y: 18, w: 16, h: 16, c: "#1a1036" },
+        { x: 9, y: 19, w: 14, h: 2, c: "#3f2b73" },
+        { x: 9, y: 22, w: 14, h: 1, c: "#4f3687" },
+        { x: 9, y: 25, w: 14, h: 1, c: "#3f2b73" },
+        { x: 9, y: 28, w: 14, h: 1, c: "#2f205f" },
+
         { x: 10, y: 36, w: 5, h: 2, c: "#ffd95e" },
-        { x: 16, y: 36, w: 5, h: 2, c: "#7de86f" }
+        { x: 16, y: 36, w: 5, h: 2, c: "#7de86f" },
+        { x: 13, y: 36, w: 3, h: 2, c: "#66d8ff" }
       ]
     );
     makePixelTexture(
