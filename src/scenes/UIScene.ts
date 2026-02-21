@@ -20,13 +20,13 @@ export class UIScene extends Phaser.Scene {
     super("UIScene");
   }
 
-  create(data?: { maxLives?: number; levelNumber?: number; timerStartMs?: number }): void {
+  create(data?: { maxLives?: number; levelNumber?: number }): void {
     this.heartSprites = [];
     this.hideHintTimer?.remove(false);
     this.hideHintTimer = undefined;
 
     this.maxLives = data?.maxLives ?? 5;
-    this.timerStartMs = data?.timerStartMs ?? Date.now();
+    this.timerStartMs = Date.now();
     this.requiredSparklesToFinish = getRequiredSparklesToFinish(data?.levelNumber ?? 1);
     this.audioContext = "context" in this.sound ? (this.sound.context as AudioContext) : undefined;
     for (let i = 0; i < this.maxLives; i += 1) {

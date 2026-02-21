@@ -78,6 +78,7 @@ export class GameScene extends Phaser.Scene {
   private levelSkipTargetLevel?: number;
   private levelSkipResetTimer?: Phaser.Time.TimerEvent;
   private timerStartMs = 0;
+  private levelTimes: number[] = [];
 
   constructor() {
     super("GameScene");
@@ -89,12 +90,13 @@ export class GameScene extends Phaser.Scene {
     levelNumber?: number;
     currentLives?: number;
     hasRainbow?: boolean;
-    timerStartMs?: number;
+    levelTimes?: number[];
   }): void {
     this.maxLives = data?.maxLives ?? 5;
     this.difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
     this.levelNumber = data?.levelNumber ?? 1;
-    this.timerStartMs = data?.timerStartMs ?? Date.now();
+    this.levelTimes = data?.levelTimes ?? [];
+    this.timerStartMs = Date.now();
     this.levelComplete = false;
     this.lives = data?.currentLives ?? this.maxLives;
     this.canTakeDamageAt = 0;
@@ -305,13 +307,14 @@ export class GameScene extends Phaser.Scene {
 
     this.levelComplete = true;
     this.player?.setControlsEnabled(false);
+    this.levelTimes.push(Date.now() - this.timerStartMs);
     const sceneData = {
       maxLives: this.maxLives,
       difficulty: this.difficulty,
       levelNumber: targetLevel,
       currentLives: this.lives,
       hasRainbow: this.player?.hasRainbowPower() ?? false,
-      timerStartMs: this.timerStartMs
+      levelTimes: [...this.levelTimes]
     };
     this.scene.stop("UIScene");
     this.scene.restart(sceneData);
@@ -1288,11 +1291,12 @@ export class GameScene extends Phaser.Scene {
     if (this.lives <= 0) {
       this.game.events.emit(GAME_EVENTS.gameOver);
       this.scene.stop("UIScene");
+      const allTimes = [...this.levelTimes, Date.now() - this.timerStartMs];
       this.scene.start("GameOverScene", {
         maxLives: this.maxLives,
         difficulty: this.difficulty,
         levelNumber: this.levelNumber,
-        elapsedMs: Date.now() - this.timerStartMs
+        levelTimes: allTimes
       });
       return;
     }
@@ -1329,6 +1333,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.game.events.emit(GAME_EVENTS.levelWon);
     this.scene.stop("UIScene");
+    this.levelTimes.push(Date.now() - this.timerStartMs);
     this.time.delayedCall(500, () => {
       if (this.levelNumber < LEVEL_COUNT) {
         const sceneData = {
@@ -1337,9 +1342,8 @@ export class GameScene extends Phaser.Scene {
           levelNumber: this.levelNumber + 1,
           currentLives: this.lives,
           hasRainbow: this.player.hasRainbowPower(),
-          timerStartMs: this.timerStartMs
+          levelTimes: [...this.levelTimes]
         };
-        // Restarting the same scene key is more reliable than start() here.
         this.scene.restart(sceneData);
         this.scene.launch("UIScene", sceneData);
         return;
@@ -1347,7 +1351,7 @@ export class GameScene extends Phaser.Scene {
 
       this.scene.start("WinScene", {
         sparkles: collected,
-        elapsedMs: Date.now() - this.timerStartMs
+        levelTimes: [...this.levelTimes]
       });
     });
   }
