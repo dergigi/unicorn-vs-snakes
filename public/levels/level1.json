@@ -44,9 +44,9 @@
     { "x": 3020, "y": 478, "width": 36, "height": 30 }
   ],
   "friendlyCritters": [
-    { "x": 900, "y": 478, "width": 40, "height": 38 },
-    { "x": 1840, "y": 478, "width": 40, "height": 38 },
-    { "x": 2820, "y": 478, "width": 40, "height": 38 }
+    { "x": 900, "y": 478, "width": 36, "height": 34 },
+    { "x": 1840, "y": 478, "width": 36, "height": 34 },
+    { "x": 2820, "y": 478, "width": 36, "height": 34 }
   ],
   "storyCat": { "x": 260, "y": 478, "width": 33, "height": 33 },
   "snakes": [
