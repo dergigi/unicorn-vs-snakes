@@ -36,4 +36,4 @@ The production files are generated in `dist/`. You can host that folder on:
 ## Credits
 
 - Unicorn sprite: "Running unicorn" by magdum (CC-BY-SA 3.0) from OpenGameArt: [https://opengameart.org/content/running-unicorn-0](https://opengameart.org/content/running-unicorn-0)
-- Forest tree sprites: "Chestnut Trees (Yar's Tree Rework)" (CC-BY 3.0) from OpenGameArt: [https://opengameart.org/content/chestnut-trees-yars-tree-rework](https://opengameart.org/content/chestnut-trees-yars-tree-rework)
+- Forest tree sprites: "Chestnut Trees (Yar's Tree Rework)" (CC-BY 3.0) by Yar (rework page by AntumDeluge) from OpenGameArt: [https://opengameart.org/content/chestnut-trees-yars-tree-rework](https://opengameart.org/content/chestnut-trees-yars-tree-rework)
