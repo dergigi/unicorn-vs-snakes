@@ -391,79 +391,33 @@ export class GameScene extends Phaser.Scene {
     if (this.levelData.theme === "castle") {
       this.baseSkyLayer = this.add.rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x2f2b45).setOrigin(0, 0);
       this.baseHorizonLayer = this.add
-        .rectangle(0, WORLD_HEIGHT - 190, WORLD_WIDTH, 190, 0x4a4764, 0.45)
+        .rectangle(0, WORLD_HEIGHT - 160, WORLD_WIDTH, 160, 0x3d3860, 0.35)
         .setOrigin(0, 0);
 
       const castleImage = this.textures.get("castle-bg").getSourceImage() as { width: number; height: number };
-      const nearLayerHeight = 256;
-      const nearScale = nearLayerHeight / Math.max(1, castleImage.height);
-      const nearLayerWidth = Math.max(160, castleImage.width * nearScale);
-      for (let x = -40; x < WORLD_WIDTH + nearLayerWidth; x += nearLayerWidth - 30) {
+      const layerHeight = 200;
+      const scale = layerHeight / Math.max(1, castleImage.height);
+      const layerWidth = Math.max(150, castleImage.width * scale);
+      for (let x = -60; x < WORLD_WIDTH + layerWidth; x += layerWidth - 20) {
         this.add
-          .image(x, WORLD_HEIGHT - 22, "castle-bg")
+          .image(x, WORLD_HEIGHT - 60, "castle-bg")
           .setOrigin(0, 1)
-          .setScale(nearScale)
-          .setAlpha(0.34)
-          .setTint(0x8f8aa8)
-          .setScrollFactor(0.22);
-      }
-
-      const farLayerHeight = 220;
-      const farScale = farLayerHeight / Math.max(1, castleImage.height);
-      const farLayerWidth = Math.max(150, castleImage.width * farScale);
-      for (let x = -60; x < WORLD_WIDTH + farLayerWidth; x += farLayerWidth - 26) {
-        this.add
-          .image(x, WORLD_HEIGHT - 78, "castle-bg")
-          .setOrigin(0, 1)
-          .setScale(farScale)
-          .setAlpha(0.22)
-          .setTint(0x6c6887)
-          .setScrollFactor(0.14);
-      }
-
-      for (let i = 0; i < 8; i += 1) {
-        const x = 220 + i * 460;
-        const towerKey = i % 3 === 1 ? "castle-tower-damaged" : "castle-tower";
-        const scale = towerKey === "castle-tower" ? 0.66 : 0.62;
-        this.add
-          .image(x, WORLD_HEIGHT - 78, towerKey)
-          .setOrigin(0.5, 1)
           .setScale(scale)
-          .setAlpha(0.3)
-          .setTint(0x7f7a9c)
+          .setAlpha(0.18)
+          .setTint(0x6c6887)
+          .setScrollFactor(0.15);
+      }
+
+      for (let i = 0; i < 5; i += 1) {
+        const x = 300 + i * 700;
+        const towerKey = i % 2 === 0 ? "castle-tower" : "castle-tower-damaged";
+        this.add
+          .image(x, WORLD_HEIGHT - 70, towerKey)
+          .setOrigin(0.5, 1)
+          .setScale(0.55)
+          .setAlpha(0.2)
+          .setTint(0x6a6588)
           .setScrollFactor(0.18);
-      }
-
-      // Extra silhouette towers for parallax depth.
-      for (let i = 0; i < 9; i += 1) {
-        const x = 140 + i * 420;
-        const w = 170 + (i % 3) * 24;
-        const h = 120 + (i % 2) * 22;
-        this.add
-          .rectangle(x, WORLD_HEIGHT - 58, w, h, 0x3c3958, 0.62)
-          .setOrigin(0.5, 1)
-          .setScrollFactor(0.24);
-        this.add
-          .rectangle(x - w * 0.26, WORLD_HEIGHT - h - 58, 30, 34, 0x4f4b73, 0.72)
-          .setOrigin(0.5, 1)
-          .setScrollFactor(0.24);
-        this.add
-          .rectangle(x + w * 0.28, WORLD_HEIGHT - h - 50, 26, 28, 0x4f4b73, 0.72)
-          .setOrigin(0.5, 1)
-          .setScrollFactor(0.24);
-      }
-
-      for (let i = 0; i < 12; i += 1) {
-        const x = 80 + i * 320;
-        const h = 86 + (i % 4) * 14;
-        this.add
-          .rectangle(x, WORLD_HEIGHT - 44, 120, h, 0x666286, 0.66)
-          .setOrigin(0.5, 1)
-          .setScrollFactor(0.4);
-        this.add
-          .rectangle(x, WORLD_HEIGHT - h - 44, 18, 22, 0x7d76a3, 0.8)
-          .setOrigin(0.5, 1)
-          .setScrollFactor(0.4);
       }
       return;
     }
