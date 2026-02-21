@@ -51,7 +51,7 @@ export class UIScene extends Phaser.Scene {
       stroke: "#24133d",
       strokeThickness: 4
     }).setOrigin(0.5, 0).setScrollFactor(0);
-    this.hintText = this.add.text(GAME_WIDTH - 16, 16, "Arrows/WASD + Up/W", {
+    this.hintText = this.add.text(GAME_WIDTH - 16, 16, "", {
       fontFamily: "monospace",
       fontSize: "20px",
       color: "#ccf5ff",
@@ -173,7 +173,7 @@ export class UIScene extends Phaser.Scene {
   private resetHintSoon(): void {
     this.hideHintTimer?.remove(false);
     this.hideHintTimer = this.time.delayedCall(1800, () => {
-      this.hintText.setText("Arrows/WASD + Up/W");
+      this.hintText.setText("");
       this.hintText.setColor("#ccf5ff");
       this.hintText.setStroke("#24133d", 4);
     });
