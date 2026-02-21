@@ -5,6 +5,7 @@ import { GAME_EVENTS } from "../config/events";
 import {
   DEFAULT_DIFFICULTY,
   GAME_HEIGHT,
+  GAME_WIDTH,
   PLAYER_MOVE_SPEED,
   PLAYER_HIT_INVULNERABILITY_MS,
   REQUIRED_SPARKLES_TO_FINISH,
@@ -50,6 +51,7 @@ export class GameScene extends Phaser.Scene {
   private storyCat?: Phaser.Physics.Arcade.Image;
   private wasNearStoryCat = false;
   private catStoryBox?: Phaser.GameObjects.Graphics;
+  private catStoryPortrait?: Phaser.GameObjects.Image;
   private catStoryText?: Phaser.GameObjects.Text;
   private catNoiseText?: Phaser.GameObjects.Text;
   private catNoiseEvent?: Phaser.Time.TimerEvent;
@@ -87,10 +89,12 @@ export class GameScene extends Phaser.Scene {
     this.storyCat = undefined;
     this.wasNearStoryCat = false;
     this.catStoryBox?.destroy();
+    this.catStoryPortrait?.destroy();
     this.catStoryText?.destroy();
     this.catNoiseText?.destroy();
     this.catNoiseEvent?.remove(false);
     this.catStoryBox = undefined;
+    this.catStoryPortrait = undefined;
     this.catStoryText = undefined;
     this.catNoiseText = undefined;
     this.catNoiseEvent = undefined;
@@ -490,55 +494,48 @@ export class GameScene extends Phaser.Scene {
     if (!this.storyCat) {
       return;
     }
-    if (this.catStoryBox || this.catStoryText) {
+    if (this.catStoryBox || this.catStoryText || this.catStoryPortrait) {
       return;
     }
 
-    const bubbleWidth = 396;
-    const bubbleHeight = 112;
-    const bubbleCenterX = this.storyCat.x + 176;
-    const bubbleCenterY = this.storyCat.y - 146;
-    const bubbleLeft = bubbleCenterX - bubbleWidth / 2;
-    const bubbleTop = bubbleCenterY - bubbleHeight / 2;
-    const bubbleBottom = bubbleCenterY + bubbleHeight / 2;
-    const tailBaseX = bubbleLeft + 72;
-    const tailBaseY = bubbleBottom - 1;
-    const tailMidX = this.storyCat.x + 30;
-    const tailMidY = this.storyCat.y - this.storyCat.displayHeight - 28;
-    const tailTipX = this.storyCat.x + 12;
-    const tailTipY = this.storyCat.y - this.storyCat.displayHeight - 8;
+    const dialogWidth = GAME_WIDTH - 120;
+    const dialogHeight = 102;
+    const dialogX = 60;
+    const dialogY = 14;
+    const portraitSize = 42;
+    const portraitCenterX = dialogX + 30;
+    const portraitCenterY = dialogY + dialogHeight / 2;
 
-    const bubble = this.add.graphics().setDepth(1000);
-    bubble.fillStyle(0x0f253d, 0.95);
-    bubble.lineStyle(3, 0xb8ecff, 1);
-    bubble.fillRoundedRect(bubbleLeft, bubbleTop, bubbleWidth, bubbleHeight, 18);
-    bubble.strokeRoundedRect(bubbleLeft, bubbleTop, bubbleWidth, bubbleHeight, 18);
+    const dialog = this.add.graphics().setDepth(1000).setScrollFactor(0);
+    dialog.fillStyle(0x10243a, 0.95);
+    dialog.lineStyle(3, 0xb8ecff, 1);
+    dialog.fillRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 14);
+    dialog.strokeRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 14);
+    this.catStoryBox = dialog;
 
-    // Soft comic-style tail (two circles) looks cleaner than a long sharp triangle.
-    bubble.fillCircle(tailBaseX, tailBaseY, 11);
-    bubble.strokeCircle(tailBaseX, tailBaseY, 11);
-    bubble.fillCircle(tailMidX, tailMidY, 8);
-    bubble.strokeCircle(tailMidX, tailMidY, 8);
-    bubble.fillCircle(tailTipX, tailTipY, 5);
-    bubble.strokeCircle(tailTipX, tailTipY, 5);
-    this.catStoryBox = bubble;
+    this.catStoryPortrait = this.add
+      .image(portraitCenterX, portraitCenterY, "story-cat")
+      .setDisplaySize(portraitSize, portraitSize)
+      .setScrollFactor(0)
+      .setDepth(1001);
 
     this.catStoryText = this.add
       .text(
-        bubbleCenterX,
-        bubbleCenterY,
+        dialogX + 62,
+        portraitCenterY,
         "Hi, brave unicorn! The Rainbow Kingdom's colors were stolen\nby sneaky snakes. Collect sparkles to re-light the sky and open the gate!",
         {
           fontFamily: "monospace",
           fontSize: "16px",
           color: "#e6fbff",
-          align: "center",
-          wordWrap: { width: bubbleWidth - 34 },
+          align: "left",
+          wordWrap: { width: dialogWidth - 76 },
           stroke: "#091321",
           strokeThickness: 3
         }
       )
-      .setOrigin(0.5)
+      .setOrigin(0, 0.5)
+      .setScrollFactor(0)
       .setDepth(1001);
 
     if (this.audioContext) {
@@ -548,8 +545,10 @@ export class GameScene extends Phaser.Scene {
 
   private hideStoryCatBubble(): void {
     this.catStoryBox?.destroy();
+    this.catStoryPortrait?.destroy();
     this.catStoryText?.destroy();
     this.catStoryBox = undefined;
+    this.catStoryPortrait = undefined;
     this.catStoryText = undefined;
   }
 
