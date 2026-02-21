@@ -18,6 +18,10 @@ export class UIScene extends Phaser.Scene {
   }
 
   create(data?: { maxLives?: number; levelNumber?: number }): void {
+    this.heartSprites = [];
+    this.hideHintTimer?.remove(false);
+    this.hideHintTimer = undefined;
+
     this.maxLives = data?.maxLives ?? 5;
     this.requiredSparklesToFinish = getRequiredSparklesToFinish(data?.levelNumber ?? 1);
     this.audioContext = "context" in this.sound ? (this.sound.context as AudioContext) : undefined;
