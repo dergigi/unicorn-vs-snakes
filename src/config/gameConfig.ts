@@ -34,4 +34,12 @@ export const SNAKE_SPEED = 70;
 export const SNAKE_SPEED_VARIATION = 25;
 
 export const TOTAL_SPARKLES = 21;
-export const REQUIRED_SPARKLES_TO_FINISH = 14;
+const REQUIRED_SPARKLES_BY_LEVEL: Record<number, number> = {
+  1: 10,
+  2: 15,
+  3: 20
+};
+
+export function getRequiredSparklesToFinish(levelNumber: number): number {
+  return REQUIRED_SPARKLES_BY_LEVEL[levelNumber] ?? REQUIRED_SPARKLES_BY_LEVEL[3];
+}

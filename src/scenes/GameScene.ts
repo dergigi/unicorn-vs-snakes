@@ -8,10 +8,10 @@ import {
   GAME_WIDTH,
   PLAYER_MOVE_SPEED,
   PLAYER_HIT_INVULNERABILITY_MS,
-  REQUIRED_SPARKLES_TO_FINISH,
   TOTAL_SPARKLES,
   WORLD_HEIGHT,
   WORLD_WIDTH,
+  getRequiredSparklesToFinish,
   type Difficulty
 } from "../config/gameConfig";
 import { CheckpointSystem } from "../systems/CheckpointSystem";
@@ -66,6 +66,7 @@ export class GameScene extends Phaser.Scene {
   private skyRelightGlow?: Phaser.GameObjects.Rectangle;
   private baseSkyLayer?: Phaser.GameObjects.Rectangle;
   private baseHorizonLayer?: Phaser.GameObjects.Rectangle;
+  private requiredSparklesToFinish = getRequiredSparklesToFinish(1);
   private levelSkipPressCount = 0;
   private levelSkipTargetLevel?: number;
   private levelSkipResetTimer?: Phaser.Time.TimerEvent;
@@ -89,6 +90,7 @@ export class GameScene extends Phaser.Scene {
     this.audioContext = "context" in this.sound ? (this.sound.context as AudioContext) : undefined;
 
     this.levelData = this.cache.json.get(`level-${this.levelNumber}`) as LevelData;
+    this.requiredSparklesToFinish = getRequiredSparklesToFinish(this.levelNumber);
     this.gateUnlocked = false;
     this.perfectSparkleHeartAwarded = false;
     this.skyRelit = false;
@@ -1034,7 +1036,7 @@ export class GameScene extends Phaser.Scene {
     if (this.gateUnlocked) {
       return;
     }
-    if (this.collectibleSystem.getCollectedCount() < REQUIRED_SPARKLES_TO_FINISH) {
+    if (this.collectibleSystem.getCollectedCount() < this.requiredSparklesToFinish) {
       return;
     }
     this.gateUnlocked = true;
@@ -1209,7 +1211,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     const collected = this.collectibleSystem.getCollectedCount();
-    if (collected < REQUIRED_SPARKLES_TO_FINISH) {
+    if (collected < this.requiredSparklesToFinish) {
       this.cameras.main.shake(120, 0.0025);
       if (this.audioContext) {
         beep(this.audioContext, 230, 0.09, "square", 0.03);

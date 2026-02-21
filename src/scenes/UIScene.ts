@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { GAME_EVENTS } from "../config/events";
-import { GAME_WIDTH, REQUIRED_SPARKLES_TO_FINISH } from "../config/gameConfig";
+import { GAME_WIDTH, getRequiredSparklesToFinish } from "../config/gameConfig";
 import { beep } from "../utils/sfx";
 
 export class UIScene extends Phaser.Scene {
@@ -11,13 +11,15 @@ export class UIScene extends Phaser.Scene {
   private hideHintTimer?: Phaser.Time.TimerEvent;
   private audioContext?: AudioContext;
   private maxLives = 5;
+  private requiredSparklesToFinish = getRequiredSparklesToFinish(1);
 
   constructor() {
     super("UIScene");
   }
 
-  create(data?: { maxLives?: number }): void {
+  create(data?: { maxLives?: number; levelNumber?: number }): void {
     this.maxLives = data?.maxLives ?? 5;
+    this.requiredSparklesToFinish = getRequiredSparklesToFinish(data?.levelNumber ?? 1);
     this.audioContext = "context" in this.sound ? (this.sound.context as AudioContext) : undefined;
     for (let i = 0; i < this.maxLives; i += 1) {
       const heart = this.add
@@ -27,7 +29,7 @@ export class UIScene extends Phaser.Scene {
       this.heartSprites.push(heart);
     }
     this.sparkleIcon = this.add.image(28, 64, "sparkle").setScale(0.72).setScrollFactor(0);
-    this.sparkleCountText = this.add.text(46, 52, `0 / ${REQUIRED_SPARKLES_TO_FINISH}`, {
+    this.sparkleCountText = this.add.text(46, 52, `0 / ${this.requiredSparklesToFinish}`, {
       fontFamily: "monospace",
       fontSize: "22px",
       color: "#fff7b1",
@@ -94,8 +96,8 @@ export class UIScene extends Phaser.Scene {
   }
 
   private onSparkleChanged(count: number): void {
-    this.sparkleCountText.setText(`${count} / ${REQUIRED_SPARKLES_TO_FINISH}`);
-    if (count >= REQUIRED_SPARKLES_TO_FINISH) {
+    this.sparkleCountText.setText(`${count} / ${this.requiredSparklesToFinish}`);
+    if (count >= this.requiredSparklesToFinish) {
       this.hintText.setText("Gate unlocked! Reach the rainbow!");
       this.hintText.setColor("#9fffb8");
       this.hintText.setStroke("#223a2f", 4);
