@@ -63,6 +63,7 @@ export class GameScene extends Phaser.Scene {
     this.levelData = this.cache.json.get(`level-${this.levelNumber}`) as LevelData;
     this.gateUnlocked = false;
     this.lavaHitbox = undefined;
+    this.snakes = [];
     this.stumpHitboxes = [];
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
