@@ -1635,6 +1635,13 @@ export class GameScene extends Phaser.Scene {
     if (this.levelComplete) {
       return;
     }
+    if (!this.gateUnlocked) {
+      this.cameras.main.shake(120, 0.0025);
+      if (this.audioContext) {
+        beep(this.audioContext, 230, 0.09, "square", 0.03);
+      }
+      return;
+    }
 
     const collected = this.collectibleSystem.getCollectedCount();
     if (collected < this.requiredSparklesToFinish) {
