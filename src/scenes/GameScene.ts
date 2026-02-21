@@ -35,8 +35,7 @@ export class GameScene extends Phaser.Scene {
   private audioContext?: AudioContext;
   private lavaHitbox?: Phaser.GameObjects.Rectangle;
   private rainbowPowerup?: Phaser.Physics.Arcade.Image;
-  private rainbowAura?: Phaser.GameObjects.Image;
-  private rainbowAuraOuter?: Phaser.GameObjects.Image;
+  private nextRainbowTrailAt = 0;
 
   constructor() {
     super("GameScene");
@@ -75,21 +74,6 @@ export class GameScene extends Phaser.Scene {
     );
     this.player.setRainbowPowerup(false);
     this.physics.add.collider(this.player, this.platforms);
-
-    this.rainbowAura = this.add
-      .image(this.player.x, this.player.y - 42, "rainbow-aura")
-      .setScale(1.5)
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setAlpha(0.9)
-      .setDepth(this.player.depth - 1)
-      .setVisible(false);
-    this.rainbowAuraOuter = this.add
-      .image(this.player.x, this.player.y - 42, "rainbow-aura")
-      .setScale(2.3)
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setAlpha(0.36)
-      .setDepth(this.player.depth - 2)
-      .setVisible(false);
 
     this.rainbowPowerup = this.physics.add
       .staticImage(
@@ -160,7 +144,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     this.player.update(time, delta);
-    this.updateRainbowAura(time);
+    this.emitRainbowTrail(time);
     for (const snake of this.snakes) {
       snake.update();
     }
@@ -246,36 +230,40 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private updateRainbowAura(time: number): void {
-    if (!this.rainbowAura || !this.rainbowAuraOuter) {
-      return;
-    }
-
+  private emitRainbowTrail(time: number): void {
     if (!this.player.hasRainbowPower()) {
-      this.rainbowAura.setVisible(false);
-      this.rainbowAuraOuter.setVisible(false);
       return;
     }
+    if (time < this.nextRainbowTrailAt) {
+      return;
+    }
+    this.nextRainbowTrailAt = time + 65;
 
-    const hue = (time * 0.00024) % 1;
-    const innerColor = Phaser.Display.Color.HSVToRGB(hue, 0.62, 1).color;
-    const outerColor = Phaser.Display.Color.HSVToRGB((hue + 0.18) % 1, 0.58, 1).color;
-    const pulse = 1 + Math.sin(time * 0.012) * 0.12;
+    const tailDirection = this.player.flipX ? 1 : -1;
+    const x = this.player.x + tailDirection * 14;
+    const y = this.player.y - 14 + Phaser.Math.Between(-2, 2);
+    const colors = [0xff6fa7, 0xffbf6a, 0xfff07a, 0x8ff59f, 0x7ad9ff, 0xba9bff];
 
-    this.rainbowAura.setVisible(true);
-    this.rainbowAuraOuter.setVisible(true);
+    const sparkle = this.add
+      .image(x, y, "sparkle")
+      .setScale(Phaser.Math.FloatBetween(0.16, 0.28))
+      .setTint(colors[Phaser.Math.Between(0, colors.length - 1)])
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setAlpha(0.9)
+      .setDepth(this.player.depth - 1);
 
-    this.rainbowAura.setPosition(this.player.x, this.player.y - 34 + Math.sin(time * 0.014) * 2);
-    this.rainbowAura.setScale(1.42 * pulse, 1.2 * pulse);
-    this.rainbowAura.setTint(innerColor);
-    this.rainbowAura.setAlpha(0.78 + Math.sin(time * 0.01) * 0.2);
-
-    this.rainbowAuraOuter.setPosition(this.player.x, this.player.y - 34 + Math.sin(time * 0.012) * 3);
-    this.rainbowAuraOuter.setScale(2.1 * pulse, 1.75 * pulse);
-    this.rainbowAuraOuter.setTint(outerColor);
-    this.rainbowAuraOuter.setAlpha(0.3 + Math.sin(time * 0.009) * 0.08);
-
-    this.player.setTint(Phaser.Display.Color.HSVToRGB((hue + 0.07) % 1, 0.28, 1).color);
+    this.tweens.add({
+      targets: sparkle,
+      x: x + tailDirection * Phaser.Math.Between(14, 24),
+      y: y + Phaser.Math.Between(-8, 10),
+      alpha: 0,
+      scaleX: 0.05,
+      scaleY: 0.05,
+      angle: Phaser.Math.Between(-40, 40),
+      duration: Phaser.Math.Between(260, 420),
+      ease: "Sine.easeOut",
+      onComplete: () => sparkle.destroy()
+    });
   }
 
   private handlePlayerHit(
