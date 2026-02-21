@@ -1223,11 +1223,12 @@ export class GameScene extends Phaser.Scene {
       this.bossHeartSprites.pop()?.destroy();
     }
 
-    const spacing = 28;
-    const totalWidth = (this.bossHeartSprites.length - 1) * spacing;
-    const startX = GAME_WIDTH / 2 - totalWidth / 2;
+    const spacing = 30;
+    const rightMargin = 30;
+    const y = 30;
     for (let i = 0; i < this.bossHeartSprites.length; i += 1) {
-      this.bossHeartSprites[i].setPosition(startX + i * spacing, 44);
+      const x = GAME_WIDTH - rightMargin - i * spacing;
+      this.bossHeartSprites[i].setPosition(x, y);
     }
   }
 
