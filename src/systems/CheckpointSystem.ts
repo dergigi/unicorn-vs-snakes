@@ -20,7 +20,7 @@ export class CheckpointSystem {
 
   public addCheckpoint(x: number, y: number): void {
     const checkpoint = this.checkpoints.create(x, y, "checkpoint");
-    checkpoint.setScale(1.2);
+    checkpoint.setScale(1.35);
     checkpoint.refreshBody();
     checkpoint.setData("used", false);
   }

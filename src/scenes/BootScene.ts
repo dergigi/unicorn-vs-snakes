@@ -102,7 +102,9 @@ export class BootScene extends Phaser.Scene {
       18,
       28,
       [
-        { x: 1, y: 2, w: 1, h: 10, c: "#9b6f4b" },
+        // Pole now extends all the way to ground line.
+        { x: 1, y: 1, w: 1, h: 13, c: "#9b6f4b" },
+        { x: 1, y: 13, w: 2, h: 1, c: "#6f4d34" },
         { x: 2, y: 2, w: 5, h: 4, c: "#ff8fd3" },
         { x: 3, y: 3, w: 3, h: 2, c: "#ffc2ea" }
       ]
