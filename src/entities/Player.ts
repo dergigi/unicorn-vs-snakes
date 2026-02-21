@@ -96,12 +96,13 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.lastJumpPressedAt = time;
     }
 
+    const speed = this.hasRainbowPowerup ? PLAYER_MOVE_SPEED * 1.05 : PLAYER_MOVE_SPEED;
     let velocityX = 0;
     if (this.cursors.left?.isDown || this.cursors.a.isDown) {
-      velocityX = -PLAYER_MOVE_SPEED;
+      velocityX = -speed;
       this.setFlipX(true);
     } else if (this.cursors.right?.isDown || this.cursors.d.isDown) {
-      velocityX = PLAYER_MOVE_SPEED;
+      velocityX = speed;
       this.setFlipX(false);
     }
     this.setVelocityX(velocityX);
