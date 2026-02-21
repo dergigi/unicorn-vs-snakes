@@ -50,6 +50,10 @@
     { "x": 2660, "y": 470, "patrolWidth": 180, "speedFactor": 0.4 },
     { "x": 3200, "y": 470, "patrolWidth": 180, "speedFactor": 0.15 }
   ],
+  "apples": [
+    { "x": 1940, "y": 364, "width": 20, "height": 20 },
+    { "x": 2820, "y": 329, "width": 20, "height": 20 }
+  ],
   "sparkles": [
     { "x": 240, "y": 464 },
     { "x": 440, "y": 464 },

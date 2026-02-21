@@ -712,7 +712,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private createApples(): void {
-    if (this.levelData.theme !== "forest" || !this.levelData.apples?.length) {
+    if (!this.levelData.apples?.length) {
       return;
     }
 
