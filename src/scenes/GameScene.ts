@@ -1125,45 +1125,39 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    this.canTakeDamageAt = this.time.now + PLAYER_HIT_INVULNERABILITY_MS;
+    this.game.events.emit(GAME_EVENTS.playerHit);
+
     if (this.player.hasRainbowPower()) {
       this.player.setRainbowPowerup(false);
-      this.canTakeDamageAt = this.time.now + PLAYER_HIT_INVULNERABILITY_MS;
       this.game.events.emit(GAME_EVENTS.rainbowPowerupLost);
-      this.game.events.emit(GAME_EVENTS.playerHit);
       if (this.audioContext) {
         beep(this.audioContext, 300, 0.12, "square", 0.03);
       }
-
-      this.player.setControlsEnabled(false);
-      this.player.setTint(0xffd998);
-      const hazardX =
-        typeof hazard === "object" && hazard !== null && "x" in hazard
-          ? (hazard.x as number)
-          : this.player.x;
-      const direction = this.player.x < hazardX ? -1 : 1;
-      this.player.setVelocityX(direction * 220);
-      this.player.setVelocityY(-250);
-
-      this.time.delayedCall(260, () => {
-        if (!this.scene.isActive() || !this.player || !this.player.active) {
-          return;
-        }
-        this.player.clearTint();
-        this.player.setControlsEnabled(true);
-      });
+      this.knockbackPlayer(hazard, 0xffd998);
+      this.time.delayedCall(260, () => this.recoverPlayer());
       return;
     }
 
     this.lives -= 1;
-    this.canTakeDamageAt = this.time.now + PLAYER_HIT_INVULNERABILITY_MS;
     this.game.events.emit(GAME_EVENTS.livesChanged, this.lives);
-    this.game.events.emit(GAME_EVENTS.playerHit);
     if (this.audioContext) {
       beep(this.audioContext, 180, 0.16, "sawtooth", 0.045);
     }
+    this.knockbackPlayer(hazard, 0xff8da8);
+    this.time.delayedCall(260, () => this.recoverAfterDamage());
+  }
 
+  private knockbackPlayer(
+    hazard:
+      | Phaser.Types.Physics.Arcade.GameObjectWithBody
+      | Phaser.Physics.Arcade.Body
+      | Phaser.Physics.Arcade.StaticBody
+      | Phaser.Tilemaps.Tile,
+    tintColor: number
+  ): void {
     this.player.setControlsEnabled(false);
-    this.player.setTint(0xff8da8);
+    this.player.setTint(tintColor);
     const hazardX =
       typeof hazard === "object" && hazard !== null && "x" in hazard
         ? (hazard.x as number)
@@ -1171,36 +1165,38 @@ export class GameScene extends Phaser.Scene {
     const direction = this.player.x < hazardX ? -1 : 1;
     this.player.setVelocityX(direction * 220);
     this.player.setVelocityY(-250);
+  }
 
-    this.time.delayedCall(260, () => {
-      if (!this.scene.isActive() || !this.player || !this.player.active) {
-        return;
-      }
-      if (this.lives <= 0) {
-        this.game.events.emit(GAME_EVENTS.gameOver);
-        this.scene.stop("UIScene");
-        this.scene.start("GameOverScene", {
-          maxLives: this.maxLives,
-          difficulty: this.difficulty,
-          levelNumber: this.levelNumber
-        });
-        return;
-      }
+  private recoverPlayer(): void {
+    if (!this.scene.isActive() || !this.player || !this.player.active) {
+      return;
+    }
+    this.player.clearTint();
+    this.player.setControlsEnabled(true);
+  }
 
-      if (!this.checkpointSystem) {
-        this.player.clearTint();
-        this.player.setControlsEnabled(true);
-        return;
-      }
-      const spawn = this.checkpointSystem.getActiveSpawn();
-      if (!spawn) {
-        this.player.clearTint();
-        this.player.setControlsEnabled(true);
-        return;
-      }
+  private recoverAfterDamage(): void {
+    if (!this.scene.isActive() || !this.player || !this.player.active) {
+      return;
+    }
+    if (this.lives <= 0) {
+      this.game.events.emit(GAME_EVENTS.gameOver);
+      this.scene.stop("UIScene");
+      this.scene.start("GameOverScene", {
+        maxLives: this.maxLives,
+        difficulty: this.difficulty,
+        levelNumber: this.levelNumber
+      });
+      return;
+    }
+
+    const spawn = this.checkpointSystem?.getActiveSpawn();
+    if (spawn) {
       this.player.resetAt(spawn.x, spawn.y);
-      this.player.setControlsEnabled(true);
-    });
+    } else {
+      this.player.clearTint();
+    }
+    this.player.setControlsEnabled(true);
   }
 
   private tryFinishLevel(): void {
