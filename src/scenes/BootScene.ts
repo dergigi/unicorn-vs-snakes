@@ -55,9 +55,10 @@ export class BootScene extends Phaser.Scene {
     this.load.image("moldy-wall-tile", "assets/sprites/moldy-wall-tile.png");
     this.load.image("castle-tower", "assets/sprites/towers/tower-drawing/Tower.png");
     this.load.image("castle-tower-damaged", "assets/sprites/towers/tower-drawing/Tower_damage3.png");
-    this.load.spritesheet("torch", "assets/sprites/torch.png", {
-      frameWidth: 116,
-      frameHeight: 150
+    this.load.spritesheet("torch", "assets/sprites/torch-trimmed.png", {
+      frameWidth: 85,
+      frameHeight: 149,
+      spacing: 1
     });
     this.load.spritesheet("bat", "assets/sprites/bat-sprite.png", {
       frameWidth: 32,
