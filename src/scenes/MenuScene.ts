@@ -166,7 +166,7 @@ export class MenuScene extends Phaser.Scene {
       });
 
       const labels: Record<Difficulty, string> = {
-        easy: "🍀 EASY",
+        easy: "EASY",
         normal: "NORMAL",
         hard: "HARD",
         insane: "INSANE-O",
