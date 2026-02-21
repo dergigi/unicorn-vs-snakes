@@ -133,51 +133,91 @@ export class MenuScene extends Phaser.Scene {
 
   private buildDifficultyButtons(): void {
     const difficulties: Difficulty[] = ["easy", "normal", "hard", "insane"];
-    const difficultyColors: Record<Difficulty, number> = {
-      easy: 0x6fdc7f,
-      normal: 0xff7fd9,
-      hard: 0xffaa5b,
-      insane: 0xff5f6a
+    const colors: Record<Difficulty, { face: number; hi: number; shadow: number; muted: number }> = {
+      easy:   { face: 0x6fdc7f, hi: 0xb4ffc0, shadow: 0x3a7a42, muted: 0x3d5e42 },
+      normal: { face: 0xff7fd9, hi: 0xffbfee, shadow: 0x8f3f76, muted: 0x6a3f60 },
+      hard:   { face: 0xffaa5b, hi: 0xffd5a8, shadow: 0x8f5a28, muted: 0x6a4f36 },
+      insane: { face: 0xff5f6a, hi: 0xffaab0, shadow: 0x8f2f35, muted: 0x5e3438 },
     };
-    const mutedColors: Record<Difficulty, number> = {
-      easy: 0x4d6f53,
-      normal: 0x7a4f6f,
-      hard: 0x7a6249,
-      insane: 0x6e4a4d
-    };
-    const buttons: Partial<Record<Difficulty, Phaser.GameObjects.Rectangle>> = {};
+
+    const bw = 152;
+    const bh = 50;
+    const border = 4;
+    const btnGraphics: Partial<Record<Difficulty, Phaser.GameObjects.Graphics>> = {};
+    const hitAreas: Partial<Record<Difficulty, Phaser.GameObjects.Rectangle>> = {};
 
     difficulties.forEach((difficulty, index) => {
-      const x = 222 + index * 172;
-      const y = 262;
-      const button = this.add
-        .rectangle(x, y, 154, 56, 0x6f5cc4)
-        .setStrokeStyle(2, 0xd5ccff)
-        .setInteractive({ useHandCursor: true });
-      const label = difficulty === "insane" ? "☠️ INSANE-O" : difficulty.toUpperCase();
-      this.add
-        .text(x, y, label, {
-          fontSize: "22px",
-          color: "#f8f4ff",
-          fontFamily: "monospace"
-        })
-        .setOrigin(0.5);
+      const cx = 222 + index * 172;
+      const cy = 262;
+      const left = cx - bw / 2;
+      const top = cy - bh / 2;
 
-      button.on("pointerdown", () => {
+      const gfx = this.add.graphics();
+      btnGraphics[difficulty] = gfx;
+
+      const hitArea = this.add
+        .rectangle(cx, cy, bw, bh, 0, 0)
+        .setInteractive({ useHandCursor: true });
+      hitAreas[difficulty] = hitArea;
+
+      hitArea.on("pointerdown", () => {
         this.selectedDifficulty = difficulty;
         applyStyles();
       });
-      buttons[difficulty] = button;
+
+      const label = difficulty === "insane" ? "☠️ INSANE-O" : difficulty.toUpperCase();
+      this.add
+        .text(cx, cy, label, {
+          fontSize: "16px",
+          color: "#ffffff",
+          fontFamily: "\"Press Start 2P\", \"Courier New\", monospace",
+          stroke: "#000000",
+          strokeThickness: 3,
+        })
+        .setOrigin(0.5);
     });
+
+    const drawButton = (d: Difficulty, selected: boolean): void => {
+      const gfx = btnGraphics[d];
+      if (!gfx) return;
+      gfx.clear();
+
+      const cx = 222 + difficulties.indexOf(d) * 172;
+      const cy = 262;
+      const left = cx - bw / 2;
+      const top = cy - bh / 2;
+      const c = colors[d];
+      const face = selected ? c.face : c.muted;
+      const hi = selected ? c.hi : 0x5a5a6a;
+      const shadow = selected ? c.shadow : 0x1a1a24;
+
+      // Highlight edge (top + left)
+      gfx.fillStyle(hi, 1);
+      gfx.fillRect(left, top, bw, border);
+      gfx.fillRect(left, top, border, bh);
+
+      // Shadow edge (bottom + right)
+      gfx.fillStyle(shadow, 1);
+      gfx.fillRect(left, top + bh - border, bw, border);
+      gfx.fillRect(left + bw - border, top, border, bh);
+
+      // Face fill
+      gfx.fillStyle(face, 1);
+      gfx.fillRect(left + border, top + border, bw - border * 2, bh - border * 2);
+
+      // Corner pixel notches for extra crunch
+      gfx.fillStyle(0x000000, 0.3);
+      gfx.fillRect(left, top, border, border);
+      gfx.fillRect(left + bw - border, top, border, border);
+      gfx.fillRect(left, top + bh - border, border, border);
+      gfx.fillRect(left + bw - border, top + bh - border, border, border);
+
+      gfx.setAlpha(selected ? 1 : 0.7);
+    };
 
     const applyStyles = (): void => {
       for (const d of difficulties) {
-        const btn = buttons[d];
-        if (!btn) continue;
-        const sel = d === this.selectedDifficulty;
-        btn.setFillStyle(sel ? difficultyColors[d] : mutedColors[d]);
-        btn.setAlpha(sel ? 1 : 0.7);
-        btn.setStrokeStyle(sel ? 4 : 2, sel ? 0xffffff : 0x2f224f);
+        drawButton(d, d === this.selectedDifficulty);
       }
     };
     applyStyles();
