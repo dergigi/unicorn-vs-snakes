@@ -147,7 +147,7 @@ export class MenuScene extends Phaser.Scene {
     }
 
     const GRAVITY = 0.35;
-    const MAX_HOLD_FRAMES = 14;
+    const MAX_HOLD_FRAMES = 18;
     if (!this.unicornOnGround) {
       if (jumpHeld && this.jumpHoldFrames < MAX_HOLD_FRAMES) {
         this.jumpHoldFrames++;
