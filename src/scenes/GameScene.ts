@@ -79,6 +79,7 @@ export class GameScene extends Phaser.Scene {
     difficulty?: Difficulty;
     levelNumber?: number;
     currentLives?: number;
+    hasRainbow?: boolean;
   }): void {
     this.maxLives = data?.maxLives ?? 5;
     this.difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
@@ -158,7 +159,7 @@ export class GameScene extends Phaser.Scene {
       this.levelData.spawn.y,
       this.cursors
     );
-    this.player.setRainbowPowerup(false);
+    this.player.setRainbowPowerup(data?.hasRainbow ?? false);
     this.physics.add.collider(this.player, this.platforms);
     this.createForestPuddles();
     this.createForestStumps();
@@ -293,7 +294,8 @@ export class GameScene extends Phaser.Scene {
       maxLives: this.maxLives,
       difficulty: this.difficulty,
       levelNumber: targetLevel,
-      currentLives: this.lives
+      currentLives: this.lives,
+      hasRainbow: this.player?.hasRainbowPower() ?? false
     };
     this.scene.stop("UIScene");
     this.scene.restart(sceneData);
@@ -1228,7 +1230,8 @@ export class GameScene extends Phaser.Scene {
           maxLives: this.maxLives,
           difficulty: this.difficulty,
           levelNumber: this.levelNumber + 1,
-          currentLives: this.lives
+          currentLives: this.lives,
+          hasRainbow: this.player.hasRainbowPower()
         };
         // Restarting the same scene key is more reliable than start() here.
         this.scene.restart(sceneData);
