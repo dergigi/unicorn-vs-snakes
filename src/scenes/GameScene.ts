@@ -876,7 +876,7 @@ export class GameScene extends Phaser.Scene {
     this.catStoryBox = dialog;
 
     this.catStoryPortrait = this.add
-      .image(portraitCenterX, portraitCenterY, "story-cat")
+      .image(portraitCenterX, portraitCenterY, "story-cat-idle", 0)
       .setDisplaySize(portraitSize, portraitSize)
       .setFlipX(true)
       .setScrollFactor(0)
