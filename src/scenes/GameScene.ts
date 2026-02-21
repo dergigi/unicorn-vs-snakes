@@ -169,6 +169,9 @@ export class GameScene extends Phaser.Scene {
     this.emitRainbowTrail(time);
     this.updateGateUnlockState();
     for (const snake of this.snakes) {
+      if (!snake.active) {
+        continue;
+      }
       snake.update();
     }
 
@@ -425,7 +428,10 @@ export class GameScene extends Phaser.Scene {
 
       this.player.setControlsEnabled(false);
       this.player.setTint(0xffd998);
-      const hazardX = "x" in hazard ? hazard.x : this.player.x;
+      const hazardX =
+        typeof hazard === "object" && hazard !== null && "x" in hazard
+          ? (hazard.x as number)
+          : this.player.x;
       const direction = this.player.x < hazardX ? -1 : 1;
       this.player.setVelocityX(direction * 220);
       this.player.setVelocityY(-250);
@@ -447,7 +453,10 @@ export class GameScene extends Phaser.Scene {
 
     this.player.setControlsEnabled(false);
     this.player.setTint(0xff8da8);
-    const hazardX = "x" in hazard ? hazard.x : this.player.x;
+    const hazardX =
+      typeof hazard === "object" && hazard !== null && "x" in hazard
+        ? (hazard.x as number)
+        : this.player.x;
     const direction = this.player.x < hazardX ? -1 : 1;
     this.player.setVelocityX(direction * 220);
     this.player.setVelocityY(-250);

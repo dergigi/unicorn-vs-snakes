@@ -33,6 +33,9 @@ export class Snake extends Phaser.Physics.Arcade.Sprite {
   }
 
   public update(): void {
+    if (!this.active || !this.body) {
+      return;
+    }
     const body = this.body as Phaser.Physics.Arcade.Body;
     if (this.x < this.minX) {
       this.setX(this.minX);
