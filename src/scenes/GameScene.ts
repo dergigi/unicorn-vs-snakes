@@ -27,6 +27,12 @@ type CritterMover = {
   previousX: number;
 };
 
+type PlatformMover = {
+  image: Phaser.Physics.Arcade.Image;
+  prevX: number;
+  prevY: number;
+};
+
 export class GameScene extends Phaser.Scene {
   private player!: Player;
   private cursors!: Cursors;
@@ -49,6 +55,7 @@ export class GameScene extends Phaser.Scene {
   private flameHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private applePickups?: Phaser.Physics.Arcade.StaticGroup;
   private critterMovers: CritterMover[] = [];
+  private platformMovers: PlatformMover[] = [];
   private storyCat?: Phaser.Physics.Arcade.Sprite;
   private wasNearStoryCat = false;
   private catStoryBox?: Phaser.GameObjects.Graphics;
@@ -101,6 +108,7 @@ export class GameScene extends Phaser.Scene {
     this.flameHitboxes = [];
     this.applePickups = undefined;
     this.critterMovers = [];
+    this.platformMovers = [];
     this.storyCat = undefined;
     this.wasNearStoryCat = false;
     this.catStoryBox?.destroy();
@@ -220,6 +228,7 @@ export class GameScene extends Phaser.Scene {
     if (this.lavaHitbox) {
       this.physics.add.overlap(this.player, this.lavaHitbox, this.handlePlayerHit, undefined, this);
     }
+    this.createMovingPlatforms();
 
     this.finishGate = this.physics.add
       .staticImage(this.levelData.finishGate.x, this.levelData.finishGate.y, "finish-gate-closed")
@@ -310,6 +319,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.player.update(time, delta);
     this.updateFriendlyCritterPush();
+    this.updateMovingPlatforms();
     this.emitRainbowTrail(time);
     this.updateStoryCatBubbleVisibility();
     this.updateGateUnlockState();
@@ -734,6 +744,89 @@ export class GameScene extends Phaser.Scene {
       playerBody.setVelocityX(
         Phaser.Math.Clamp(playerBody.velocity.x + deltaX * 34, -PLAYER_MOVE_SPEED, PLAYER_MOVE_SPEED)
       );
+    }
+  }
+
+  private createMovingPlatforms(): void {
+    if (!this.levelData.movingPlatforms?.length) {
+      return;
+    }
+
+    const textureKey =
+      this.levelData.theme === "castle"
+        ? "cobble-tile"
+        : this.levelData.theme === "lava"
+          ? "ground"
+          : "ground";
+
+    for (const mp of this.levelData.movingPlatforms) {
+      const image = this.physics.add
+        .image(mp.x, mp.y, textureKey)
+        .setDisplaySize(mp.width, mp.height);
+      if (this.levelData.theme === "forest") {
+        image.setTint(0x6f8f52);
+      }
+
+      const body = image.body as Phaser.Physics.Arcade.Body;
+      body.setImmovable(true);
+      body.setAllowGravity(false);
+
+      this.physics.add.collider(this.player, image);
+      for (const snake of this.snakes) {
+        this.physics.add.collider(snake, image);
+      }
+
+      this.tweens.add({
+        targets: image,
+        x: mp.x + (mp.moveX ?? 0),
+        y: mp.y + (mp.moveY ?? 0),
+        duration: mp.duration ?? 2000,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut"
+      });
+
+      this.platformMovers.push({ image, prevX: mp.x, prevY: mp.y });
+    }
+  }
+
+  private updateMovingPlatforms(): void {
+    if (!this.platformMovers.length) {
+      return;
+    }
+    const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
+
+    for (const mover of this.platformMovers) {
+      const dx = mover.image.x - mover.prevX;
+      const dy = mover.image.y - mover.prevY;
+      mover.prevX = mover.image.x;
+      mover.prevY = mover.image.y;
+
+      if (Math.abs(dx) < 0.05 && Math.abs(dy) < 0.05) {
+        continue;
+      }
+      if (!playerBody.touching.down && !playerBody.blocked.down) {
+        continue;
+      }
+
+      const platBody = mover.image.body as Phaser.Physics.Arcade.Body;
+      const playerRight = playerBody.x + playerBody.width;
+      const playerLeft = playerBody.x;
+      const platRight = platBody.x + platBody.width;
+      const platLeft = platBody.x;
+      if (playerRight < platLeft || playerLeft > platRight) {
+        continue;
+      }
+
+      const playerBottom = playerBody.y + playerBody.height;
+      if (Math.abs(playerBottom - platBody.y) > 8) {
+        continue;
+      }
+
+      playerBody.x += dx;
+      if (Math.abs(dy) > 0.05) {
+        playerBody.y += dy;
+      }
     }
   }
 

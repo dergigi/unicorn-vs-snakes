@@ -33,6 +33,12 @@ export type FlameData = RectData & {
   patrolRight?: number;
 };
 
+export type MovingPlatformData = RectData & {
+  moveX?: number;
+  moveY?: number;
+  duration?: number;
+};
+
 export type LevelData = {
   theme: "forest" | "lava" | "castle";
   spawn: { x: number; y: number };
@@ -48,4 +54,5 @@ export type LevelData = {
   storyCat?: StoryCatData;
   flames?: FlameData[];
   apples?: AppleData[];
+  movingPlatforms?: MovingPlatformData[];
 };
