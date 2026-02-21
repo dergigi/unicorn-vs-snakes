@@ -68,12 +68,17 @@ export class BootScene extends Phaser.Scene {
     makePixelTexture(
       this,
       "sparkle",
-      16,
-      16,
+      20,
+      20,
       [
-        { x: 3, y: 1, w: 2, h: 6, c: "#fff1aa" },
-        { x: 1, y: 3, w: 6, h: 2, c: "#fff1aa" },
-        { x: 2, y: 2, w: 4, h: 4, c: "#fffbe0" }
+        { x: 4, y: 0, w: 2, h: 10, c: "#fff2a8" },
+        { x: 0, y: 4, w: 10, h: 2, c: "#fff2a8" },
+        { x: 2, y: 2, w: 6, h: 6, c: "#fffbe8" },
+        { x: 3, y: 3, w: 4, h: 4, c: "#ffffff" },
+        { x: 1, y: 1, w: 1, h: 1, c: "#ffd1ff" },
+        { x: 8, y: 1, w: 1, h: 1, c: "#b9f2ff" },
+        { x: 1, y: 8, w: 1, h: 1, c: "#b9f2ff" },
+        { x: 8, y: 8, w: 1, h: 1, c: "#ffd1ff" }
       ]
     );
     makePixelTexture(

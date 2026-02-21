@@ -35,7 +35,7 @@ export class UIScene extends Phaser.Scene {
         .setScrollFactor(0);
       this.heartSprites.push(heart);
     }
-    this.sparkleText = this.add.text(18, 44, "Sparkles: 0 / 14", {
+    this.sparkleText = this.add.text(18, 44, "✦ 0 / 14", {
       fontFamily: "monospace",
       fontSize: "22px",
       color: "#fff7b1",
@@ -70,7 +70,7 @@ export class UIScene extends Phaser.Scene {
   }
 
   private onSparkleChanged(count: number): void {
-    this.sparkleText.setText(`Sparkles: ${count} / ${REQUIRED_SPARKLES_TO_FINISH}`);
+    this.sparkleText.setText(`✦ ${count} / ${REQUIRED_SPARKLES_TO_FINISH}`);
     if (count >= REQUIRED_SPARKLES_TO_FINISH) {
       this.hintText.setText("Gate unlocked! Reach the rainbow!");
       this.hintText.setColor("#9fffb8");
