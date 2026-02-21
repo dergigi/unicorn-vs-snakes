@@ -26,8 +26,8 @@ export class UIScene extends Phaser.Scene {
         .setScrollFactor(0);
       this.heartSprites.push(heart);
     }
-    this.sparkleIcon = this.add.image(28, 56, "sparkle").setScale(0.72).setScrollFactor(0);
-    this.sparkleCountText = this.add.text(46, 44, `0 / ${REQUIRED_SPARKLES_TO_FINISH}`, {
+    this.sparkleIcon = this.add.image(28, 64, "sparkle").setScale(0.72).setScrollFactor(0);
+    this.sparkleCountText = this.add.text(46, 52, `0 / ${REQUIRED_SPARKLES_TO_FINISH}`, {
       fontFamily: "monospace",
       fontSize: "22px",
       color: "#fff7b1",
