@@ -43,6 +43,11 @@
     { "x": 2080, "y": 478, "width": 34, "height": 30 },
     { "x": 3020, "y": 478, "width": 36, "height": 30 }
   ],
+  "friendlyCritters": [
+    { "x": 900, "y": 478, "width": 46, "height": 44 },
+    { "x": 1840, "y": 478, "width": 46, "height": 44 },
+    { "x": 2820, "y": 478, "width": 46, "height": 44 }
+  ],
   "snakes": [
     { "x": 1560, "y": 470, "patrolWidth": 180, "speedFactor": 0.22 },
     { "x": 2920, "y": 470, "patrolWidth": 180, "speedFactor": 0.18 }

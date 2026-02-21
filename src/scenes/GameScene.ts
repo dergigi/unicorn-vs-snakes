@@ -39,6 +39,7 @@ export class GameScene extends Phaser.Scene {
   private audioContext?: AudioContext;
   private lavaHitbox?: Phaser.GameObjects.Rectangle;
   private stumpHitboxes: Phaser.GameObjects.Rectangle[] = [];
+  private critterHitboxes: Phaser.GameObjects.Rectangle[] = [];
   private rainbowPowerup?: Phaser.Physics.Arcade.Image;
   private nextRainbowTrailAt = 0;
   private gateUnlocked = false;
@@ -68,6 +69,7 @@ export class GameScene extends Phaser.Scene {
     this.lavaHitbox = undefined;
     this.snakes = [];
     this.stumpHitboxes = [];
+    this.critterHitboxes = [];
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -99,6 +101,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.platforms);
     this.createForestPuddles();
     this.createForestStumps();
+    this.createFriendlyCritters();
 
     this.rainbowPowerup = this.physics.add
       .staticImage(
@@ -329,6 +332,32 @@ export class GameScene extends Phaser.Scene {
       this.physics.add.existing(hitbox, true);
       this.physics.add.collider(this.player, hitbox);
       this.stumpHitboxes.push(hitbox);
+    }
+  }
+
+  private createFriendlyCritters(): void {
+    if (this.levelData.theme !== "forest" || !this.levelData.friendlyCritters?.length) {
+      return;
+    }
+
+    for (const critter of this.levelData.friendlyCritters) {
+      this.add
+        .image(critter.x, critter.y, "friendly-critter")
+        .setOrigin(0.5, 1)
+        .setDisplaySize(critter.width, critter.height)
+        .setDepth(8);
+
+      const hitbox = this.add.rectangle(
+        critter.x,
+        critter.y - critter.height / 2,
+        Math.max(12, critter.width - 8),
+        Math.max(12, critter.height - 4),
+        0,
+        0
+      );
+      this.physics.add.existing(hitbox, true);
+      this.physics.add.collider(this.player, hitbox);
+      this.critterHitboxes.push(hitbox);
     }
   }
 
