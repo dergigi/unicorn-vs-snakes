@@ -77,6 +77,12 @@ export class MenuScene extends Phaser.Scene {
       hard: 0xffaa5b,
       insane: 0xff5f6a
     };
+    const mutedDifficultyColors: Record<Difficulty, number> = {
+      easy: 0x4d6f53,
+      normal: 0x7a4f6f,
+      hard: 0x7a6249,
+      insane: 0x6e4a4d
+    };
     const buttons: Record<Difficulty, Phaser.GameObjects.Rectangle> = {
       easy: this.add.rectangle(0, 0, 1, 1, 0),
       normal: this.add.rectangle(0, 0, 1, 1, 0),
@@ -103,8 +109,10 @@ export class MenuScene extends Phaser.Scene {
     const updateDifficultyButtons = (): void => {
       difficulties.forEach((difficulty) => {
         const isSelected = difficulty === this.selectedDifficulty;
-        buttons[difficulty].setFillStyle(difficultyColors[difficulty]);
-        buttons[difficulty].setAlpha(isSelected ? 1 : 0.84);
+        buttons[difficulty].setFillStyle(
+          isSelected ? difficultyColors[difficulty] : mutedDifficultyColors[difficulty]
+        );
+        buttons[difficulty].setAlpha(isSelected ? 1 : 0.7);
         buttons[difficulty].setStrokeStyle(isSelected ? 4 : 2, isSelected ? 0xffffff : 0x2f224f);
       });
     };
