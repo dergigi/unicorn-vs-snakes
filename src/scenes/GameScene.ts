@@ -353,7 +353,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     for (const critter of this.levelData.friendlyCritters) {
-      this.add
+      const critterSprite = this.add
         .image(critter.x, critter.y, "friendly-critter")
         .setOrigin(0.5, 1)
         .setDisplaySize(critter.width, critter.height)
@@ -367,9 +367,24 @@ export class GameScene extends Phaser.Scene {
         0,
         0
       );
-      this.physics.add.existing(hitbox, true);
+      this.physics.add.existing(hitbox, false);
+      const body = hitbox.body as Phaser.Physics.Arcade.Body;
+      body.setAllowGravity(false);
+      body.setImmovable(true);
       this.physics.add.collider(this.player, hitbox);
       this.critterHitboxes.push(hitbox);
+
+      // Give the critter a tiny back-and-forth patrol so it feels alive.
+      const patrolRange = 18;
+      const patrolDuration = Phaser.Math.Between(1300, 1900);
+      this.tweens.add({
+        targets: [critterSprite, hitbox],
+        x: critter.x + patrolRange,
+        duration: patrolDuration,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut"
+      });
     }
   }
 
