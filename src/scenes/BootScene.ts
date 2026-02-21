@@ -47,6 +47,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image("apple-pickup", "assets/sprites/apple.png");
     this.load.image("story-cat", "assets/sprites/story-cat.png");
     this.load.image("castle-bg", "assets/sprites/castle_4.png");
+    this.load.image("castle-bricks", "assets/sprites/bricks.brown_.png");
     this.load.spritesheet("unicorn", "assets/sprites/unicorn.png", {
       frameWidth: 16,
       frameHeight: 16,

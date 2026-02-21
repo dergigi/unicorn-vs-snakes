@@ -139,6 +139,10 @@ export class GameScene extends Phaser.Scene {
     this.platforms = this.physics.add.staticGroup();
     for (const platform of this.levelData.platforms) {
       const tile = this.platforms.create(platform.x, platform.y, "ground");
+      if (this.levelData.theme === "castle") {
+        tile.setTexture("castle-bricks");
+        tile.clearTint();
+      }
       tile.setDisplaySize(platform.width, platform.height);
       if (this.levelData.theme === "forest") {
         const isMainGroundLane = platform.y >= 500;
