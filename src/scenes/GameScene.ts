@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Player } from "../entities/Player";
+import { Player, type Cursors } from "../entities/Player";
 import { Snake } from "../entities/Snake";
 import { GAME_EVENTS } from "../config/events";
 import {
@@ -29,13 +29,7 @@ type CritterMover = {
 
 export class GameScene extends Phaser.Scene {
   private player!: Player;
-  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys & {
-    jump: Phaser.Input.Keyboard.Key;
-    w: Phaser.Input.Keyboard.Key;
-    a: Phaser.Input.Keyboard.Key;
-    s: Phaser.Input.Keyboard.Key;
-    d: Phaser.Input.Keyboard.Key;
-  };
+  private cursors!: Cursors;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
   private snakes: Snake[] = [];
   private collectibleSystem!: CollectibleSystem;

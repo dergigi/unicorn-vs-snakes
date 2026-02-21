@@ -10,7 +10,7 @@ import {
   PLAYER_MOVE_SPEED
 } from "../config/gameConfig";
 
-type Cursors = Phaser.Types.Input.Keyboard.CursorKeys & {
+export type Cursors = Phaser.Types.Input.Keyboard.CursorKeys & {
   jump: Phaser.Input.Keyboard.Key;
   w: Phaser.Input.Keyboard.Key;
   a: Phaser.Input.Keyboard.Key;
