@@ -240,6 +240,22 @@ export class GameScene extends Phaser.Scene {
     if (this.levelData.theme === "forest") {
       this.add.rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x21452d).setOrigin(0, 0);
       this.add.rectangle(0, WORLD_HEIGHT - 210, WORLD_WIDTH, 210, 0x326a3f, 0.42).setOrigin(0, 0);
+
+      // Rolling hill silhouettes behind the tree layers.
+      const farHillColor = 0x4f8455;
+      for (let i = 0; i < 8; i += 1) {
+        this.add
+          .ellipse(150 + i * 520, WORLD_HEIGHT - 70 + (i % 2) * 10, 740, 180, farHillColor, 0.46)
+          .setScrollFactor(0.2);
+      }
+
+      const nearHillColor = 0x67a268;
+      for (let i = 0; i < 10; i += 1) {
+        this.add
+          .ellipse(80 + i * 410, WORLD_HEIGHT - 42 + (i % 3) * 8, 560, 140, nearHillColor, 0.52)
+          .setScrollFactor(0.34);
+      }
+
       const treeKeys = [
         "tree-chestnut-1",
         "tree-chestnut-2",
