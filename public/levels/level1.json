@@ -1,5 +1,6 @@
 {
   "spawn": { "x": 130, "y": 360 },
+  "rainbowPowerup": { "x": 280, "y": 450 },
   "finishGate": { "x": 3430, "y": 478 },
   "checkpoints": [
     { "x": 1080, "y": 355 },

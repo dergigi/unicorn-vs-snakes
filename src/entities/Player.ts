@@ -21,6 +21,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private jumpsUsed = 0;
   private airJumpUsed = false;
   private wasGrounded = false;
+  private hasRainbowPowerup = false;
   private jumpHoldUntil = 0;
   private controlsEnabled = true;
 
@@ -57,6 +58,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.airJumpUsed = false;
     this.wasGrounded = false;
     this.jumpHoldUntil = 0;
+  }
+
+  public setRainbowPowerup(enabled: boolean): void {
+    this.hasRainbowPowerup = enabled;
+  }
+
+  public hasRainbowPower(): boolean {
+    return this.hasRainbowPowerup;
   }
 
   public update(time: number, delta: number): void {
@@ -99,6 +108,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       !isGrounded &&
       this.jumpsUsed > 0 &&
       !this.airJumpUsed &&
+      this.hasRainbowPowerup &&
       this.jumpsUsed < MAX_JUMPS;
 
     if (jumpBuffered && (canGroundJump || canAirJump)) {

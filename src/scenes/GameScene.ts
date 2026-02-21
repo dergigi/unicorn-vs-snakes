@@ -31,6 +31,8 @@ export class GameScene extends Phaser.Scene {
   private levelData!: LevelData;
   private audioContext?: AudioContext;
   private lavaHitbox?: Phaser.GameObjects.Rectangle;
+  private rainbowPowerup?: Phaser.Physics.Arcade.Image;
+  private rainbowAura?: Phaser.GameObjects.Image;
 
   constructor() {
     super("GameScene");
@@ -65,7 +67,30 @@ export class GameScene extends Phaser.Scene {
       this.levelData.spawn.y,
       this.cursors
     );
+    this.player.setRainbowPowerup(false);
     this.physics.add.collider(this.player, this.platforms);
+
+    this.rainbowAura = this.add
+      .image(this.player.x, this.player.y - 42, "rainbow-aura")
+      .setAlpha(0.95)
+      .setDepth(this.player.depth - 1)
+      .setVisible(false);
+
+    this.rainbowPowerup = this.physics.add
+      .staticImage(
+        this.levelData.rainbowPowerup.x,
+        this.levelData.rainbowPowerup.y,
+        "rainbow-powerup"
+      )
+      .setOrigin(0.5, 1)
+      .setScale(1.7);
+    this.physics.add.overlap(
+      this.player,
+      this.rainbowPowerup,
+      this.handleRainbowPowerupCollect,
+      undefined,
+      this
+    );
 
     this.checkpointSystem = new CheckpointSystem(this, this.levelData.spawn);
     for (const checkpoint of this.levelData.checkpoints) {
@@ -120,6 +145,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     this.player.update(time, delta);
+    this.updateRainbowAura(time);
     for (const snake of this.snakes) {
       snake.update();
     }
@@ -190,6 +216,34 @@ export class GameScene extends Phaser.Scene {
       ...baseCursors,
       jump: jumpKey
     };
+  }
+
+  private handleRainbowPowerupCollect(): void {
+    if (!this.rainbowPowerup || !this.rainbowPowerup.active) {
+      return;
+    }
+    this.rainbowPowerup.destroy();
+    this.player.setRainbowPowerup(true);
+    this.game.events.emit(GAME_EVENTS.rainbowPowerupCollected);
+    if (this.audioContext) {
+      beep(this.audioContext, 690, 0.08, "triangle", 0.03);
+      this.time.delayedCall(100, () => beep(this.audioContext!, 930, 0.12, "triangle", 0.03));
+    }
+  }
+
+  private updateRainbowAura(time: number): void {
+    if (!this.rainbowAura) {
+      return;
+    }
+
+    if (!this.player.hasRainbowPower()) {
+      this.rainbowAura.setVisible(false);
+      return;
+    }
+
+    this.rainbowAura.setVisible(true);
+    this.rainbowAura.setPosition(this.player.x, this.player.y - 36 + Math.sin(time * 0.014) * 2);
+    this.rainbowAura.setAlpha(0.8 + Math.sin(time * 0.01) * 0.16);
   }
 
   private handlePlayerHit(

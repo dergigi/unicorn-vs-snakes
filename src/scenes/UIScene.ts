@@ -44,12 +44,22 @@ export class UIScene extends Phaser.Scene {
 
     this.game.events.on(GAME_EVENTS.livesChanged, this.onLivesChanged, this);
     this.game.events.on(GAME_EVENTS.sparkleChanged, this.onSparkleChanged, this);
+    this.game.events.on(
+      GAME_EVENTS.rainbowPowerupCollected,
+      this.onRainbowPowerupCollected,
+      this
+    );
     this.game.events.on(GAME_EVENTS.checkpointReached, this.onCheckpointReached, this);
     this.game.events.on(GAME_EVENTS.playerHit, this.onPlayerHit, this);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.game.events.off(GAME_EVENTS.livesChanged, this.onLivesChanged, this);
       this.game.events.off(GAME_EVENTS.sparkleChanged, this.onSparkleChanged, this);
+      this.game.events.off(
+        GAME_EVENTS.rainbowPowerupCollected,
+        this.onRainbowPowerupCollected,
+        this
+      );
       this.game.events.off(GAME_EVENTS.checkpointReached, this.onCheckpointReached, this);
       this.game.events.off(GAME_EVENTS.playerHit, this.onPlayerHit, this);
     });
@@ -88,6 +98,16 @@ export class UIScene extends Phaser.Scene {
     this.resetHintSoon();
     if (this.audioContext) {
       beep(this.audioContext, 700, 0.08, "triangle", 0.025);
+    }
+  }
+
+  private onRainbowPowerupCollected(): void {
+    this.hintText.setText("Rainbow power! Double jump unlocked!");
+    this.hintText.setColor("#ffd7ff");
+    this.hintText.setStroke("#5a2a63", 4);
+    this.resetHintSoon();
+    if (this.audioContext) {
+      beep(this.audioContext, 760, 0.08, "triangle", 0.026);
     }
   }
 

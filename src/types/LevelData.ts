@@ -19,6 +19,7 @@ export type SparkleData = {
 
 export type LevelData = {
   spawn: { x: number; y: number };
+  rainbowPowerup: { x: number; y: number };
   finishGate: { x: number; y: number };
   checkpoints: { x: number; y: number }[];
   platforms: PlatformData[];
