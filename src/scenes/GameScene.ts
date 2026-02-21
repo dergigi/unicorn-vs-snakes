@@ -1167,18 +1167,7 @@ export class GameScene extends Phaser.Scene {
     if (this.bossHealth > 0) {
       return;
     }
-    this.bossBatSpawnTimer?.remove(false);
-    this.bossBatSpawnTimer = undefined;
-    this.bossWitch.destroy();
-    this.bossWitch = undefined;
-    this.bossInvulnerableUntil = 0;
-    this.bossHealthText?.destroy();
-    this.bossHealthText = undefined;
-    this.cameras.main.shake(220, 0.0045);
-    if (this.audioContext) {
-      beep(this.audioContext, 980, 0.1, "triangle", 0.04);
-    }
-    this.updateGateUnlockState();
+    this.triggerBossDefeat();
   }
 
   private updateBossWitch(time: number): void {
@@ -1214,6 +1203,68 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     this.bossHealthText.setText(label);
+  }
+
+  private triggerBossDefeat(): void {
+    if (!this.bossWitch || !this.bossWitch.active) {
+      return;
+    }
+
+    const witch = this.bossWitch;
+    this.bossBatSpawnTimer?.remove(false);
+    this.bossBatSpawnTimer = undefined;
+    this.bossInvulnerableUntil = Number.MAX_SAFE_INTEGER;
+    this.bossHealth = 0;
+    this.updateBossHealthText();
+
+    const blast = this.add.circle(witch.x, witch.y - 8, 14, 0xffc07a, 0.8).setDepth(14);
+    this.tweens.add({
+      targets: blast,
+      scale: 4,
+      alpha: 0,
+      duration: 260,
+      ease: "Cubic.easeOut",
+      onComplete: () => blast.destroy()
+    });
+
+    for (let i = 0; i < 14; i += 1) {
+      const spark = this.add
+        .circle(witch.x, witch.y - 8, Phaser.Math.Between(2, 4), 0xff9a5c, 0.95)
+        .setDepth(14);
+      const angle = Phaser.Math.FloatBetween(0, Math.PI * 2);
+      const distance = Phaser.Math.Between(30, 85);
+      this.tweens.add({
+        targets: spark,
+        x: spark.x + Math.cos(angle) * distance,
+        y: spark.y + Math.sin(angle) * distance,
+        alpha: 0,
+        duration: Phaser.Math.Between(220, 360),
+        ease: "Quad.easeOut",
+        onComplete: () => spark.destroy()
+      });
+    }
+
+    this.tweens.add({
+      targets: witch,
+      alpha: 0,
+      scaleX: witch.scaleX * 1.8,
+      scaleY: witch.scaleY * 1.8,
+      angle: 18,
+      duration: 240,
+      ease: "Back.easeIn",
+      onComplete: () => {
+        witch.destroy();
+        this.bossWitch = undefined;
+        this.bossInvulnerableUntil = 0;
+        this.updateGateUnlockState();
+      }
+    });
+
+    this.cameras.main.shake(220, 0.0045);
+    if (this.audioContext) {
+      beep(this.audioContext, 980, 0.1, "triangle", 0.04);
+      this.time.delayedCall(90, () => beep(this.audioContext!, 760, 0.09, "square", 0.03));
+    }
   }
 
   private handleBossWitchCollision(
@@ -1258,19 +1309,7 @@ export class GameScene extends Phaser.Scene {
     if (this.bossHealth > 0) {
       return;
     }
-
-    this.bossBatSpawnTimer?.remove(false);
-    this.bossBatSpawnTimer = undefined;
-    this.bossWitch.destroy();
-    this.bossWitch = undefined;
-    this.bossInvulnerableUntil = 0;
-    this.bossHealthText?.destroy();
-    this.bossHealthText = undefined;
-    if (this.audioContext) {
-      beep(this.audioContext, 980, 0.1, "triangle", 0.04);
-    }
-    this.cameras.main.shake(180, 0.004);
-    this.updateGateUnlockState();
+    this.triggerBossDefeat();
   }
 
   private createStoryCat(): void {
