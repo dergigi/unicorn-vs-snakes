@@ -57,6 +57,7 @@ export class GameScene extends Phaser.Scene {
   private bossWitch?: Phaser.Physics.Arcade.Sprite;
   private bossHealth = 0;
   private bossInvulnerableUntil = 0;
+  private bossHealthText?: Phaser.GameObjects.Text;
   private bossBatSpawnTimer?: Phaser.Time.TimerEvent;
   private mushroomPickup?: Phaser.Physics.Arcade.Image;
   private hasMushroomPower = false;
@@ -129,6 +130,8 @@ export class GameScene extends Phaser.Scene {
     this.bossWitch = undefined;
     this.bossHealth = 0;
     this.bossInvulnerableUntil = 0;
+    this.bossHealthText?.destroy();
+    this.bossHealthText = undefined;
     this.bossBatSpawnTimer?.remove(false);
     this.bossBatSpawnTimer = undefined;
     this.mushroomPickup = undefined;
@@ -1042,6 +1045,7 @@ export class GameScene extends Phaser.Scene {
     this.bossWitch = witch;
     this.bossHealth = bossData.health ?? 6;
     this.bossInvulnerableUntil = 0;
+    this.updateBossHealthText();
     this.bossBatSpawnTimer = this.time.addEvent({
       delay: 2200,
       loop: true,
@@ -1154,6 +1158,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.bossInvulnerableUntil = this.time.now + 260;
     this.bossHealth -= 1;
+    this.updateBossHealthText();
     this.bossWitch.setTint(0xff956c);
     this.time.delayedCall(100, () => this.bossWitch?.clearTint());
     if (this.audioContext) {
@@ -1167,6 +1172,8 @@ export class GameScene extends Phaser.Scene {
     this.bossWitch.destroy();
     this.bossWitch = undefined;
     this.bossInvulnerableUntil = 0;
+    this.bossHealthText?.destroy();
+    this.bossHealthText = undefined;
     this.cameras.main.shake(220, 0.0045);
     if (this.audioContext) {
       beep(this.audioContext, 980, 0.1, "triangle", 0.04);
@@ -1183,6 +1190,30 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     this.bossWitch.setAlpha(1);
+  }
+
+  private updateBossHealthText(): void {
+    if (!this.bossWitch || !this.bossWitch.active || this.bossHealth <= 0) {
+      this.bossHealthText?.destroy();
+      this.bossHealthText = undefined;
+      return;
+    }
+    const label = `Witch HP: ${this.bossHealth}`;
+    if (!this.bossHealthText) {
+      this.bossHealthText = this.add
+        .text(GAME_WIDTH / 2, 44, label, {
+          fontFamily: "monospace",
+          fontSize: "20px",
+          color: "#ffd6f8",
+          stroke: "#24133d",
+          strokeThickness: 4
+        })
+        .setOrigin(0.5, 0)
+        .setScrollFactor(0)
+        .setDepth(1002);
+      return;
+    }
+    this.bossHealthText.setText(label);
   }
 
   private handleBossWitchCollision(
@@ -1216,6 +1247,7 @@ export class GameScene extends Phaser.Scene {
 
     this.bossInvulnerableUntil = this.time.now + 420;
     this.bossHealth -= 1;
+    this.updateBossHealthText();
     this.player.setVelocityY(-420);
     this.bossWitch.setTint(0xffd36a);
     this.time.delayedCall(120, () => this.bossWitch?.clearTint());
@@ -1232,6 +1264,8 @@ export class GameScene extends Phaser.Scene {
     this.bossWitch.destroy();
     this.bossWitch = undefined;
     this.bossInvulnerableUntil = 0;
+    this.bossHealthText?.destroy();
+    this.bossHealthText = undefined;
     if (this.audioContext) {
       beep(this.audioContext, 980, 0.1, "triangle", 0.04);
     }
