@@ -253,7 +253,7 @@ export class GameScene extends Phaser.Scene {
         .setTint(colors[Phaser.Math.Between(0, colors.length - 1)])
         .setBlendMode(Phaser.BlendModes.ADD)
         .setAlpha(0.96)
-        .setDepth(this.player.depth - 1);
+        .setDepth(this.player.depth + 1);
 
       this.tweens.add({
         targets: sparkle,
