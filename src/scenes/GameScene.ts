@@ -603,6 +603,7 @@ export class GameScene extends Phaser.Scene {
     this.catStoryPortrait = this.add
       .image(portraitCenterX, portraitCenterY, "story-cat")
       .setDisplaySize(portraitSize, portraitSize)
+      .setFlipX(true)
       .setScrollFactor(0)
       .setDepth(1001);
 
