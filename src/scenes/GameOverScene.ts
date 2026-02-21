@@ -7,12 +7,13 @@ export class GameOverScene extends Phaser.Scene {
     super("GameOverScene");
   }
 
-  create(data?: { maxLives?: number; difficulty?: Difficulty; levelNumber?: number; levelTimes?: number[] }): void {
+  create(data?: { maxLives?: number; difficulty?: Difficulty; levelNumber?: number; levelTimes?: number[]; menuTimeMs?: number }): void {
     const maxLives = data?.maxLives ?? 5;
     const difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
     const levelNumber = data?.levelNumber ?? 1;
     const levelTimes = data?.levelTimes ?? [];
-    const totalMs = levelTimes.reduce((sum, t) => sum + t, 0);
+    const menuTimeMs = data?.menuTimeMs ?? 0;
+    const totalMs = menuTimeMs + levelTimes.reduce((sum, t) => sum + t, 0);
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1a0f30).setOrigin(0, 0);
     this.add.text(GAME_WIDTH / 2, 90, "Oops! Try Again", {
@@ -27,6 +28,12 @@ export class GameOverScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     let timesY = 205;
+    this.add.text(GAME_WIDTH / 2, timesY, `Menu: ${formatTime(menuTimeMs)}`, {
+      fontFamily: "monospace",
+      fontSize: "18px",
+      color: "#c8c0e8"
+    }).setOrigin(0.5);
+    timesY += 26;
     for (let i = 0; i < levelTimes.length; i++) {
       this.add.text(GAME_WIDTH / 2, timesY, `Level ${i + 1}: ${formatTime(levelTimes[i])}`, {
         fontFamily: "monospace",

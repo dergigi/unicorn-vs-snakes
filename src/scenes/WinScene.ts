@@ -7,9 +7,10 @@ export class WinScene extends Phaser.Scene {
     super("WinScene");
   }
 
-  create(data: { sparkles?: number; levelTimes?: number[] }): void {
+  create(data: { sparkles?: number; levelTimes?: number[]; menuTimeMs?: number }): void {
     const levelTimes = data.levelTimes ?? [];
-    const totalMs = levelTimes.reduce((sum, t) => sum + t, 0);
+    const menuTimeMs = data.menuTimeMs ?? 0;
+    const totalMs = menuTimeMs + levelTimes.reduce((sum, t) => sum + t, 0);
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x152744).setOrigin(0, 0);
     this.add.rectangle(0, GAME_HEIGHT - 180, GAME_WIDTH, 180, 0x1f4d78).setOrigin(0, 0);
@@ -36,6 +37,12 @@ export class WinScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     let timesY = 230;
+    this.add.text(GAME_WIDTH / 2, timesY, `Menu: ${formatTime(menuTimeMs)}`, {
+      fontFamily: "monospace",
+      fontSize: "20px",
+      color: "#c8c0e8"
+    }).setOrigin(0.5);
+    timesY += 28;
     for (let i = 0; i < levelTimes.length; i++) {
       this.add.text(GAME_WIDTH / 2, timesY, `Level ${i + 1}: ${formatTime(levelTimes[i])}`, {
         fontFamily: "monospace",

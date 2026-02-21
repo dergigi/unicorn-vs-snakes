@@ -79,6 +79,7 @@ export class GameScene extends Phaser.Scene {
   private levelSkipResetTimer?: Phaser.Time.TimerEvent;
   private timerStartMs = 0;
   private levelTimes: number[] = [];
+  private menuTimeMs = 0;
 
   constructor() {
     super("GameScene");
@@ -91,11 +92,13 @@ export class GameScene extends Phaser.Scene {
     currentLives?: number;
     hasRainbow?: boolean;
     levelTimes?: number[];
+    menuTimeMs?: number;
   }): void {
     this.maxLives = data?.maxLives ?? 5;
     this.difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
     this.levelNumber = data?.levelNumber ?? 1;
     this.levelTimes = data?.levelTimes ?? [];
+    this.menuTimeMs = data?.menuTimeMs ?? 0;
     this.timerStartMs = Date.now();
     this.levelComplete = false;
     this.lives = data?.currentLives ?? this.maxLives;
@@ -322,7 +325,8 @@ export class GameScene extends Phaser.Scene {
       levelNumber: targetLevel,
       currentLives: this.lives,
       hasRainbow: this.player?.hasRainbowPower() ?? false,
-      levelTimes: [...this.levelTimes]
+      levelTimes: [...this.levelTimes],
+      menuTimeMs: this.menuTimeMs
     };
     this.scene.stop("UIScene");
     this.scene.restart(sceneData);
@@ -1304,7 +1308,8 @@ export class GameScene extends Phaser.Scene {
         maxLives: this.maxLives,
         difficulty: this.difficulty,
         levelNumber: this.levelNumber,
-        levelTimes: allTimes
+        levelTimes: allTimes,
+        menuTimeMs: this.menuTimeMs
       });
       return;
     }
@@ -1350,7 +1355,8 @@ export class GameScene extends Phaser.Scene {
           levelNumber: this.levelNumber + 1,
           currentLives: this.lives,
           hasRainbow: this.player.hasRainbowPower(),
-          levelTimes: [...this.levelTimes]
+          levelTimes: [...this.levelTimes],
+          menuTimeMs: this.menuTimeMs
         };
         this.scene.restart(sceneData);
         this.scene.launch("UIScene", sceneData);
@@ -1359,7 +1365,8 @@ export class GameScene extends Phaser.Scene {
 
       this.scene.start("WinScene", {
         sparkles: collected,
-        levelTimes: [...this.levelTimes]
+        levelTimes: [...this.levelTimes],
+        menuTimeMs: this.menuTimeMs
       });
     });
   }

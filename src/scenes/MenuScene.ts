@@ -41,6 +41,7 @@ export class MenuScene extends Phaser.Scene {
   private levelSkipPressCount = 0;
   private levelSkipTargetLevel?: number;
   private levelSkipResetTimer?: Phaser.Time.TimerEvent;
+  private menuCreatedAt = 0;
 
   constructor() {
     super("MenuScene");
@@ -48,6 +49,7 @@ export class MenuScene extends Phaser.Scene {
 
   create(): void {
     this.started = false;
+    this.menuCreatedAt = Date.now();
     this.nextTrailAt = 0;
     this.menuSnakes = [];
 
@@ -431,7 +433,8 @@ export class MenuScene extends Phaser.Scene {
       difficulty: this.selectedDifficulty,
       maxLives,
       levelNumber,
-      currentLives: maxLives
+      currentLives: maxLives,
+      menuTimeMs: Date.now() - this.menuCreatedAt
     };
     this.scene.start("GameScene", sceneData);
     this.scene.launch("UIScene", sceneData);
