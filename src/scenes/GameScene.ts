@@ -698,10 +698,10 @@ export class GameScene extends Phaser.Scene {
       .text(
         dialogX + 62,
         portraitCenterY,
-        "Brave little unicorn! The Rainbow Kingdom's sparkling light was stolen\nby a wicked witch, and she put sneaky snakes everywhere.\nCollect sparkles to re-light the sky, open the gate, and don't get bitten by the snakes!",
+        "Brave little unicorn! The Rainbow Kingdom's sparkling light was stolen by a wicked witch, and she put sneaky snakes everywhere. Collect sparkles to re-light the sky, open the gate, and don't get bitten by the snakes!",
         {
-          fontFamily: "monospace",
-          fontSize: "16px",
+          fontFamily: "\"Press Start 2P\", \"VT323\", \"Courier New\", monospace",
+          fontSize: "14px",
           color: "#e6fbff",
           align: "left",
           wordWrap: { width: dialogWidth - 76 },
