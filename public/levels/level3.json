@@ -31,9 +31,13 @@
     { "x": 3260, "y": 290, "width": 120, "height": 28 }
   ],
   "snakes": [
+    { "x": 620, "y": 470, "patrolWidth": 150, "speedFactor": 0.15 },
     { "x": 960, "y": 470, "patrolWidth": 180, "speedFactor": 0.2 },
+    { "x": 1320, "y": 470, "patrolWidth": 160, "speedFactor": -0.1 },
     { "x": 1640, "y": 470, "patrolWidth": 180, "speedFactor": -0.15 },
+    { "x": 1960, "y": 470, "patrolWidth": 160, "speedFactor": 0.25 },
     { "x": 2260, "y": 470, "patrolWidth": 170, "speedFactor": 0.35 },
+    { "x": 2580, "y": 470, "patrolWidth": 165, "speedFactor": -0.2 },
     { "x": 2920, "y": 470, "patrolWidth": 180, "speedFactor": 0.1 }
   ],
   "sparkles": [
