@@ -385,11 +385,14 @@ export class MenuScene extends Phaser.Scene {
 
     const onTwo = (): void => this.handleLevelSkipKey(2);
     const onThree = (): void => this.handleLevelSkipKey(3);
+    const onFour = (): void => this.handleLevelSkipKey(4);
     keyboard.on("keydown-TWO", onTwo, this);
     keyboard.on("keydown-THREE", onThree, this);
+    keyboard.on("keydown-FOUR", onFour, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       keyboard.off("keydown-TWO", onTwo, this);
       keyboard.off("keydown-THREE", onThree, this);
+      keyboard.off("keydown-FOUR", onFour, this);
       this.levelSkipResetTimer?.remove(false);
       this.levelSkipResetTimer = undefined;
     });
