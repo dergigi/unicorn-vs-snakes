@@ -8,9 +8,9 @@ import {
 } from "../config/gameConfig";
 import { spawnRainbowTrail } from "../utils/rainbowTrail";
 
-const FLOOR_Y = GAME_HEIGHT - 118;
-const GRASS_TOP = FLOOR_Y + 20;
+const GRASS_TOP = GAME_HEIGHT - 98;
 const GRASS_HEIGHT = 52;
+const FLOOR_Y = GRASS_TOP + 8;
 const UNICORN_SPEED = 3.2;
 const GATE_X = GAME_WIDTH - 100;
 const GATE_OVERLAP_DIST = 28;
