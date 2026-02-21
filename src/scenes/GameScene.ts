@@ -33,6 +33,7 @@ export class GameScene extends Phaser.Scene {
   private lavaHitbox?: Phaser.GameObjects.Rectangle;
   private rainbowPowerup?: Phaser.Physics.Arcade.Image;
   private rainbowAura?: Phaser.GameObjects.Image;
+  private rainbowAuraOuter?: Phaser.GameObjects.Image;
 
   constructor() {
     super("GameScene");
@@ -72,8 +73,17 @@ export class GameScene extends Phaser.Scene {
 
     this.rainbowAura = this.add
       .image(this.player.x, this.player.y - 42, "rainbow-aura")
-      .setAlpha(0.95)
+      .setScale(1.5)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setAlpha(0.9)
       .setDepth(this.player.depth - 1)
+      .setVisible(false);
+    this.rainbowAuraOuter = this.add
+      .image(this.player.x, this.player.y - 42, "rainbow-aura")
+      .setScale(2.3)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setAlpha(0.36)
+      .setDepth(this.player.depth - 2)
       .setVisible(false);
 
     this.rainbowPowerup = this.physics.add
@@ -232,18 +242,35 @@ export class GameScene extends Phaser.Scene {
   }
 
   private updateRainbowAura(time: number): void {
-    if (!this.rainbowAura) {
+    if (!this.rainbowAura || !this.rainbowAuraOuter) {
       return;
     }
 
     if (!this.player.hasRainbowPower()) {
       this.rainbowAura.setVisible(false);
+      this.rainbowAuraOuter.setVisible(false);
       return;
     }
 
+    const hue = (time * 0.00024) % 1;
+    const innerColor = Phaser.Display.Color.HSVToRGB(hue, 0.62, 1).color;
+    const outerColor = Phaser.Display.Color.HSVToRGB((hue + 0.18) % 1, 0.58, 1).color;
+    const pulse = 1 + Math.sin(time * 0.012) * 0.12;
+
     this.rainbowAura.setVisible(true);
-    this.rainbowAura.setPosition(this.player.x, this.player.y - 36 + Math.sin(time * 0.014) * 2);
-    this.rainbowAura.setAlpha(0.8 + Math.sin(time * 0.01) * 0.16);
+    this.rainbowAuraOuter.setVisible(true);
+
+    this.rainbowAura.setPosition(this.player.x, this.player.y - 34 + Math.sin(time * 0.014) * 2);
+    this.rainbowAura.setScale(1.42 * pulse, 1.2 * pulse);
+    this.rainbowAura.setTint(innerColor);
+    this.rainbowAura.setAlpha(0.78 + Math.sin(time * 0.01) * 0.2);
+
+    this.rainbowAuraOuter.setPosition(this.player.x, this.player.y - 34 + Math.sin(time * 0.012) * 3);
+    this.rainbowAuraOuter.setScale(2.1 * pulse, 1.75 * pulse);
+    this.rainbowAuraOuter.setTint(outerColor);
+    this.rainbowAuraOuter.setAlpha(0.3 + Math.sin(time * 0.009) * 0.08);
+
+    this.player.setTint(Phaser.Display.Color.HSVToRGB((hue + 0.07) % 1, 0.28, 1).color);
   }
 
   private handlePlayerHit(
