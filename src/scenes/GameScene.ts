@@ -274,20 +274,24 @@ export class GameScene extends Phaser.Scene {
     }
 
     for (const puddle of this.levelData.waterPuddles) {
-      // Draw puddles flush with ground top so the player can drop in and jump out.
+      // Fill puddles down to scene bottom so they match full-height ground columns.
+      const puddleTopY = puddle.y - puddle.height / 2;
+      const deepWaterHeight = WORLD_HEIGHT - puddleTopY;
+      const deepWaterCenterY = puddleTopY + deepWaterHeight / 2;
+
       this.add
-        .rectangle(puddle.x, puddle.y + 1, puddle.width, puddle.height, 0x3d8fd6, 0.92)
+        .rectangle(puddle.x, deepWaterCenterY, puddle.width, deepWaterHeight, 0x2b73c2, 0.88)
         .setDepth(2);
       this.add
         .rectangle(
           puddle.x,
-          puddle.y - 3,
-          puddle.width * 0.78,
-          Math.max(4, puddle.height * 0.34),
+          puddleTopY + 4,
+          puddle.width * 0.84,
+          Math.max(6, puddle.height * 0.44),
           0x9fe8ff,
-          0.66
+          0.72
         )
-        .setDepth(3);
+        .setDepth(4);
     }
   }
 
