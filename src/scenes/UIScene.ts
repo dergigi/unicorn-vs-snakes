@@ -160,7 +160,7 @@ export class UIScene extends Phaser.Scene {
   }
 
   private onMushroomPowerupCollected(): void {
-    this.hintText.setText("Mushroom power! Press X to shoot fireballs!");
+    this.hintText.setText("Mushroom power! Press Space to shoot fireballs!");
     this.hintText.setColor("#ffd6a1");
     this.hintText.setStroke("#5a2f1f", 4);
     this.resetHintSoon();
