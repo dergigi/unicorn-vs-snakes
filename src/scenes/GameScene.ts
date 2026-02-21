@@ -190,7 +190,6 @@ export class GameScene extends Phaser.Scene {
         "tree-chestnut-2",
         "tree-chestnut-3",
         "tree-gnarled",
-        "tree-a-tree",
         "tree-lpc-green",
         "tree-krook"
       ] as const;
@@ -205,17 +204,6 @@ export class GameScene extends Phaser.Scene {
           .setAlpha(0.38)
           .setTint(0x6aa768)
           .setScrollFactor(0.28);
-      }
-
-      // Extra distant oak backdrop from the old-oak pack.
-      for (let i = 0; i < 4; i += 1) {
-        this.add
-          .image(500 + i * 900, WORLD_HEIGHT - 192, "tree-old-oak")
-          .setOrigin(0.5, 1)
-          .setScale(0.7)
-          .setAlpha(0.2)
-          .setTint(0x557a57)
-          .setScrollFactor(0.18);
       }
 
       // Mid/near layer: brighter trees that feel lush and alive.

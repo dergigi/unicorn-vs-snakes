@@ -1,6 +1,6 @@
 # Tree Asset Sources
 
-Used in Level 1 (forest background):
+Currently used in Level 1 (forest background):
 
 - **Chestnut Trees (Yar's Tree Rework)**  
   File(s): `PNG/32x32/chestnut-001.png`, `chestnut-002.png`, `chestnut-003.png`  
@@ -19,6 +19,7 @@ Used in Level 1 (forest background):
   Source: [https://opengameart.org/content/a-tree](https://opengameart.org/content/a-tree)  
   License: CC0  
   Attribution: airockstar
+  Status: downloaded variant (not currently rendered)
 
 - **[LPC] Tree Recolors**  
   File: `extra/lpc-green-trees.png`  
@@ -37,3 +38,4 @@ Used in Level 1 (forest background):
   Source: [https://opengameart.org/content/old-oak-tree](https://opengameart.org/content/old-oak-tree)  
   License options on source page include GPL 2.0/3.0 and CC-BY-SA 3.0  
   Attribution: Julius
+  Status: downloaded variant (not currently rendered)
