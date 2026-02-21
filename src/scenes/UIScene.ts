@@ -8,7 +8,6 @@ import {
 import { beep } from "../utils/sfx";
 
 export class UIScene extends Phaser.Scene {
-  private heartsLabel!: Phaser.GameObjects.Text;
   private heartSprites: Phaser.GameObjects.Image[] = [];
   private sparkleText!: Phaser.GameObjects.Text;
   private hintText!: Phaser.GameObjects.Text;
@@ -21,16 +20,9 @@ export class UIScene extends Phaser.Scene {
 
   create(): void {
     this.audioContext = "context" in this.sound ? (this.sound.context as AudioContext) : undefined;
-    this.heartsLabel = this.add.text(18, 14, "Hearts:", {
-      fontFamily: "monospace",
-      fontSize: "22px",
-      color: "#fff1ff",
-      stroke: "#24133d",
-      strokeThickness: 5
-    }).setScrollFactor(0);
     for (let i = 0; i < MAX_LIVES; i += 1) {
       const heart = this.add
-        .image(112 + i * 30, 30, "hearts", 0)
+        .image(30 + i * 30, 30, "hearts", 0)
         .setScale(0.06)
         .setScrollFactor(0);
       this.heartSprites.push(heart);
