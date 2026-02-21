@@ -3,6 +3,16 @@ export const GAME_HEIGHT = 540;
 export const WORLD_WIDTH = 3600;
 export const WORLD_HEIGHT = GAME_HEIGHT;
 
+export type Difficulty = "easy" | "normal" | "hard" | "insane";
+
+export const DIFFICULTY_HEARTS: Record<Difficulty, number> = {
+  easy: 9,
+  normal: 5,
+  hard: 3,
+  insane: 1
+};
+export const DEFAULT_DIFFICULTY: Difficulty = "normal";
+
 export const PHYSICS_GRAVITY_Y = 1300;
 
 export const PLAYER_MOVE_SPEED = 240;
@@ -15,7 +25,7 @@ export const MAX_JUMPS = 2;
 export const JUMP_HOLD_MAX_MS = 170;
 export const JUMP_HOLD_BOOST_PER_FRAME = 18;
 
-export const MAX_LIVES = 3;
+export const MAX_LIVES = DIFFICULTY_HEARTS[DEFAULT_DIFFICULTY];
 export const PLAYER_HIT_INVULNERABILITY_MS = 1100;
 export const KNOCKBACK_X = 180;
 export const KNOCKBACK_Y = -260;

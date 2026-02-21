@@ -1,10 +1,6 @@
 import Phaser from "phaser";
 import { GAME_EVENTS } from "../config/events";
-import {
-  GAME_WIDTH,
-  MAX_LIVES,
-  REQUIRED_SPARKLES_TO_FINISH
-} from "../config/gameConfig";
+import { GAME_WIDTH, REQUIRED_SPARKLES_TO_FINISH } from "../config/gameConfig";
 import { beep } from "../utils/sfx";
 
 export class UIScene extends Phaser.Scene {
@@ -14,14 +10,16 @@ export class UIScene extends Phaser.Scene {
   private hintText!: Phaser.GameObjects.Text;
   private hideHintTimer?: Phaser.Time.TimerEvent;
   private audioContext?: AudioContext;
+  private maxLives = 5;
 
   constructor() {
     super("UIScene");
   }
 
-  create(): void {
+  create(data?: { maxLives?: number }): void {
+    this.maxLives = data?.maxLives ?? 5;
     this.audioContext = "context" in this.sound ? (this.sound.context as AudioContext) : undefined;
-    for (let i = 0; i < MAX_LIVES; i += 1) {
+    for (let i = 0; i < this.maxLives; i += 1) {
       const heart = this.add
         .image(30 + i * 30, 30, "hearts", 0)
         .setScale(0.06)
@@ -51,6 +49,7 @@ export class UIScene extends Phaser.Scene {
       this.onRainbowPowerupCollected,
       this
     );
+    this.game.events.on(GAME_EVENTS.rainbowPowerupLost, this.onRainbowPowerupLost, this);
     this.game.events.on(GAME_EVENTS.checkpointReached, this.onCheckpointReached, this);
     this.game.events.on(GAME_EVENTS.playerHit, this.onPlayerHit, this);
 
@@ -62,6 +61,7 @@ export class UIScene extends Phaser.Scene {
         this.onRainbowPowerupCollected,
         this
       );
+      this.game.events.off(GAME_EVENTS.rainbowPowerupLost, this.onRainbowPowerupLost, this);
       this.game.events.off(GAME_EVENTS.checkpointReached, this.onCheckpointReached, this);
       this.game.events.off(GAME_EVENTS.playerHit, this.onPlayerHit, this);
     });
@@ -111,6 +111,13 @@ export class UIScene extends Phaser.Scene {
     if (this.audioContext) {
       beep(this.audioContext, 760, 0.08, "triangle", 0.026);
     }
+  }
+
+  private onRainbowPowerupLost(): void {
+    this.hintText.setText("Ouch! Rainbow power lost!");
+    this.hintText.setColor("#ffd0a1");
+    this.hintText.setStroke("#5a361f", 4);
+    this.resetHintSoon();
   }
 
   private onPlayerHit(): void {

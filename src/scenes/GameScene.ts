@@ -3,12 +3,13 @@ import { Player } from "../entities/Player";
 import { Snake } from "../entities/Snake";
 import { GAME_EVENTS } from "../config/events";
 import {
+  DEFAULT_DIFFICULTY,
   GAME_HEIGHT,
-  MAX_LIVES,
   PLAYER_HIT_INVULNERABILITY_MS,
   REQUIRED_SPARKLES_TO_FINISH,
   WORLD_HEIGHT,
-  WORLD_WIDTH
+  WORLD_WIDTH,
+  type Difficulty
 } from "../config/gameConfig";
 import { CheckpointSystem } from "../systems/CheckpointSystem";
 import { CollectibleSystem } from "../systems/CollectibleSystem";
@@ -25,7 +26,9 @@ export class GameScene extends Phaser.Scene {
   private collectibleSystem!: CollectibleSystem;
   private checkpointSystem!: CheckpointSystem;
   private finishGate!: Phaser.Physics.Arcade.Image;
-  private lives = MAX_LIVES;
+  private lives = 5;
+  private maxLives = 5;
+  private difficulty: Difficulty = DEFAULT_DIFFICULTY;
   private canTakeDamageAt = 0;
   private levelComplete = false;
   private levelData!: LevelData;
@@ -39,9 +42,11 @@ export class GameScene extends Phaser.Scene {
     super("GameScene");
   }
 
-  create(): void {
+  create(data?: { maxLives?: number; difficulty?: Difficulty }): void {
+    this.maxLives = data?.maxLives ?? 5;
+    this.difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
     this.levelComplete = false;
-    this.lives = MAX_LIVES;
+    this.lives = this.maxLives;
     this.canTakeDamageAt = 0;
     this.audioContext = "context" in this.sound ? (this.sound.context as AudioContext) : undefined;
 
@@ -289,6 +294,29 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    if (this.player.hasRainbowPower()) {
+      this.player.setRainbowPowerup(false);
+      this.canTakeDamageAt = this.time.now + PLAYER_HIT_INVULNERABILITY_MS;
+      this.game.events.emit(GAME_EVENTS.rainbowPowerupLost);
+      this.game.events.emit(GAME_EVENTS.playerHit);
+      if (this.audioContext) {
+        beep(this.audioContext, 300, 0.12, "square", 0.03);
+      }
+
+      this.player.setControlsEnabled(false);
+      this.player.setTint(0xffd998);
+      const hazardX = "x" in hazard ? hazard.x : this.player.x;
+      const direction = this.player.x < hazardX ? -1 : 1;
+      this.player.setVelocityX(direction * 220);
+      this.player.setVelocityY(-250);
+
+      this.time.delayedCall(260, () => {
+        this.player.clearTint();
+        this.player.setControlsEnabled(true);
+      });
+      return;
+    }
+
     this.lives -= 1;
     this.canTakeDamageAt = this.time.now + PLAYER_HIT_INVULNERABILITY_MS;
     this.game.events.emit(GAME_EVENTS.livesChanged, this.lives);
@@ -308,7 +336,10 @@ export class GameScene extends Phaser.Scene {
       if (this.lives <= 0) {
         this.game.events.emit(GAME_EVENTS.gameOver);
         this.scene.stop("UIScene");
-        this.scene.start("GameOverScene");
+        this.scene.start("GameOverScene", {
+          maxLives: this.maxLives,
+          difficulty: this.difficulty
+        });
         return;
       }
 
