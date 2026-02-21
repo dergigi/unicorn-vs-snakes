@@ -44,12 +44,6 @@ export class MenuScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 295, "Difficulty", {
-      fontSize: "24px",
-      color: "#fff1ff",
-      fontFamily: "monospace"
-    }).setOrigin(0.5);
-
     const difficulties: Difficulty[] = ["easy", "normal", "hard", "insane"];
     const buttons: Record<Difficulty, Phaser.GameObjects.Rectangle> = {
       easy: this.add.rectangle(0, 0, 1, 1, 0),
