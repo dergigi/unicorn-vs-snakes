@@ -44,6 +44,32 @@ export class MenuScene extends Phaser.Scene {
       }
     ).setOrigin(0.5);
 
+    const unicornSplash = this.add
+      .sprite(GAME_WIDTH / 2 - 170, 170, "unicorn", 0)
+      .setScale(3)
+      .setFlipX(false);
+    const snakeSplash = this.add
+      .image(GAME_WIDTH / 2 + 170, 178, "snake-1")
+      .setScale(1.55)
+      .setFlipX(true);
+
+    this.tweens.add({
+      targets: unicornSplash,
+      y: unicornSplash.y - 6,
+      duration: 700,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut"
+    });
+    this.tweens.add({
+      targets: snakeSplash,
+      angle: 5,
+      duration: 520,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut"
+    });
+
     const difficulties: Difficulty[] = ["easy", "normal", "hard", "insane"];
     const difficultyColors: Record<Difficulty, number> = {
       easy: 0x6fdc7f,
