@@ -411,8 +411,7 @@ export class GameScene extends Phaser.Scene {
       .setDisplaySize(this.levelData.storyCat.width, this.levelData.storyCat.height)
       .setDepth(9);
     this.storyCat = cat;
-    this.physics.add.collider(this.player, cat);
-    this.physics.add.overlap(this.player, cat, this.handleStoryCatTouch, undefined, this);
+    this.physics.add.collider(this.player, cat, this.handleStoryCatTouch, undefined, this);
 
     this.catNoiseText = this.add
       .text(cat.x, cat.y - this.levelData.storyCat.height - 6, "", {
