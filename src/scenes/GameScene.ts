@@ -45,6 +45,8 @@ export class GameScene extends Phaser.Scene {
   private catStoryShown = false;
   private catStoryBox?: Phaser.GameObjects.Rectangle;
   private catStoryText?: Phaser.GameObjects.Text;
+  private catNoiseText?: Phaser.GameObjects.Text;
+  private catNoiseEvent?: Phaser.Time.TimerEvent;
   private rainbowPowerup?: Phaser.Physics.Arcade.Image;
   private nextRainbowTrailAt = 0;
   private gateUnlocked = false;
@@ -79,8 +81,12 @@ export class GameScene extends Phaser.Scene {
     this.catStoryShown = false;
     this.catStoryBox?.destroy();
     this.catStoryText?.destroy();
+    this.catNoiseText?.destroy();
+    this.catNoiseEvent?.remove(false);
     this.catStoryBox = undefined;
     this.catStoryText = undefined;
+    this.catNoiseText = undefined;
+    this.catNoiseEvent = undefined;
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -401,6 +407,48 @@ export class GameScene extends Phaser.Scene {
     this.storyCat = cat;
     this.physics.add.collider(this.player, cat);
     this.physics.add.overlap(this.player, cat, this.handleStoryCatTouch, undefined, this);
+
+    this.catNoiseText = this.add
+      .text(cat.x, cat.y - this.levelData.storyCat.height - 6, "", {
+        fontFamily: "monospace",
+        fontSize: "16px",
+        color: "#fff4d2",
+        stroke: "#1b1220",
+        strokeThickness: 3
+      })
+      .setOrigin(0.5, 1)
+      .setDepth(12)
+      .setAlpha(0);
+
+    this.time.delayedCall(1200, () => this.emitCatNoise());
+    this.catNoiseEvent = this.time.addEvent({
+      delay: 2800,
+      loop: true,
+      callback: this.emitCatNoise,
+      callbackScope: this
+    });
+  }
+
+  private emitCatNoise(): void {
+    if (!this.storyCat || !this.storyCat.active || !this.catNoiseText) {
+      return;
+    }
+
+    const noises = ["meow!", "mrrp?", "purr...", "mew!"];
+    const baseY = this.storyCat.y - this.storyCat.displayHeight - 6;
+    this.catNoiseText
+      .setText(Phaser.Utils.Array.GetRandom(noises))
+      .setPosition(this.storyCat.x, baseY)
+      .setAlpha(1);
+
+    this.tweens.killTweensOf(this.catNoiseText);
+    this.tweens.add({
+      targets: this.catNoiseText,
+      y: baseY - 10,
+      alpha: 0,
+      duration: 1350,
+      ease: "Sine.easeOut"
+    });
   }
 
   private handleStoryCatTouch(): void {
