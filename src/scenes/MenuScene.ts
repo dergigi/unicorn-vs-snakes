@@ -35,6 +35,9 @@ export class MenuScene extends Phaser.Scene {
   private unicornVY = 0;
   private unicornBaseY = 0;
   private unicornOnGround = true;
+  private jumpHoldFrames = 0;
+  private difficultyBounds: { difficulty: Difficulty; left: number; right: number; top: number; bottom: number }[] = [];
+  private applyDifficultyStyles: (() => void) | null = null;
   private levelSkipPressCount = 0;
   private levelSkipTargetLevel?: number;
   private levelSkipResetTimer?: Phaser.Time.TimerEvent;
@@ -133,24 +136,35 @@ export class MenuScene extends Phaser.Scene {
 
     this.unicorn.x = Phaser.Math.Clamp(this.unicorn.x, 40, GAME_WIDTH - 40);
 
-    const jumpPressed =
+    const jumpHeld = this.jumpKey?.isDown || this.cursors?.up.isDown;
+    const jumpJustPressed =
       Phaser.Input.Keyboard.JustDown(this.jumpKey!) ||
-      Phaser.Input.Keyboard.JustDown(this.cursors!.up) ||
-      (this.cursors!.up.isDown && this.unicornOnGround);
-    if (jumpPressed && this.unicornOnGround) {
-      this.unicornVY = -5.5;
+      Phaser.Input.Keyboard.JustDown(this.cursors!.up);
+    if (jumpJustPressed && this.unicornOnGround) {
+      this.unicornVY = -7;
       this.unicornOnGround = false;
+      this.jumpHoldFrames = 0;
     }
 
+    const GRAVITY = 0.35;
+    const MAX_HOLD_FRAMES = 20;
     if (!this.unicornOnGround) {
-      this.unicornVY += 0.35;
+      if (jumpHeld && this.jumpHoldFrames < MAX_HOLD_FRAMES) {
+        this.jumpHoldFrames++;
+        this.unicornVY += GRAVITY - 0.35;
+      } else {
+        this.unicornVY += GRAVITY;
+      }
       this.unicorn.y += this.unicornVY;
       if (this.unicorn.y >= this.unicornBaseY) {
         this.unicorn.y = this.unicornBaseY;
         this.unicornVY = 0;
         this.unicornOnGround = true;
+        this.jumpHoldFrames = 0;
       }
     }
+
+    this.checkButtonOverlap();
 
     if (!this.unicornOnGround) {
       this.unicorn.setFrame(2);
@@ -183,10 +197,19 @@ export class MenuScene extends Phaser.Scene {
     const border = 4;
     const btnGraphics: Partial<Record<Difficulty, Phaser.GameObjects.Graphics>> = {};
     const hitAreas: Partial<Record<Difficulty, Phaser.GameObjects.Rectangle>> = {};
+    this.difficultyBounds = [];
 
     difficulties.forEach((difficulty, index) => {
       const cx = 222 + index * 172;
       const cy = 262;
+
+      this.difficultyBounds.push({
+        difficulty,
+        left: cx - bw / 2,
+        right: cx + bw / 2,
+        top: cy - bh / 2,
+        bottom: cy + bh / 2
+      });
 
       const gfx = this.add.graphics();
       btnGraphics[difficulty] = gfx;
@@ -268,7 +291,27 @@ export class MenuScene extends Phaser.Scene {
         drawButton(d, d === this.selectedDifficulty);
       }
     };
+    this.applyDifficultyStyles = applyStyles;
     applyStyles();
+  }
+
+  private checkButtonOverlap(): void {
+    const spriteH = 48;
+    const spriteW = 48;
+    const uLeft = this.unicorn.x - spriteW / 2;
+    const uRight = this.unicorn.x + spriteW / 2;
+    const uTop = this.unicorn.y - spriteH;
+    const uBottom = this.unicorn.y;
+
+    for (const btn of this.difficultyBounds) {
+      if (uRight > btn.left && uLeft < btn.right && uBottom > btn.top && uTop < btn.bottom) {
+        if (this.selectedDifficulty !== btn.difficulty) {
+          this.selectedDifficulty = btn.difficulty;
+          this.applyDifficultyStyles?.();
+        }
+        break;
+      }
+    }
   }
 
   private spawnPatrolSnakes(): void {
