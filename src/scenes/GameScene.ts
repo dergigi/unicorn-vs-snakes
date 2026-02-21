@@ -237,33 +237,31 @@ export class GameScene extends Phaser.Scene {
     if (time < this.nextRainbowTrailAt) {
       return;
     }
-    this.nextRainbowTrailAt = time + 42;
+    this.nextRainbowTrailAt = time + 30;
 
     const tailDirection = this.player.flipX ? 1 : -1;
     const baseX = this.player.x + tailDirection * 16;
     const baseY = this.player.y - 10;
     const colors = [0xff6fa7, 0xffbf6a, 0xfff07a, 0x8ff59f, 0x7ad9ff, 0xba9bff];
 
-    for (let i = 0; i < 3; i += 1) {
+    for (let i = 0; i < 4; i += 1) {
       const x = baseX + Phaser.Math.Between(-2, 2);
       const y = baseY + Phaser.Math.Between(-3, 3);
       const sparkle = this.add
-        .image(x, y, "sparkle")
-        .setScale(Phaser.Math.FloatBetween(0.34, 0.56))
-        .setTint(colors[Phaser.Math.Between(0, colors.length - 1)])
-        .setBlendMode(Phaser.BlendModes.ADD)
-        .setAlpha(0.96)
-        .setDepth(this.player.depth + 1);
+        .rectangle(x, y, Phaser.Math.Between(3, 5), Phaser.Math.Between(3, 5))
+        .setFillStyle(colors[Phaser.Math.Between(0, colors.length - 1)], 1)
+        .setDepth(this.player.depth + 2)
+        .setAlpha(0.95);
 
       this.tweens.add({
         targets: sparkle,
-        x: x + tailDirection * Phaser.Math.Between(22, 36),
+        x: x + tailDirection * Phaser.Math.Between(20, 34),
         y: y + Phaser.Math.Between(-12, 14),
         alpha: 0,
-        scaleX: 0.08,
-        scaleY: 0.08,
+        scaleX: 0.2,
+        scaleY: 0.2,
         angle: Phaser.Math.Between(-70, 70),
-        duration: Phaser.Math.Between(300, 470),
+        duration: Phaser.Math.Between(240, 380),
         ease: "Sine.easeOut",
         onComplete: () => sparkle.destroy()
       });
