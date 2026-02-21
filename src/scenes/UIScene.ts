@@ -9,7 +9,8 @@ import { beep } from "../utils/sfx";
 
 export class UIScene extends Phaser.Scene {
   private heartSprites: Phaser.GameObjects.Image[] = [];
-  private sparkleText!: Phaser.GameObjects.Text;
+  private sparkleIcon!: Phaser.GameObjects.Image;
+  private sparkleCountText!: Phaser.GameObjects.Text;
   private hintText!: Phaser.GameObjects.Text;
   private hideHintTimer?: Phaser.Time.TimerEvent;
   private audioContext?: AudioContext;
@@ -27,7 +28,8 @@ export class UIScene extends Phaser.Scene {
         .setScrollFactor(0);
       this.heartSprites.push(heart);
     }
-    this.sparkleText = this.add.text(18, 44, "✦ 0 / 14", {
+    this.sparkleIcon = this.add.image(28, 56, "sparkle").setScale(0.72).setScrollFactor(0);
+    this.sparkleCountText = this.add.text(46, 44, `0 / ${REQUIRED_SPARKLES_TO_FINISH}`, {
       fontFamily: "monospace",
       fontSize: "22px",
       color: "#fff7b1",
@@ -80,7 +82,7 @@ export class UIScene extends Phaser.Scene {
   }
 
   private onSparkleChanged(count: number): void {
-    this.sparkleText.setText(`✦ ${count} / ${REQUIRED_SPARKLES_TO_FINISH}`);
+    this.sparkleCountText.setText(`${count} / ${REQUIRED_SPARKLES_TO_FINISH}`);
     if (count >= REQUIRED_SPARKLES_TO_FINISH) {
       this.hintText.setText("Gate unlocked! Reach the rainbow!");
       this.hintText.setColor("#9fffb8");

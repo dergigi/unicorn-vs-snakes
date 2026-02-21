@@ -16,7 +16,10 @@ export class CollectibleSystem {
   }
 
   public addSparkle(x: number, y: number): void {
-    this.group.create(x, y, "sparkle").setData("kind", "sparkle");
+    const sparkle = this.group.create(x, y, "sparkle") as Phaser.Physics.Arcade.Image;
+    sparkle.setScale(0.72);
+    sparkle.refreshBody();
+    sparkle.setData("kind", "sparkle");
   }
 
   public handleCollect = (
