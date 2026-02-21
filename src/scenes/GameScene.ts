@@ -134,10 +134,34 @@ export class GameScene extends Phaser.Scene {
 
   private drawBackground(): void {
     this.add.rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 0x26164a).setOrigin(0, 0);
-    for (let i = 0; i < 6; i += 1) {
+    for (let i = 0; i < 7; i += 1) {
+      const baseX = 180 + i * 500;
+      const baseY = 112 + (i % 3) * 22;
+      const scrollFactor = 0.45;
+
       this.add
-        .ellipse(300 + i * 520, 120 + (i % 2) * 20, 280, 90, 0x3a2a67, 0.8)
-        .setScrollFactor(0.5);
+        .ellipse(baseX, baseY + 20, 210, 62, 0x2d2055, 0.6)
+        .setScrollFactor(scrollFactor);
+
+      this.add
+        .ellipse(baseX - 76, baseY + 6, 120, 64, 0x4b3a80, 0.75)
+        .setScrollFactor(scrollFactor);
+      this.add
+        .ellipse(baseX - 22, baseY - 8, 146, 84, 0x4f3f88, 0.8)
+        .setScrollFactor(scrollFactor);
+      this.add
+        .ellipse(baseX + 46, baseY - 4, 136, 76, 0x4e3e86, 0.8)
+        .setScrollFactor(scrollFactor);
+      this.add
+        .ellipse(baseX + 102, baseY + 8, 112, 58, 0x4a3a7f, 0.75)
+        .setScrollFactor(scrollFactor);
+
+      this.add
+        .ellipse(baseX - 20, baseY - 16, 78, 44, 0x7f72b7, 0.38)
+        .setScrollFactor(scrollFactor);
+      this.add
+        .ellipse(baseX + 34, baseY - 14, 64, 36, 0x7f72b7, 0.28)
+        .setScrollFactor(scrollFactor);
     }
   }
 
