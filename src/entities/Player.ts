@@ -25,7 +25,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
-    this.setOrigin(0.5, 1);
+    // The OpenGameArt frame has transparent pixels below the hooves.
+    // Use a slightly higher origin so the visible feet rest on the ground.
+    this.setOrigin(0.5, 0.88);
     this.setScale(2);
     this.setCollideWorldBounds(true);
     body.setSize(24, 30, true);
