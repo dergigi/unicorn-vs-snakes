@@ -2,6 +2,15 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   server: {
-    open: true
-  }
+    open: true,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          phaser: ["phaser"],
+        },
+      },
+    },
+  },
 });
