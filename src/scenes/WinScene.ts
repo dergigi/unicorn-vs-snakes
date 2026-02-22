@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { GAME_HEIGHT, GAME_WIDTH, LEVEL_COUNT, type Difficulty } from "../config/gameConfig";
+import { GAME_HEIGHT, GAME_WIDTH, LEVEL_COUNT, NOSTR_HASHTAG, type Difficulty } from "../config/gameConfig";
 import { formatTime } from "../utils/formatTime";
 import { nostrService, type LeaderboardEntry } from "../nostr/nostrService";
 import type { ScoreData } from "../nostr/scoreBlueprint";
@@ -114,12 +114,13 @@ export class WinScene extends Phaser.Scene {
     this.add.text(valueX, totalY, formatTime(totalMs), statsStyle).setOrigin(0, 0.5);
 
     // Share dialog
+    const tag = `#${NOSTR_HASHTAG}`;
     const shareText = is100Percent
-      ? `I just had a 100% Unicorn vs Snakes run and beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!! #UvS`
-      : `I just beat Unicorn vs Snakes on ${difficulty} difficulty in ${formatTime(totalMs)}! #UvS`;
+      ? `I just had a 100% Unicorn vs Snakes run and beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!! ${tag}`
+      : `I just beat Unicorn vs Snakes on ${difficulty} difficulty in ${formatTime(totalMs)}! ${tag}`;
     const displayText = is100Percent
-      ? `I just had a 100% Unicorn vs Snakes run\nand beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!! #UvS`
-      : `I just beat Unicorn vs Snakes\non ${difficulty} difficulty in ${formatTime(totalMs)}! #UvS`;
+      ? `I just had a 100% Unicorn vs Snakes run\nand beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!! ${tag}`
+      : `I just beat Unicorn vs Snakes\non ${difficulty} difficulty in ${formatTime(totalMs)}! ${tag}`;
 
     const btnY = GAME_HEIGHT - 52;
     const portraitSize = 38;
