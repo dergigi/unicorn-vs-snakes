@@ -317,9 +317,9 @@ export class WinScene extends Phaser.Scene {
         const medal = i === 0 ? "1." : i === 1 ? "2." : i === 2 ? "3." : `${i + 1}.`;
         this.add.text(rankX, y, medal, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
 
-        const nameLabel = isMe ? "You" : nostrService.getDisplayName(entry.pubkey);
+        const nameLabel = nostrService.getDisplayName(entry.pubkey);
         const nameText = this.add.text(nameX, y, nameLabel, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
-        if (!isMe) nameTexts.push({ text: nameText, pubkey: entry.pubkey, isMe });
+        nameTexts.push({ text: nameText, pubkey: entry.pubkey, isMe });
 
         this.add.text(timeX, y, formatTime(entry.totalMs), { ...rowStyle, color: highlight }).setOrigin(1, 0.5);
       }
