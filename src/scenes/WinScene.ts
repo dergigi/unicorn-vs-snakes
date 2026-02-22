@@ -144,19 +144,19 @@ export class WinScene extends Phaser.Scene {
       strokeThickness: 3
     }).setOrigin(0, 0.5);
 
-    const copyBtn = this.add.text(
-      dialogX + dialogWidth - 12,
-      dialogY + dialogHeight - 12,
-      "📋",
-      { fontSize: "14px" }
-    ).setOrigin(1, 1);
-    copyBtn.setInteractive({ useHandCursor: true });
-    copyBtn.on("pointerover", () => copyBtn.setScale(1.25));
-    copyBtn.on("pointerout", () => copyBtn.setScale(1));
-    copyBtn.on("pointerdown", () => {
+    const copyIcon = this.add.image(
+      dialogX + dialogWidth - 16,
+      dialogY + dialogHeight - 16,
+      "copy-icon"
+    ).setDisplaySize(16, 16).setOrigin(1, 1).setAlpha(0.7);
+    copyIcon.setInteractive({ useHandCursor: true });
+    copyIcon.on("pointerover", () => { copyIcon.setScale(1.25); copyIcon.setAlpha(1); });
+    copyIcon.on("pointerout", () => { copyIcon.setScale(1); copyIcon.setAlpha(0.7); });
+    copyIcon.on("pointerdown", () => {
       navigator.clipboard.writeText(shareText).then(() => {
-        copyBtn.setText("✓");
-        this.time.delayedCall(1500, () => copyBtn.setText("📋"));
+        copyIcon.setAlpha(0.4);
+        this.time.delayedCall(150, () => copyIcon.setAlpha(1));
+        this.time.delayedCall(1500, () => copyIcon.setAlpha(0.7));
       });
     });
 
