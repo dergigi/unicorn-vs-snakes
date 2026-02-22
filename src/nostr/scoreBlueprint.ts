@@ -1,7 +1,7 @@
 import type { EventTemplate } from "applesauce-core/helpers/event";
 import type { EventBlueprint } from "applesauce-core/event-factory";
 import type { Difficulty } from "../config/gameConfig";
-import { NOSTR_KIND, NOSTR_GAME_TAG } from "../config/gameConfig";
+import { NOSTR_KIND, NOSTR_GAME_TAG, NOSTR_SCORE_VERSION } from "../config/gameConfig";
 
 export interface ScoreData {
   difficulty: Difficulty;
@@ -26,7 +26,7 @@ export function ScoreBlueprint(data: ScoreData): EventBlueprint<EventTemplate> {
       totalMs: data.totalMs,
       percent100: data.percent100,
       cheated: data.cheated,
-      version: 1,
+      version: NOSTR_SCORE_VERSION,
     });
 
     const tags: string[][] = [
@@ -35,6 +35,7 @@ export function ScoreBlueprint(data: ScoreData): EventBlueprint<EventTemplate> {
       ["time", String(data.totalMs)],
       ["t", NOSTR_GAME_TAG],
       ["t", "gaming"],
+      ["version", String(NOSTR_SCORE_VERSION)],
     ];
     if (data.cheated) {
       tags.push(["cheated", "true"]);
