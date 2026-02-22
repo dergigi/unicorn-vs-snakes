@@ -7,7 +7,7 @@ export class WinScene extends Phaser.Scene {
     super("WinScene");
   }
 
-  create(data: { sparkles?: number; levelTimes?: number[]; menuTimeMs?: number }): void {
+  create(data: { totalSparkles?: number; levelTimes?: number[]; menuTimeMs?: number }): void {
     const levelTimes = data.levelTimes ?? [];
     const menuTimeMs = data.menuTimeMs ?? 0;
     const totalMs = menuTimeMs + levelTimes.reduce((sum, t) => sum + t, 0);
@@ -23,7 +23,7 @@ export class WinScene extends Phaser.Scene {
     this.add.text(
       GAME_WIDTH / 2,
       150,
-      `Sparkles Collected: ${data.sparkles ?? 0}`,
+      `Total sparkles collected: ${data.totalSparkles ?? 0}`,
       {
         fontFamily: "monospace",
         fontSize: "26px",

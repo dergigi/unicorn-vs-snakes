@@ -92,6 +92,7 @@ export class GameScene extends Phaser.Scene {
   private timerStartMs = 0;
   private levelTimes: number[] = [];
   private menuTimeMs = 0;
+  private totalSparkles = 0;
 
   constructor() {
     super("GameScene");
@@ -105,12 +106,14 @@ export class GameScene extends Phaser.Scene {
     hasRainbow?: boolean;
     levelTimes?: number[];
     menuTimeMs?: number;
+    totalSparkles?: number;
   }): void {
     this.maxLives = data?.maxLives ?? 5;
     this.difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
     this.levelNumber = data?.levelNumber ?? 1;
     this.levelTimes = data?.levelTimes ?? [];
     this.menuTimeMs = data?.menuTimeMs ?? 0;
+    this.totalSparkles = data?.totalSparkles ?? 0;
     this.timerStartMs = Date.now();
     this.levelComplete = false;
     this.lives = data?.currentLives ?? this.maxLives;
@@ -400,7 +403,8 @@ export class GameScene extends Phaser.Scene {
       currentLives: this.lives,
       hasRainbow: this.player?.hasRainbowPower() ?? false,
       levelTimes: [...this.levelTimes],
-      menuTimeMs: this.menuTimeMs
+      menuTimeMs: this.menuTimeMs,
+      totalSparkles: this.totalSparkles + this.collectibleSystem.getCollectedCount()
     };
     this.scene.stop("UIScene");
     this.scene.restart(sceneData);
@@ -1801,6 +1805,7 @@ export class GameScene extends Phaser.Scene {
     this.scene.stop("UIScene");
     this.levelTimes.push(Date.now() - this.timerStartMs);
     this.time.delayedCall(500, () => {
+      const runningSparkles = this.totalSparkles + collected;
       if (this.levelNumber < LEVEL_COUNT) {
         const sceneData = {
           maxLives: this.maxLives,
@@ -1809,7 +1814,8 @@ export class GameScene extends Phaser.Scene {
           currentLives: this.lives,
           hasRainbow: this.player.hasRainbowPower(),
           levelTimes: [...this.levelTimes],
-          menuTimeMs: this.menuTimeMs
+          menuTimeMs: this.menuTimeMs,
+          totalSparkles: runningSparkles
         };
         this.scene.restart(sceneData);
         this.scene.launch("UIScene", sceneData);
@@ -1817,7 +1823,7 @@ export class GameScene extends Phaser.Scene {
       }
 
       this.scene.start("WinScene", {
-        sparkles: collected,
+        totalSparkles: runningSparkles,
         levelTimes: [...this.levelTimes],
         menuTimeMs: this.menuTimeMs
       });
