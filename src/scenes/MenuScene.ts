@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import {
   DEFAULT_DIFFICULTY,
   DIFFICULTY_HEARTS,
+  DIFFICULTY_LABELS,
   GAME_HEIGHT,
   GAME_WIDTH,
   type Difficulty
@@ -9,6 +10,8 @@ import {
 import { spawnRainbowTrail } from "../utils/rainbowTrail";
 import { type PatrolSnake, spawnPatrolSnakes, updatePatrolSnakes } from "../utils/patrolSnakes";
 import { TouchControls } from "../input/TouchControls";
+import { nostrService, type LeaderboardEntry } from "../nostr/nostrService";
+import { formatTime } from "../utils/formatTime";
 
 const GRASS_TOP = GAME_HEIGHT - 130;
 const GRASS_HEIGHT = 52;
@@ -40,6 +43,8 @@ export class MenuScene extends Phaser.Scene {
   private levelSkipResetTimer?: Phaser.Time.TimerEvent;
   private menuCreatedAt = 0;
   private touchControls?: TouchControls;
+  private bestTimeLabel?: Phaser.GameObjects.Text;
+  private scoreCache = new Map<Difficulty, LeaderboardEntry[]>();
 
   constructor() {
     super("MenuScene");
@@ -50,6 +55,7 @@ export class MenuScene extends Phaser.Scene {
     this.menuCreatedAt = Date.now();
     this.nextTrailAt = 0;
     this.menuSnakes = [];
+    this.bestTimeLabel = undefined;
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1d1336).setOrigin(0, 0);
     for (let tx = 0; tx < GAME_WIDTH; tx += 32) {
@@ -82,6 +88,7 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.buildDifficultyButtons();
+    this.buildBestTimeLabel();
 
     this.add
       .image(GATE_X, FLOOR_Y, "finish-gate-open")
@@ -134,6 +141,7 @@ export class MenuScene extends Phaser.Scene {
     this.wasdW = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.W);
     this.touchControls = new TouchControls(this);
     this.setupLevelSkipCheat();
+    this.buildNostrButton();
   }
 
   update(time: number): void {
@@ -207,6 +215,69 @@ export class MenuScene extends Phaser.Scene {
       this.startGame();
     }
     this.touchControls?.resetFrameState();
+  }
+
+  private buildNostrButton(): void {
+    if (!nostrService.isExtensionAvailable()) return;
+
+    const btnX = GAME_WIDTH - 16;
+    const btnY = 16;
+    const style: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: "monospace",
+      fontSize: "13px",
+      color: "#b8a0d8",
+      stroke: "#1d1336",
+      strokeThickness: 3,
+    };
+
+    const nostrBtn = this.add.text(btnX, btnY, "", style).setOrigin(1, 0);
+
+    const updateLabel = (): void => {
+      if (nostrService.isLoggedIn()) {
+        const pk = nostrService.getPubkey();
+        nostrBtn.setText(pk ? nostrService.getDisplayName(pk) : "Connected");
+        nostrBtn.setColor("#c8b8ff");
+      } else {
+        nostrBtn.setText("Login with Nostr");
+        nostrBtn.setColor("#b8a0d8");
+      }
+    };
+
+    const resolveAndUpdate = (): void => {
+      updateLabel();
+      const pk = nostrService.getPubkey();
+      if (pk) {
+        nostrService.fetchProfiles([pk]).then(() => {
+          if (!this.scene.isActive()) return;
+          updateLabel();
+        }).catch(() => { /* keep fallback */ });
+      }
+    };
+
+    resolveAndUpdate();
+    nostrBtn.setInteractive({ useHandCursor: true });
+
+    nostrBtn.on("pointerover", () => nostrBtn.setColor("#ffffff"));
+    nostrBtn.on("pointerout", () => {
+      nostrBtn.setColor(nostrService.isLoggedIn() ? "#c8b8ff" : "#b8a0d8");
+    });
+
+    nostrBtn.on("pointerdown", () => {
+      if (nostrService.isLoggedIn()) {
+        nostrService.logout();
+        updateLabel();
+        return;
+      }
+      nostrBtn.setText("Connecting...");
+      nostrBtn.setColor("#8a7fb0");
+      nostrService.login().then(() => {
+        resolveAndUpdate();
+      }).catch(() => {
+        nostrBtn.setText("Login failed");
+        nostrBtn.setColor("#ff8888");
+        this.time.delayedCall(2000, updateLabel);
+      });
+    });
   }
 
   private buildDifficultyButtons(): void {
@@ -316,9 +387,67 @@ export class MenuScene extends Phaser.Scene {
       for (const d of difficulties) {
         drawButton(d, d === this.selectedDifficulty);
       }
+      this.refreshBestTime();
     };
     this.applyDifficultyStyles = applyStyles;
     applyStyles();
+  }
+
+  private buildBestTimeLabel(): void {
+    this.scoreCache.clear();
+    this.bestTimeLabel = this.add.text(GAME_WIDTH / 2, 306, "", {
+      fontFamily: "monospace",
+      fontSize: "14px",
+      color: "#a090c0",
+      stroke: "#1d1336",
+      strokeThickness: 3
+    }).setOrigin(0.5).setAlpha(0.85);
+    this.refreshBestTime();
+  }
+
+  private refreshBestTime(): void {
+    if (!this.bestTimeLabel) return;
+
+    const diff = this.selectedDifficulty;
+    const cached = this.scoreCache.get(diff);
+    if (cached) {
+      this.showBestTime(cached, diff);
+      return;
+    }
+
+    this.bestTimeLabel.setText("Best: ...");
+    nostrService.fetchTopScores(diff, 1).then((entries) => {
+      if (!this.scene.isActive()) return;
+      this.scoreCache.set(diff, entries);
+      if (this.selectedDifficulty === diff) {
+        this.showBestTime(entries, diff);
+      }
+    }).catch(() => {
+      if (!this.scene.isActive()) return;
+      if (this.selectedDifficulty === diff) {
+        this.bestTimeLabel?.setText("");
+      }
+    });
+  }
+
+  private showBestTime(entries: LeaderboardEntry[], diff: Difficulty): void {
+    if (!this.bestTimeLabel || this.selectedDifficulty !== diff) return;
+    const label = DIFFICULTY_LABELS[diff];
+    if (entries.length === 0) {
+      this.bestTimeLabel.setText(`No ${label} scores yet`);
+      return;
+    }
+
+    const best = entries[0];
+    const name = nostrService.getDisplayName(best.pubkey);
+    this.bestTimeLabel.setText(`Best ${label} time: ${formatTime(best.totalMs)} by ${name}`);
+
+    nostrService.fetchProfiles([best.pubkey]).then(() => {
+      if (!this.scene.isActive()) return;
+      if (this.selectedDifficulty !== diff) return;
+      const resolved = nostrService.getDisplayName(best.pubkey);
+      this.bestTimeLabel?.setText(`Best ${label} time: ${formatTime(best.totalMs)} by ${resolved}`);
+    }).catch(() => { /* keep fallback */ });
   }
 
   private checkButtonOverlap(): void {
@@ -428,7 +557,8 @@ export class MenuScene extends Phaser.Scene {
         totalPowerups: 3,
         difficulty: this.selectedDifficulty,
         levelTimes: [12345, 23456, 34567, 45678],
-        menuTimeMs: 6789
+        menuTimeMs: 6789,
+        cheated: true
       });
       return;
     }
@@ -457,7 +587,8 @@ export class MenuScene extends Phaser.Scene {
       maxLives,
       levelNumber,
       currentLives: maxLives,
-      menuTimeMs: Date.now() - this.menuCreatedAt
+      menuTimeMs: Date.now() - this.menuCreatedAt,
+      cheated: levelNumber > 1
     };
     this.scene.start("GameScene", sceneData);
     this.scene.launch("UIScene", sceneData);

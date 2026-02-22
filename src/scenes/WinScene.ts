@@ -1,6 +1,8 @@
 import Phaser from "phaser";
-import { GAME_HEIGHT, GAME_WIDTH, LEVEL_COUNT, type Difficulty } from "../config/gameConfig";
+import { DIFFICULTY_LABELS, GAME_HEIGHT, GAME_WIDTH, LEVEL_COUNT, NOSTR_HASHTAG, type Difficulty } from "../config/gameConfig";
 import { formatTime } from "../utils/formatTime";
+import { nostrService, type LeaderboardEntry } from "../nostr/nostrService";
+import type { ScoreData } from "../nostr/scoreBlueprint";
 
 interface WinData {
   totalSparkles?: number;
@@ -9,6 +11,7 @@ interface WinData {
   difficulty?: Difficulty;
   levelTimes?: number[];
   menuTimeMs?: number;
+  cheated?: boolean;
 }
 
 export class WinScene extends Phaser.Scene {
@@ -84,18 +87,20 @@ export class WinScene extends Phaser.Scene {
       strokeThickness: 2
     };
 
-    this.add.text(cx, 122, `Sparkles: ${data.totalSparkles ?? 0}`, statsStyle).setOrigin(0.5);
+    const leftCx = GAME_WIDTH * 0.3;
+    const rightCx = GAME_WIDTH * 0.72;
 
-    // Times table — two columns: label right-aligned, time left-aligned
+    this.add.text(leftCx, 118, `Sparkles: ${data.totalSparkles ?? 0}`, statsStyle).setOrigin(0.5);
+
     const allTimes: [string, number][] = [
       ["Level 0", menuTimeMs],
       ...levelTimes.map((t, i): [string, number] => [`Level ${i + 1}`, t])
     ];
 
-    const tableTop = 152;
+    const tableTop = 146;
     const rowH = 18;
-    const labelX = cx - 10;
-    const valueX = cx + 10;
+    const labelX = leftCx - 10;
+    const valueX = leftCx + 10;
 
     for (let i = 0; i < allTimes.length; i++) {
       const [label, ms] = allTimes[i];
@@ -109,12 +114,13 @@ export class WinScene extends Phaser.Scene {
     this.add.text(valueX, totalY, formatTime(totalMs), statsStyle).setOrigin(0, 0.5);
 
     // Share dialog
+    const tag = `#${NOSTR_HASHTAG}`;
     const shareText = is100Percent
-      ? `I just had a 100% Unicorn vs Snakes run and beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!!`
-      : `I just beat Unicorn vs Snakes on ${difficulty} difficulty in ${formatTime(totalMs)}!`;
+      ? `I just had a 100% Unicorn vs Snakes run and beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!! ${tag}`
+      : `I just beat Unicorn vs Snakes on ${difficulty} difficulty in ${formatTime(totalMs)}! ${tag}`;
     const displayText = is100Percent
-      ? `I just had a 100% Unicorn vs Snakes run\nand beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!!`
-      : `I just beat Unicorn vs Snakes\non ${difficulty} difficulty in ${formatTime(totalMs)}!`;
+      ? `I just had a 100% Unicorn vs Snakes run\nand beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!! ${tag}`
+      : `I just beat Unicorn vs Snakes\non ${difficulty} difficulty in ${formatTime(totalMs)}! ${tag}`;
 
     const btnY = GAME_HEIGHT - 52;
     const portraitSize = 38;
@@ -129,8 +135,10 @@ export class WinScene extends Phaser.Scene {
     const dialogHeight = 73;
     measureText.destroy();
 
-    const dialogX = (GAME_WIDTH - dialogWidth) / 2;
-    const dialogY = totalY + (btnY - totalY - dialogHeight) / 2;
+    const contentBottom = Math.max(totalY + 18, 280);
+    const nostrBtnSpace = nostrService.isLoggedIn() ? 36 : 0;
+    const dialogY = contentBottom + (btnY - 25 - contentBottom - dialogHeight - nostrBtnSpace) / 2;
+    const dialogX = cx - dialogWidth / 2;
     const portraitCenterX = dialogX + 32;
     const portraitCenterY = dialogY + dialogHeight / 2;
 
@@ -165,6 +173,24 @@ export class WinScene extends Phaser.Scene {
       });
     });
 
+    if (nostrService.isLoggedIn()) {
+      const scoreData: ScoreData = {
+        difficulty,
+        sparkles: collectedSparkles,
+        apples: collectedApples,
+        powerups: collectedPowerups,
+        levelTimes,
+        menuTimeMs,
+        totalMs,
+        percent100: is100Percent,
+        cheated: data.cheated ?? false,
+      };
+      this.buildNostrButton(dialogX, dialogY + dialogHeight + 8, dialogWidth, scoreData);
+    }
+
+    // Leaderboard panel (right column)
+    this.buildLeaderboard(rightCx, 110, difficulty, totalMs);
+
     // Play again button — anchored near bottom
     const again = this.add.rectangle(cx, btnY, 260, 50, 0xff8fd3);
     again.setStrokeStyle(3, 0xffffff);
@@ -179,6 +205,143 @@ export class WinScene extends Phaser.Scene {
 
     again.on("pointerdown", () => {
       this.scene.start("MenuScene");
+    });
+  }
+
+  private buildNostrButton(x: number, y: number, width: number, scoreData: ScoreData): void {
+    const btnH = 28;
+    const btnCx = x + width / 2;
+    const btnCy = y + btnH / 2;
+
+    const bg = this.add.graphics();
+    bg.fillStyle(0x6a2f80, 0.85);
+    bg.lineStyle(1, 0xc88cff, 0.6);
+    bg.fillRoundedRect(x, y, width, btnH, 8);
+    bg.strokeRoundedRect(x, y, width, btnH, 8);
+
+    const label = this.add.text(btnCx, btnCy, "Post to Nostr", {
+      fontFamily: "monospace",
+      fontSize: "13px",
+      color: "#e8d0ff",
+      stroke: "#2a1040",
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    const hitArea = this.add.rectangle(btnCx, btnCy, width, btnH, 0, 0);
+    hitArea.setInteractive({ useHandCursor: true });
+
+    let posting = false;
+    hitArea.on("pointerover", () => {
+      if (!posting) label.setColor("#ffffff");
+    });
+    hitArea.on("pointerout", () => {
+      if (!posting) label.setColor("#e8d0ff");
+    });
+
+    hitArea.on("pointerdown", () => {
+      if (posting) return;
+      posting = true;
+      label.setText("Signing...");
+      label.setColor("#b8a0d8");
+
+      nostrService.publishScore(scoreData).then((ok) => {
+        if (ok) {
+          label.setText("Posted!");
+          label.setColor("#9fffb8");
+          hitArea.disableInteractive();
+        } else {
+          label.setText("Relay error — tap to retry");
+          label.setColor("#ff8888");
+          posting = false;
+        }
+      }).catch(() => {
+        label.setText("Failed — tap to retry");
+        label.setColor("#ff8888");
+        posting = false;
+      });
+    });
+  }
+
+  private buildLeaderboard(cx: number, top: number, difficulty: Difficulty, playerMs: number): void {
+    const panelW = 280;
+    const panelX = cx - panelW / 2;
+    const headerStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: "monospace",
+      fontSize: "15px",
+      color: "#ffe0f6",
+      stroke: "#3b1a4f",
+      strokeThickness: 3
+    };
+    const rowStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: "monospace",
+      fontSize: "13px",
+      color: "#d8b8f0",
+      stroke: "#2a1040",
+      strokeThickness: 2
+    };
+
+    const diffLabel = DIFFICULTY_LABELS[difficulty];
+    this.add.text(cx, top, `Best Times (${diffLabel})`, headerStyle).setOrigin(0.5);
+
+    const loadingLabel = this.add.text(cx, top + 30, "Loading...", {
+      ...rowStyle, color: "#a090c0"
+    }).setOrigin(0.5);
+
+    const TOTAL_ROWS = 5;
+    nostrService.fetchTopScores(difficulty, TOTAL_ROWS).then((entries) => {
+      if (!this.scene.isActive()) return;
+      loadingLabel.destroy();
+
+      const rowH = 22;
+      const rowTop = top + 30;
+      const rankX = panelX + 8;
+      const nameX = panelX + 36;
+      const timeX = panelX + panelW - 8;
+      const myPubkey = nostrService.getPubkey();
+      const dimColor = "#6a5a80";
+
+      const bg = this.add.graphics();
+      bg.fillStyle(0x2a1040, 0.5);
+      bg.fillRoundedRect(panelX, rowTop - 8, panelW, TOTAL_ROWS * rowH + 16, 8);
+
+      const nameTexts: { text: Phaser.GameObjects.Text; pubkey: string }[] = [];
+
+      for (let i = 0; i < TOTAL_ROWS; i++) {
+        const entry = entries[i];
+        const y = rowTop + i * rowH + 4;
+        const medal = `${i + 1}.`;
+
+        if (entry) {
+          const isMe = entry.pubkey === myPubkey;
+          const highlight = isMe ? "#ffb8e6" : rowStyle.color;
+
+          this.add.text(rankX, y, medal, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
+
+          const nameLabel = nostrService.getDisplayName(entry.pubkey);
+          const nameText = this.add.text(nameX, y, nameLabel, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
+          nameTexts.push({ text: nameText, pubkey: entry.pubkey });
+
+          this.add.text(timeX, y, formatTime(entry.totalMs), { ...rowStyle, color: highlight }).setOrigin(1, 0.5);
+        } else {
+          this.add.text(rankX, y, medal, { ...rowStyle, color: dimColor }).setOrigin(0, 0.5);
+          this.add.text(nameX, y, "TBD", { ...rowStyle, color: dimColor }).setOrigin(0, 0.5);
+          this.add.text(timeX, y, "-:--.-", { ...rowStyle, color: dimColor }).setOrigin(1, 0.5);
+        }
+      }
+
+      if (entries.length > 0) {
+        const pubkeys = entries.map(e => e.pubkey);
+        nostrService.fetchProfiles(pubkeys).then(() => {
+          if (!this.scene.isActive()) return;
+          for (const { text, pubkey } of nameTexts) {
+            text.setText(nostrService.getDisplayName(pubkey));
+          }
+        }).catch(() => { /* keep npub fallbacks */ });
+      }
+    }).catch(() => {
+      if (!this.scene.isActive()) return;
+      loadingLabel.setText("Could not load scores");
+      loadingLabel.setColor("#ff8888");
     });
   }
 

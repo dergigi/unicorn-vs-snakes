@@ -12,6 +12,12 @@ export const DIFFICULTY_HEARTS: Record<Difficulty, number> = {
   insane: 1
 };
 export const DEFAULT_DIFFICULTY: Difficulty = "normal";
+export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: "easy",
+  normal: "normal",
+  hard: "hard",
+  insane: "insane-o"
+};
 
 export const PHYSICS_GRAVITY_Y = 1300;
 
@@ -53,3 +59,13 @@ const REQUIRED_SPARKLES_BY_LEVEL: Record<number, number> = {
 export function getRequiredSparklesToFinish(levelNumber: number): number {
   return REQUIRED_SPARKLES_BY_LEVEL[levelNumber] ?? REQUIRED_SPARKLES_BY_LEVEL[3];
 }
+
+export const NOSTR_KIND = 5555;
+export const NOSTR_RELAYS = [
+  "wss://relay.damus.io",
+  "wss://relay.primal.net",
+  "wss://nos.lol",
+  "wss://wot.dergigi.com"
+];
+export const NOSTR_HASHTAG = "UvS";
+export const NOSTR_SCORE_VERSION = 2;
