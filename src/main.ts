@@ -5,6 +5,7 @@ import { GameOverScene } from "./scenes/GameOverScene";
 import { GameScene } from "./scenes/GameScene";
 import { MenuScene } from "./scenes/MenuScene";
 import { UIScene } from "./scenes/UIScene";
+import { PauseScene } from "./scenes/PauseScene";
 import { WinScene } from "./scenes/WinScene";
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -21,7 +22,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false
     }
   },
-  scene: [BootScene, MenuScene, GameScene, UIScene, GameOverScene, WinScene]
+  scene: [BootScene, MenuScene, GameScene, UIScene, PauseScene, GameOverScene, WinScene]
 };
 
 new Phaser.Game(config);

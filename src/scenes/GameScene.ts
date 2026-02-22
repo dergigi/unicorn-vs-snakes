@@ -316,11 +316,13 @@ export class GameScene extends Phaser.Scene {
     keyboard.on("keydown-THREE", this.handleLevelThreeSkipKey, this);
     keyboard.on("keydown-FOUR", this.handleLevelFourSkipKey, this);
     keyboard.on("keydown-R", this.handleResetKey, this);
+    keyboard.on("keydown-ESC", this.handlePauseKey, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       keyboard.off("keydown-TWO", this.handleLevelTwoSkipKey, this);
       keyboard.off("keydown-THREE", this.handleLevelThreeSkipKey, this);
       keyboard.off("keydown-FOUR", this.handleLevelFourSkipKey, this);
       keyboard.off("keydown-R", this.handleResetKey, this);
+      keyboard.off("keydown-ESC", this.handlePauseKey, this);
       this.levelSkipResetTimer?.remove(false);
       this.levelSkipResetTimer = undefined;
       this.levelSkipPressCount = 0;
@@ -332,6 +334,11 @@ export class GameScene extends Phaser.Scene {
     if (!this.scene.isActive()) return;
     this.scene.stop("UIScene");
     this.scene.start("MenuScene");
+  }
+
+  private handlePauseKey(): void {
+    if (!this.scene.isActive()) return;
+    this.scene.launch("PauseScene");
   }
 
   private handleLevelTwoSkipKey(): void {
