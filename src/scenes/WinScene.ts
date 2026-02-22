@@ -20,45 +20,76 @@ export class WinScene extends Phaser.Scene {
     const totalMs = menuTimeMs + levelTimes.reduce((sum, t) => sum + t, 0);
     const difficulty = data.difficulty ?? "normal";
 
-    this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x152744).setOrigin(0, 0);
-    this.add.rectangle(0, GAME_HEIGHT - 180, GAME_WIDTH, 180, 0x1f4d78).setOrigin(0, 0);
+    // Dreamy pink/purple gradient background
+    this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x3b1a4f).setOrigin(0, 0);
+    this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT * 0.5, 0x5c2d6e, 0.6).setOrigin(0, 0);
+    this.add.rectangle(0, GAME_HEIGHT * 0.5, GAME_WIDTH, GAME_HEIGHT * 0.5, 0x2a1040, 0.5).setOrigin(0, 0);
 
-    this.add.text(GAME_WIDTH / 2, 56, "Yaaaay!", {
+    // Soft pink glow behind title
+    this.add.ellipse(GAME_WIDTH / 2, 56, 500, 120, 0xff8fd3, 0.12);
+
+    // Rainbow arch across the top
+    const rainbowColors = [0xff4b5e, 0xff8a3d, 0xffd95e, 0x7de86f, 0x66d8ff, 0x6f8dff, 0xd98cff];
+    for (let i = 0; i < rainbowColors.length; i++) {
+      this.add.ellipse(GAME_WIDTH / 2, -60 + i * 6, 700 - i * 30, 180 - i * 8, rainbowColors[i], 0.18);
+    }
+
+    // Floating sparkle particles
+    this.spawnSparkles();
+
+    this.add.text(GAME_WIDTH / 2, 52, "Yaaaay!", {
       fontFamily: "monospace",
       fontSize: "52px",
-      color: "#fff1a8"
-    }).setOrigin(0.5);
-    this.add.text(
-      GAME_WIDTH / 2, 116,
-      `Total sparkles collected: ${data.totalSparkles ?? 0}`,
-      { fontFamily: "monospace", fontSize: "22px", color: "#d8f8ff" }
-    ).setOrigin(0.5);
-    this.add.text(GAME_WIDTH / 2, 148, "Rainbow Kingdom is safe!", {
-      fontFamily: "monospace",
-      fontSize: "18px",
-      color: "#ffc9f2"
+      color: "#ffe0f6",
+      stroke: "#7b2f72",
+      strokeThickness: 6
     }).setOrigin(0.5);
 
-    let timesY = 180;
+    this.add.text(
+      GAME_WIDTH / 2, 112,
+      `Total sparkles collected: ${data.totalSparkles ?? 0}`,
+      {
+        fontFamily: "monospace",
+        fontSize: "20px",
+        color: "#ffd1f7",
+        stroke: "#3b1a4f",
+        strokeThickness: 3
+      }
+    ).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 142, "Rainbow Kingdom is safe!", {
+      fontFamily: "monospace",
+      fontSize: "17px",
+      color: "#ffb8e6",
+      stroke: "#3b1a4f",
+      strokeThickness: 3
+    }).setOrigin(0.5);
+
+    let timesY = 172;
     this.add.text(GAME_WIDTH / 2, timesY, `Menu: ${formatTime(menuTimeMs)}`, {
       fontFamily: "monospace",
-      fontSize: "16px",
-      color: "#c8c0e8"
+      fontSize: "15px",
+      color: "#d8b8f0",
+      stroke: "#2a1040",
+      strokeThickness: 2
     }).setOrigin(0.5);
-    timesY += 22;
+    timesY += 20;
     for (let i = 0; i < levelTimes.length; i++) {
       this.add.text(GAME_WIDTH / 2, timesY, `Level ${i + 1}: ${formatTime(levelTimes[i])}`, {
         fontFamily: "monospace",
-        fontSize: "16px",
-        color: "#c8c0e8"
+        fontSize: "15px",
+        color: "#d8b8f0",
+        stroke: "#2a1040",
+        strokeThickness: 2
       }).setOrigin(0.5);
-      timesY += 22;
+      timesY += 20;
     }
 
     this.add.text(GAME_WIDTH / 2, timesY + 4, `Total: ${formatTime(totalMs)}`, {
       fontFamily: "monospace",
-      fontSize: "22px",
-      color: "#e0daf8"
+      fontSize: "20px",
+      color: "#f0d8ff",
+      stroke: "#2a1040",
+      strokeThickness: 3
     }).setOrigin(0.5);
 
     const shareText =
@@ -67,14 +98,14 @@ export class WinScene extends Phaser.Scene {
     const dialogWidth = GAME_WIDTH - 100;
     const dialogHeight = 72;
     const dialogX = 50;
-    const dialogY = timesY + 40;
+    const dialogY = timesY + 36;
     const portraitSize = 42;
     const portraitCenterX = dialogX + 30;
     const portraitCenterY = dialogY + dialogHeight / 2;
 
     const dialog = this.add.graphics();
-    dialog.fillStyle(0x10243a, 0.95);
-    dialog.lineStyle(3, 0xb8ecff, 1);
+    dialog.fillStyle(0x4a1850, 0.9);
+    dialog.lineStyle(3, 0xffb8e6, 0.8);
     dialog.fillRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 14);
     dialog.strokeRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 14);
 
@@ -88,10 +119,10 @@ export class WinScene extends Phaser.Scene {
       {
         fontFamily: "monospace",
         fontSize: "13px",
-        color: "#e6fbff",
+        color: "#ffe6f8",
         align: "left",
         wordWrap: { width: dialogWidth - 100 },
-        stroke: "#091321",
+        stroke: "#2a0e30",
         strokeThickness: 3
       }
     ).setOrigin(0, 0.5);
@@ -112,18 +143,56 @@ export class WinScene extends Phaser.Scene {
       });
     });
 
-    const btnY = dialogY + dialogHeight + 42;
-    const again = this.add.rectangle(GAME_WIDTH / 2, btnY, 280, 60, 0xfff1a6);
-    again.setStrokeStyle(4, 0xffffff);
+    const btnY = dialogY + dialogHeight + 40;
+    const again = this.add.rectangle(GAME_WIDTH / 2, btnY, 280, 56, 0xff8fd3);
+    again.setStrokeStyle(3, 0xffffff);
     again.setInteractive({ useHandCursor: true });
     this.add.text(GAME_WIDTH / 2, btnY, "PLAY AGAIN", {
       fontFamily: "monospace",
-      fontSize: "28px",
-      color: "#37310f"
+      fontSize: "26px",
+      color: "#3b0a2e",
+      stroke: "#ffcce8",
+      strokeThickness: 2
     }).setOrigin(0.5);
 
     again.on("pointerdown", () => {
       this.scene.start("MenuScene");
     });
+  }
+
+  private spawnSparkles(): void {
+    const sparkleColors = [0xfff2a8, 0xffb8e6, 0xb8ecff, 0xd98cff, 0xffd1ff, 0xffffff];
+
+    for (let i = 0; i < 30; i++) {
+      const x = Phaser.Math.Between(20, GAME_WIDTH - 20);
+      const y = Phaser.Math.Between(10, GAME_HEIGHT - 10);
+      const size = Phaser.Math.Between(2, 5);
+      const color = sparkleColors[i % sparkleColors.length];
+
+      const sparkle = this.add.star(x, y, 4, size * 0.4, size, color, 0.7);
+      sparkle.setDepth(0);
+
+      this.tweens.add({
+        targets: sparkle,
+        alpha: { from: 0.3, to: 0.9 },
+        scaleX: { from: 0.6, to: 1.2 },
+        scaleY: { from: 0.6, to: 1.2 },
+        duration: Phaser.Math.Between(800, 2000),
+        yoyo: true,
+        repeat: -1,
+        delay: Phaser.Math.Between(0, 1500),
+        ease: "Sine.easeInOut"
+      });
+
+      this.tweens.add({
+        targets: sparkle,
+        y: y - Phaser.Math.Between(8, 24),
+        duration: Phaser.Math.Between(2000, 4000),
+        yoyo: true,
+        repeat: -1,
+        delay: Phaser.Math.Between(0, 2000),
+        ease: "Sine.easeInOut"
+      });
+    }
   }
 }
