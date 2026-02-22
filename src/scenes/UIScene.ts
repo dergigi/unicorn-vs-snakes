@@ -51,7 +51,9 @@ export class UIScene extends Phaser.Scene {
       stroke: "#24133d",
       strokeThickness: 4
     }).setOrigin(0.5, 0).setScrollFactor(0);
-    this.hintText = this.add.text(GAME_WIDTH - 16, 16, "", {
+    const isTouch = !!this.sys.game.device.input.touch;
+    const hintRightMargin = isTouch ? 52 : 16;
+    this.hintText = this.add.text(GAME_WIDTH - hintRightMargin, 16, "", {
       fontFamily: "monospace",
       fontSize: "20px",
       color: "#ccf5ff",
@@ -59,14 +61,14 @@ export class UIScene extends Phaser.Scene {
       strokeThickness: 4
     }).setOrigin(1, 0).setScrollFactor(0);
 
-    if (this.sys.game.device.input.touch) {
-      const pauseBtn = this.add.text(GAME_WIDTH - 16, GAME_HEIGHT - 16, "⏸", {
+    if (isTouch) {
+      const pauseBtn = this.add.text(GAME_WIDTH - 16, 16, "⏸", {
         fontFamily: "monospace",
         fontSize: "28px",
         color: "#a89cc8",
         stroke: "#1d1336",
         strokeThickness: 3,
-      }).setOrigin(1, 1).setScrollFactor(0).setAlpha(0.7);
+      }).setOrigin(1, 0).setScrollFactor(0).setAlpha(0.7);
 
       pauseBtn.setInteractive({ useHandCursor: true });
       pauseBtn.on("pointerdown", () => {
