@@ -11,6 +11,9 @@
     { "x": 380, "y": 470, "width": 120, "height": 28, "moveY": -170, "duration": 1800 },
     { "x": 1060, "y": 465, "width": 120, "height": 28, "moveY": -180, "duration": 2400 }
   ],
+  "apples": [
+    { "x": 1130, "y": 478, "width": 20, "height": 20 }
+  ],
   "snakes": [],
   "sparkles": [],
   "bossWitch": {
