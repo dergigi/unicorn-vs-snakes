@@ -11,7 +11,7 @@ interface PauseData {
   menuTimeMs: number;
 }
 
-type PauseView = "menu" | "controls";
+type PauseView = "menu" | "controls" | "credits";
 
 export class PauseScene extends Phaser.Scene {
   private pauseData!: PauseData;
@@ -45,7 +45,7 @@ export class PauseScene extends Phaser.Scene {
   }
 
   private handleEsc(): void {
-    if (this.currentView === "controls") {
+    if (this.currentView !== "menu") {
       this.showMenu();
     } else {
       this.resumeGame();
@@ -56,11 +56,27 @@ export class PauseScene extends Phaser.Scene {
     this.viewContainer.removeAll(true);
   }
 
+  private addBackButton(y: number): void {
+    const back = this.add.text(GAME_WIDTH / 2, y, "← Back", {
+      fontFamily: "monospace",
+      fontSize: "24px",
+      color: "#cccccc",
+      stroke: "#24133d",
+      strokeThickness: 4
+    }).setOrigin(0.5);
+
+    back.setInteractive({ useHandCursor: true });
+    back.on("pointerover", () => { back.setColor("#ffffff"); back.setScale(1.08); });
+    back.on("pointerout", () => { back.setColor("#cccccc"); back.setScale(1); });
+    back.on("pointerdown", () => this.showMenu());
+    this.viewContainer.add(back);
+  }
+
   private showMenu(): void {
     this.clearView();
     this.currentView = "menu";
 
-    const title = this.add.text(GAME_WIDTH / 2, 120, "PAUSED", {
+    const title = this.add.text(GAME_WIDTH / 2, 110, "PAUSED", {
       fontFamily: "monospace",
       fontSize: "48px",
       color: "#ffffff",
@@ -73,11 +89,12 @@ export class PauseScene extends Phaser.Scene {
       { label: "Resume", action: () => this.resumeGame() },
       { label: "Restart Level", action: () => this.restartLevel() },
       { label: "Controls", action: () => this.showControls() },
+      { label: "Credits", action: () => this.showCredits() },
       { label: "Quit to Menu", action: () => this.quitToMenu() }
     ];
 
-    const startY = 220;
-    const spacing = 52;
+    const startY = 200;
+    const spacing = 46;
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
@@ -145,19 +162,97 @@ export class PauseScene extends Phaser.Scene {
       this.viewContainer.add([keyText, descText]);
     }
 
-    const back = this.add.text(GAME_WIDTH / 2, startY + controls.length * rowH + 40, "← Back", {
-      fontFamily: "monospace",
-      fontSize: "24px",
-      color: "#cccccc",
-      stroke: "#24133d",
-      strokeThickness: 4
-    }).setOrigin(0.5);
+    this.addBackButton(startY + controls.length * rowH + 40);
+  }
 
-    back.setInteractive({ useHandCursor: true });
-    back.on("pointerover", () => { back.setColor("#ffffff"); back.setScale(1.08); });
-    back.on("pointerout", () => { back.setColor("#cccccc"); back.setScale(1); });
-    back.on("pointerdown", () => this.showMenu());
-    this.viewContainer.add(back);
+  private showCredits(): void {
+    this.clearView();
+    this.currentView = "credits";
+
+    const title = this.add.text(GAME_WIDTH / 2, 36, "CREDITS", {
+      fontFamily: "monospace",
+      fontSize: "36px",
+      color: "#ffffff",
+      stroke: "#24133d",
+      strokeThickness: 6
+    }).setOrigin(0.5);
+    this.viewContainer.add(title);
+
+    const subtitle = this.add.text(GAME_WIDTH / 2, 68, "All assets from OpenGameArt.org", {
+      fontFamily: "monospace",
+      fontSize: "13px",
+      color: "#a89cc8",
+      stroke: "#24133d",
+      strokeThickness: 2
+    }).setOrigin(0.5);
+    this.viewContainer.add(subtitle);
+
+    const credits = [
+      ["Unicorn sprite", "magdum", "CC-BY-SA 3.0"],
+      ["A Cat (idle sprite)", "Elthen", "CC0"],
+      ["Chestnut Trees", "Yar / AntumDeluge", "CC-BY 3.0"],
+      ["Gnarled Tree", "geloescht", "CC-BY 3.0"],
+      ["LPC Tree Recolors", "C. Nilsson", "CC-BY 3.0"],
+      ["Krook Tree", "FunwithPixels", "CC-BY 3.0"],
+      ["Bat Sprite", "bagzie", "CC-BY-SA 3.0"],
+      ["Pixel Torch", "PixelMist", "CC0"],
+      ["Little Witch", "ansimuz", "CC0"],
+      ["Large Mushroom", "Digiflower", "CC0"],
+      ["Mold Brick Wall", "TexturePalace", "CC-BY 4.0"],
+      ["Castle Tower", "Eikester", "CC0"],
+      ["Castle Background", "vnitti", "CC-BY 3.0"],
+    ];
+
+    const startY = 96;
+    const rowH = 30;
+    const nameX = 60;
+    const authorX = 520;
+    const licenseX = 780;
+
+    const headerStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: "monospace",
+      fontSize: "13px",
+      color: "#8a7fb0",
+      stroke: "#24133d",
+      strokeThickness: 2
+    };
+    const hAsset = this.add.text(nameX, startY, "Asset", headerStyle).setOrigin(0, 0.5);
+    const hAuthor = this.add.text(authorX, startY, "Author", headerStyle).setOrigin(0, 0.5);
+    const hLicense = this.add.text(licenseX, startY, "License", headerStyle).setOrigin(0, 0.5);
+    this.viewContainer.add([hAsset, hAuthor, hLicense]);
+
+    for (let i = 0; i < credits.length; i++) {
+      const [asset, author, license] = credits[i];
+      const y = startY + 22 + i * rowH;
+
+      const assetText = this.add.text(nameX, y, asset, {
+        fontFamily: "monospace",
+        fontSize: "14px",
+        color: "#ffe6a8",
+        stroke: "#24133d",
+        strokeThickness: 2
+      }).setOrigin(0, 0.5);
+
+      const authorText = this.add.text(authorX, y, author, {
+        fontFamily: "monospace",
+        fontSize: "14px",
+        color: "#cccccc",
+        stroke: "#24133d",
+        strokeThickness: 2
+      }).setOrigin(0, 0.5);
+
+      const licenseText = this.add.text(licenseX, y, license, {
+        fontFamily: "monospace",
+        fontSize: "14px",
+        color: "#9bdfb8",
+        stroke: "#24133d",
+        strokeThickness: 2
+      }).setOrigin(0, 0.5);
+
+      this.viewContainer.add([assetText, authorText, licenseText]);
+    }
+
+    this.addBackButton(startY + 22 + credits.length * rowH + 20);
   }
 
   private resumeGame(): void {
