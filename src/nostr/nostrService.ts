@@ -2,7 +2,7 @@ import { ExtensionSigner } from "applesauce-signers/signers";
 import { EventFactory } from "applesauce-core";
 import { RelayPool } from "applesauce-relay";
 import { npubEncode } from "nostr-tools/nip19";
-import { firstValueFrom, toArray, timeout, catchError, of } from "rxjs";
+import { type Subscription } from "rxjs";
 import { NOSTR_RELAYS, NOSTR_KIND, NOSTR_GAME_TAG, NOSTR_SCORE_VERSION, type Difficulty } from "../config/gameConfig";
 import { ScoreBlueprint, type ScoreData } from "./scoreBlueprint";
 
@@ -96,22 +96,34 @@ class NostrService {
     const filter = {
       kinds: [NOSTR_KIND],
       "#d": [NOSTR_GAME_TAG],
-      "#difficulty": [difficulty],
-      "#version": [String(NOSTR_SCORE_VERSION)],
     };
 
-    const events$ = this.pool.request(NOSTR_RELAYS, filter).pipe(
-      timeout(8000),
-      toArray(),
-      catchError(() => of([] as import("nostr-tools").NostrEvent[])),
-    );
-
-    const events = await firstValueFrom(events$).catch(() => []);
+    const events = await new Promise<import("nostr-tools").NostrEvent[]>((resolve) => {
+      const collected: import("nostr-tools").NostrEvent[] = [];
+      let sub: Subscription | undefined;
+      let resolved = false;
+      const done = () => {
+        if (resolved) return;
+        resolved = true;
+        clearTimeout(timer);
+        sub?.unsubscribe();
+        resolve(collected);
+      };
+      const timer = setTimeout(done, 8000);
+      sub = this.pool.request(NOSTR_RELAYS, filter).subscribe({
+        next: (ev) => collected.push(ev),
+        complete: done,
+        error: () => done(),
+      });
+    });
 
     const entries: LeaderboardEntry[] = [];
     for (const ev of events) {
       try {
+        const evDifficulty = ev.tags.find(t => t[0] === "difficulty")?.[1];
+        if (evDifficulty !== difficulty) continue;
         const data = JSON.parse(ev.content);
+        if (data.version !== NOSTR_SCORE_VERSION) continue;
         if (data.cheated) continue;
         if (typeof data.totalMs !== "number" || data.totalMs <= 0) continue;
         entries.push({
