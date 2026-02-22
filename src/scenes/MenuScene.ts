@@ -103,7 +103,7 @@ export class MenuScene extends Phaser.Scene {
 
     const footerTop = GRASS_TOP + 64 + 10;
     this.add
-      .text(GAME_WIDTH / 2, footerTop, "Prompted into existence by my daughter.", {
+      .text(GAME_WIDTH / 2, footerTop, "Prompted into existence by Gigi's daughter.", {
         fontSize: "13px",
         color: "#e8d8ff",
         fontFamily: "monospace"
