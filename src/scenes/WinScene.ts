@@ -64,36 +64,55 @@ export class WinScene extends Phaser.Scene {
     const shareText =
       `I just beat Unicorn vs Snakes on ${difficulty} difficulty in ${formatTime(totalMs)}!`;
 
-    const shareY = timesY + 48;
-    this.add.text(GAME_WIDTH / 2, shareY, `"${shareText}"`, {
-      fontFamily: "monospace",
-      fontSize: "14px",
-      color: "#ffe6a8",
-      stroke: "#24133d",
-      strokeThickness: 2,
-      wordWrap: { width: GAME_WIDTH - 120 },
-      align: "center"
-    }).setOrigin(0.5, 0);
+    const dialogWidth = GAME_WIDTH - 100;
+    const dialogHeight = 72;
+    const dialogX = 50;
+    const dialogY = timesY + 40;
+    const portraitSize = 42;
+    const portraitCenterX = dialogX + 30;
+    const portraitCenterY = dialogY + dialogHeight / 2;
 
-    const copyBtnY = shareY + 46;
-    const copyBtn = this.add.text(GAME_WIDTH / 2, copyBtnY, "📋 Copy to clipboard", {
-      fontFamily: "monospace",
-      fontSize: "14px",
-      color: "#aadcff",
-      stroke: "#24133d",
-      strokeThickness: 2
-    }).setOrigin(0.5);
+    const dialog = this.add.graphics();
+    dialog.fillStyle(0x10243a, 0.95);
+    dialog.lineStyle(3, 0xb8ecff, 1);
+    dialog.fillRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 14);
+    dialog.strokeRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 14);
+
+    this.add.sprite(portraitCenterX, portraitCenterY, "unicorn", 0)
+      .setDisplaySize(portraitSize, portraitSize);
+
+    this.add.text(
+      dialogX + 62,
+      portraitCenterY,
+      shareText,
+      {
+        fontFamily: "monospace",
+        fontSize: "13px",
+        color: "#e6fbff",
+        align: "left",
+        wordWrap: { width: dialogWidth - 100 },
+        stroke: "#091321",
+        strokeThickness: 3
+      }
+    ).setOrigin(0, 0.5);
+
+    const copyBtn = this.add.text(
+      dialogX + dialogWidth - 14,
+      dialogY + dialogHeight - 14,
+      "📋",
+      { fontSize: "16px" }
+    ).setOrigin(1, 1);
     copyBtn.setInteractive({ useHandCursor: true });
-    copyBtn.on("pointerover", () => { copyBtn.setColor("#ffffff"); copyBtn.setScale(1.05); });
-    copyBtn.on("pointerout", () => { copyBtn.setColor("#aadcff"); copyBtn.setScale(1); });
+    copyBtn.on("pointerover", () => copyBtn.setScale(1.25));
+    copyBtn.on("pointerout", () => copyBtn.setScale(1));
     copyBtn.on("pointerdown", () => {
       navigator.clipboard.writeText(shareText).then(() => {
-        copyBtn.setText("✓ Copied!");
-        this.time.delayedCall(1500, () => copyBtn.setText("📋 Copy to clipboard"));
+        copyBtn.setText("✓");
+        this.time.delayedCall(1500, () => copyBtn.setText("📋"));
       });
     });
 
-    const btnY = copyBtnY + 52;
+    const btnY = dialogY + dialogHeight + 42;
     const again = this.add.rectangle(GAME_WIDTH / 2, btnY, 280, 60, 0xfff1a6);
     again.setStrokeStyle(4, 0xffffff);
     again.setInteractive({ useHandCursor: true });
