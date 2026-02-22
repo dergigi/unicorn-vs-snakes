@@ -102,13 +102,26 @@ export class MenuScene extends Phaser.Scene {
     this.spawnPatrolSnakes();
 
     const footerTop = GRASS_TOP + 64 + 10;
-    this.add
-      .text(GAME_WIDTH / 2, footerTop, "Prompted into existence by Gigi's daughter.", {
-        fontSize: "13px",
-        color: "#e8d8ff",
-        fontFamily: "monospace"
-      })
-      .setOrigin(0.5, 0);
+    const footerStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontSize: "13px",
+      color: "#e8d8ff",
+      fontFamily: "monospace"
+    };
+    const prefix = this.add.text(0, footerTop, "Prompted into existence by ", footerStyle).setOrigin(0, 0);
+    const gigiLink = this.add.text(0, footerTop, "Gigi", {
+      ...footerStyle,
+      color: "#ffb8e6"
+    }).setOrigin(0, 0);
+    const suffix = this.add.text(0, footerTop, "'s daughter.", footerStyle).setOrigin(0, 0);
+    const totalW = prefix.width + gigiLink.width + suffix.width;
+    const startX = (GAME_WIDTH - totalW) / 2;
+    prefix.setX(startX);
+    gigiLink.setX(startX + prefix.width);
+    suffix.setX(startX + prefix.width + gigiLink.width);
+    gigiLink.setInteractive({ useHandCursor: true });
+    gigiLink.on("pointerover", () => gigiLink.setColor("#ffffff"));
+    gigiLink.on("pointerout", () => gigiLink.setColor("#ffb8e6"));
+    gigiLink.on("pointerdown", () => window.open("https://dergigi.com", "_blank"));
     this.add
       .text(GAME_WIDTH / 2, footerTop + 20, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
         fontSize: "11px",
