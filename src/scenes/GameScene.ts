@@ -66,7 +66,7 @@ export class GameScene extends Phaser.Scene {
   private fireballs?: Phaser.Physics.Arcade.Group;
   private nextFireballAt = 0;
   private skipRepositionAfterDamage = false;
-  private applePickups?: Phaser.Physics.Arcade.Group;
+  private applePickups?: Phaser.Physics.Arcade.StaticGroup;
   private critterMovers: CritterMover[] = [];
   private platformMovers: PlatformMover[] = [];
   private storyCat?: Phaser.Physics.Arcade.Sprite;
@@ -233,6 +233,7 @@ export class GameScene extends Phaser.Scene {
     this.createForestStumps();
     this.createFriendlyCritters();
     this.createLavaFlames();
+    this.createApples();
     this.createStoryCat();
 
     if (this.levelData.rainbowPowerup) {
@@ -290,7 +291,6 @@ export class GameScene extends Phaser.Scene {
       this.physics.add.overlap(this.player, this.lavaHitbox, this.handlePlayerHit, undefined, this);
     }
     this.createMovingPlatforms();
-    this.createApples();
     this.createBats();
     this.createBossWitch();
     this.createBossMushroomPowerup();
@@ -819,22 +819,16 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    this.applePickups = this.physics.add.group();
+    this.applePickups = this.physics.add.staticGroup();
     for (const appleData of this.levelData.apples) {
       const apple = this.applePickups
-        .create(appleData.x, appleData.y, "apple-pickup") as Phaser.Physics.Arcade.Image;
-      apple.setOrigin(0.5, 1)
+        .create(appleData.x, appleData.y, "apple-pickup")
+        .setOrigin(0.5, 1)
         .setDisplaySize(appleData.width, appleData.height)
         .setDepth(9);
-      const body = apple.body as Phaser.Physics.Arcade.Body;
-      body.setSize(appleData.width, appleData.height);
-      body.setBounce(0);
+      (apple as Phaser.Physics.Arcade.Image).refreshBody();
     }
 
-    this.physics.add.collider(this.applePickups, this.platforms);
-    for (const mover of this.platformMovers) {
-      this.physics.add.collider(this.applePickups, mover.image);
-    }
     this.physics.add.overlap(this.player, this.applePickups, this.handleAppleCollect, undefined, this);
   }
 
