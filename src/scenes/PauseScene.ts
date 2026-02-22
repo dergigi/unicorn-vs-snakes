@@ -101,6 +101,7 @@ export class PauseScene extends Phaser.Scene {
       { label: "Resume", action: () => this.resumeGame() },
       { label: "Restart Level", action: () => this.restartLevel() },
       { label: "Controls", action: () => this.showControls() },
+      { label: "High Scores", action: () => this.showHighScores() },
       { label: "Credits", action: () => this.showCredits() },
       { label: "Quit to Menu", action: () => this.quitToMenu() }
     ];
@@ -332,6 +333,14 @@ export class PauseScene extends Phaser.Scene {
     }
 
     this.addBackButton(startY + 22 + credits.length * rowH + 20);
+  }
+
+  private showHighScores(): void {
+    this.scene.start("HighScoreScene", {
+      difficulty: this.pauseData.difficulty,
+      returnTo: "PauseScene",
+      pauseData: this.pauseData,
+    });
   }
 
   private resumeGame(): void {

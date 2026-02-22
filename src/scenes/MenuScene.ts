@@ -402,6 +402,18 @@ export class MenuScene extends Phaser.Scene {
       stroke: "#1d1336",
       strokeThickness: 3
     }).setOrigin(0.5).setAlpha(0.85);
+
+    this.bestTimeLabel.setInteractive({ useHandCursor: true });
+    this.bestTimeLabel.on("pointerover", () => this.bestTimeLabel?.setColor("#ffffff"));
+    this.bestTimeLabel.on("pointerout", () => this.bestTimeLabel?.setColor("#a090c0"));
+    this.bestTimeLabel.on("pointerdown", () => {
+      if (this.started) return;
+      this.scene.start("HighScoreScene", {
+        difficulty: this.selectedDifficulty,
+        returnTo: "MenuScene",
+      });
+    });
+
     this.refreshBestTime();
   }
 

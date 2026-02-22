@@ -7,6 +7,7 @@ import { MenuScene } from "./scenes/MenuScene";
 import { UIScene } from "./scenes/UIScene";
 import { PauseScene } from "./scenes/PauseScene";
 import { WinScene } from "./scenes/WinScene";
+import { HighScoreScene } from "./scenes/HighScoreScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -26,7 +27,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false
     }
   },
-  scene: [BootScene, MenuScene, GameScene, UIScene, PauseScene, GameOverScene, WinScene]
+  scene: [BootScene, MenuScene, GameScene, UIScene, PauseScene, GameOverScene, WinScene, HighScoreScene]
 };
 
 new Phaser.Game(config);
