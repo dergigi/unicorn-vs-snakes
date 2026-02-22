@@ -147,7 +147,10 @@ export class WinScene extends Phaser.Scene {
     ).setDisplaySize(14, 14).setOrigin(1, 1).setAlpha(0.7);
     copyIcon.setInteractive({ useHandCursor: true });
     copyIcon.on("pointerdown", () => {
-      navigator.clipboard.writeText(shareText);
+      navigator.clipboard.writeText(shareText).then(() => {
+        copyIcon.setTexture("clipboard-check");
+        this.time.delayedCall(1500, () => copyIcon.setTexture("copy-icon"));
+      });
     });
 
     // Play again button — anchored near bottom
