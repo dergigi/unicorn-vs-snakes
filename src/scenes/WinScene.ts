@@ -284,16 +284,10 @@ export class WinScene extends Phaser.Scene {
       ...rowStyle, color: "#a090c0"
     }).setOrigin(0.5);
 
-    nostrService.fetchTopScores(difficulty, 10).then((entries) => {
+    const TOTAL_ROWS = 5;
+    nostrService.fetchTopScores(difficulty, TOTAL_ROWS).then((entries) => {
       if (!this.scene.isActive()) return;
       loadingLabel.destroy();
-
-      if (entries.length === 0) {
-        this.add.text(cx, top + 50, "No scores yet!", {
-          ...rowStyle, color: "#a090c0"
-        }).setOrigin(0.5);
-        return;
-      }
 
       const rowH = 22;
       const rowTop = top + 30;
@@ -301,46 +295,46 @@ export class WinScene extends Phaser.Scene {
       const nameX = panelX + 36;
       const timeX = panelX + panelW - 8;
       const myPubkey = nostrService.getPubkey();
+      const dimColor = "#6a5a80";
 
       const bg = this.add.graphics();
       bg.fillStyle(0x2a1040, 0.5);
-      bg.fillRoundedRect(panelX, rowTop - 8, panelW, entries.length * rowH + 16, 8);
+      bg.fillRoundedRect(panelX, rowTop - 8, panelW, TOTAL_ROWS * rowH + 16, 8);
 
-      const nameTexts: { text: Phaser.GameObjects.Text; pubkey: string; isMe: boolean }[] = [];
+      const nameTexts: { text: Phaser.GameObjects.Text; pubkey: string }[] = [];
 
-      for (let i = 0; i < entries.length; i++) {
+      for (let i = 0; i < TOTAL_ROWS; i++) {
         const entry = entries[i];
         const y = rowTop + i * rowH + 4;
-        const isMe = entry.pubkey === myPubkey;
-        const highlight = isMe ? "#ffb8e6" : rowStyle.color;
+        const medal = `${i + 1}.`;
 
-        const medal = i === 0 ? "1." : i === 1 ? "2." : i === 2 ? "3." : `${i + 1}.`;
-        this.add.text(rankX, y, medal, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
+        if (entry) {
+          const isMe = entry.pubkey === myPubkey;
+          const highlight = isMe ? "#ffb8e6" : rowStyle.color;
 
-        const nameLabel = nostrService.getDisplayName(entry.pubkey);
-        const nameText = this.add.text(nameX, y, nameLabel, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
-        nameTexts.push({ text: nameText, pubkey: entry.pubkey, isMe });
+          this.add.text(rankX, y, medal, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
 
-        this.add.text(timeX, y, formatTime(entry.totalMs), { ...rowStyle, color: highlight }).setOrigin(1, 0.5);
-      }
+          const nameLabel = nostrService.getDisplayName(entry.pubkey);
+          const nameText = this.add.text(nameX, y, nameLabel, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
+          nameTexts.push({ text: nameText, pubkey: entry.pubkey });
 
-      if (myPubkey) {
-        const myRank = entries.findIndex(e => e.pubkey === myPubkey);
-        if (myRank === -1) {
-          const belowY = rowTop + entries.length * rowH + 20;
-          this.add.text(cx, belowY, `Your time: ${formatTime(playerMs)}`, {
-            ...rowStyle, color: "#a090c0", fontSize: "12px"
-          }).setOrigin(0.5);
+          this.add.text(timeX, y, formatTime(entry.totalMs), { ...rowStyle, color: highlight }).setOrigin(1, 0.5);
+        } else {
+          this.add.text(rankX, y, medal, { ...rowStyle, color: dimColor }).setOrigin(0, 0.5);
+          this.add.text(nameX, y, "TBD", { ...rowStyle, color: dimColor }).setOrigin(0, 0.5);
+          this.add.text(timeX, y, "-:--.-", { ...rowStyle, color: dimColor }).setOrigin(1, 0.5);
         }
       }
 
-      const pubkeys = entries.map(e => e.pubkey);
-      nostrService.fetchProfiles(pubkeys).then(() => {
-        if (!this.scene.isActive()) return;
-        for (const { text, pubkey } of nameTexts) {
-          text.setText(nostrService.getDisplayName(pubkey));
-        }
-      }).catch(() => { /* keep npub fallbacks */ });
+      if (entries.length > 0) {
+        const pubkeys = entries.map(e => e.pubkey);
+        nostrService.fetchProfiles(pubkeys).then(() => {
+          if (!this.scene.isActive()) return;
+          for (const { text, pubkey } of nameTexts) {
+            text.setText(nostrService.getDisplayName(pubkey));
+          }
+        }).catch(() => { /* keep npub fallbacks */ });
+      }
     }).catch(() => {
       if (!this.scene.isActive()) return;
       loadingLabel.setText("Could not load scores");
