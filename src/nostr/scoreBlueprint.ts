@@ -34,6 +34,7 @@ export function ScoreBlueprint(data: ScoreData): EventBlueprint<EventTemplate> {
       ["difficulty", data.difficulty],
       ["time", String(data.totalMs)],
       ["t", NOSTR_GAME_TAG],
+      ["t", "UvS"],
       ["t", "gaming"],
       ["version", String(NOSTR_SCORE_VERSION)],
     ];

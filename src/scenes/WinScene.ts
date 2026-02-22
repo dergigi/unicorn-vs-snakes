@@ -115,11 +115,11 @@ export class WinScene extends Phaser.Scene {
 
     // Share dialog
     const shareText = is100Percent
-      ? `I just had a 100% Unicorn vs Snakes run and beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!!`
-      : `I just beat Unicorn vs Snakes on ${difficulty} difficulty in ${formatTime(totalMs)}!`;
+      ? `I just had a 100% Unicorn vs Snakes run and beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!! #UvS`
+      : `I just beat Unicorn vs Snakes on ${difficulty} difficulty in ${formatTime(totalMs)}! #UvS`;
     const displayText = is100Percent
-      ? `I just had a 100% Unicorn vs Snakes run\nand beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!!`
-      : `I just beat Unicorn vs Snakes\non ${difficulty} difficulty in ${formatTime(totalMs)}!`;
+      ? `I just had a 100% Unicorn vs Snakes run\nand beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!! #UvS`
+      : `I just beat Unicorn vs Snakes\non ${difficulty} difficulty in ${formatTime(totalMs)}! #UvS`;
 
     const btnY = GAME_HEIGHT - 52;
     const portraitSize = 38;
