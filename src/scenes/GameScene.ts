@@ -339,7 +339,15 @@ export class GameScene extends Phaser.Scene {
 
   private handlePauseKey(): void {
     if (!this.scene.isActive()) return;
-    this.scene.launch("PauseScene");
+    this.scene.launch("PauseScene", {
+      maxLives: this.maxLives,
+      difficulty: this.difficulty,
+      levelNumber: this.levelNumber,
+      currentLives: this.lives,
+      hasRainbow: this.player?.hasRainbowPower() ?? false,
+      levelTimes: [...this.levelTimes],
+      menuTimeMs: this.menuTimeMs
+    });
   }
 
   private handleLevelTwoSkipKey(): void {
