@@ -12,6 +12,12 @@ export const DIFFICULTY_HEARTS: Record<Difficulty, number> = {
   insane: 1
 };
 export const DEFAULT_DIFFICULTY: Difficulty = "normal";
+export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: "easy",
+  normal: "normal",
+  hard: "hard",
+  insane: "insane-o"
+};
 
 export const PHYSICS_GRAVITY_Y = 1300;
 

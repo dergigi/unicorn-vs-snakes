@@ -82,12 +82,6 @@ class NostrService {
     return npubEncode(this.pubkey);
   }
 
-  getTruncatedNpub(): string | null {
-    const npub = this.getNpub();
-    if (!npub) return null;
-    return npub.slice(0, 10) + "..." + npub.slice(-4);
-  }
-
   async publishScore(data: ScoreData): Promise<boolean> {
     if (!this.factory || !this.signer) {
       throw new Error("Not logged in");
@@ -179,6 +173,10 @@ class NostrService {
     const profile = this.profileCache.get(pubkey);
     const name = profile?.display_name || profile?.name;
     if (name) return name;
+    return this.truncateNpub(pubkey);
+  }
+
+  private truncateNpub(pubkey: string): string {
     const npub = npubEncode(pubkey);
     return npub.slice(0, 10) + "..." + npub.slice(-4);
   }

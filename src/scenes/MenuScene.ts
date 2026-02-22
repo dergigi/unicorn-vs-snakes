@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import {
   DEFAULT_DIFFICULTY,
   DIFFICULTY_HEARTS,
+  DIFFICULTY_LABELS,
   GAME_HEIGHT,
   GAME_WIDTH,
   type Difficulty
@@ -429,13 +430,9 @@ export class MenuScene extends Phaser.Scene {
     });
   }
 
-  private static readonly DIFFICULTY_LABELS: Record<Difficulty, string> = {
-    easy: "easy", normal: "normal", hard: "hard", insane: "insane-o"
-  };
-
   private showBestTime(entries: LeaderboardEntry[], diff: Difficulty): void {
     if (!this.bestTimeLabel || this.selectedDifficulty !== diff) return;
-    const label = MenuScene.DIFFICULTY_LABELS[diff];
+    const label = DIFFICULTY_LABELS[diff];
     if (entries.length === 0) {
       this.bestTimeLabel.setText(`No ${label} scores yet`);
       return;

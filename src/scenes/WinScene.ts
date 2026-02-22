@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { GAME_HEIGHT, GAME_WIDTH, LEVEL_COUNT, NOSTR_HASHTAG, type Difficulty } from "../config/gameConfig";
+import { DIFFICULTY_LABELS, GAME_HEIGHT, GAME_WIDTH, LEVEL_COUNT, NOSTR_HASHTAG, type Difficulty } from "../config/gameConfig";
 import { formatTime } from "../utils/formatTime";
 import { nostrService, type LeaderboardEntry } from "../nostr/nostrService";
 import type { ScoreData } from "../nostr/scoreBlueprint";
@@ -280,7 +280,7 @@ export class WinScene extends Phaser.Scene {
       strokeThickness: 2
     };
 
-    const diffLabel = difficulty === "insane" ? "insane-o" : difficulty;
+    const diffLabel = DIFFICULTY_LABELS[difficulty];
     this.add.text(cx, top, `Best Times (${diffLabel})`, headerStyle).setOrigin(0.5);
 
     const loadingLabel = this.add.text(cx, top + 30, "Loading...", {
