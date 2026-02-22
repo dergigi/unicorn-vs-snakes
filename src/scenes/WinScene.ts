@@ -125,7 +125,7 @@ export class WinScene extends Phaser.Scene {
       fontFamily: "monospace",
       fontSize: "12px"
     });
-    const dialogWidth = leftPad + measureText.width + rightPad;
+    const dialogWidth = Math.ceil((leftPad + measureText.width + rightPad) * 1.2);
     const dialogHeight = 66;
     measureText.destroy();
 
