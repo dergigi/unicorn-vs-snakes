@@ -57,6 +57,7 @@ export function getRequiredSparklesToFinish(levelNumber: number): number {
 export const NOSTR_KIND = 5555;
 export const NOSTR_RELAYS = [
   "wss://relay.damus.io",
+  "wss://relay.primal.net",
   "wss://nos.lol",
   "wss://wot.dergigi.com"
 ];
