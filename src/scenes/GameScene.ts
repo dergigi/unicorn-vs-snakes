@@ -431,6 +431,9 @@ export class GameScene extends Phaser.Scene {
     this.updateBossWitch(time);
 
     if (this.player.y > GAME_HEIGHT + 200) {
+      if (this.levelNumber === 4) {
+        this.lives = 1;
+      }
       this.handlePlayerHit(
         this.player as unknown as Phaser.Types.Physics.Arcade.GameObjectWithBody,
         this.player as unknown as Phaser.Types.Physics.Arcade.GameObjectWithBody
