@@ -438,9 +438,19 @@ export class MenuScene extends Phaser.Scene {
     const label = MenuScene.DIFFICULTY_LABELS[diff];
     if (entries.length === 0) {
       this.bestTimeLabel.setText(`No ${label} scores yet`);
-    } else {
-      this.bestTimeLabel.setText(`Best ${label} time: ${formatTime(entries[0].totalMs)}`);
+      return;
     }
+
+    const best = entries[0];
+    const name = nostrService.getDisplayName(best.pubkey);
+    this.bestTimeLabel.setText(`Best ${label} time: ${formatTime(best.totalMs)} by ${name}`);
+
+    nostrService.fetchProfiles([best.pubkey]).then(() => {
+      if (!this.scene.isActive()) return;
+      if (this.selectedDifficulty !== diff) return;
+      const resolved = nostrService.getDisplayName(best.pubkey);
+      this.bestTimeLabel?.setText(`Best ${label} time: ${formatTime(best.totalMs)} by ${resolved}`);
+    }).catch(() => { /* keep fallback */ });
   }
 
   private checkButtonOverlap(): void {
