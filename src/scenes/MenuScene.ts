@@ -451,7 +451,9 @@ export class MenuScene extends Phaser.Scene {
 
     if (targetLevel === 5) {
       this.scene.start("WinScene", {
-        totalSparkles: 42,
+        totalSparkles: 63,
+        totalApples: 4,
+        totalPowerups: 3,
         difficulty: this.selectedDifficulty,
         levelTimes: [12345, 23456, 34567, 45678],
         menuTimeMs: 6789

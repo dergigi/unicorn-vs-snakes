@@ -1,9 +1,11 @@
 import Phaser from "phaser";
-import { GAME_HEIGHT, GAME_WIDTH, type Difficulty } from "../config/gameConfig";
+import { GAME_HEIGHT, GAME_WIDTH, LEVEL_COUNT, type Difficulty } from "../config/gameConfig";
 import { formatTime } from "../utils/formatTime";
 
 interface WinData {
   totalSparkles?: number;
+  totalApples?: number;
+  totalPowerups?: number;
   difficulty?: Difficulty;
   levelTimes?: number[];
   menuTimeMs?: number;
@@ -14,12 +16,36 @@ export class WinScene extends Phaser.Scene {
     super("WinScene");
   }
 
+  private computeMaxCollectibles(): { sparkles: number; apples: number; powerups: number } {
+    let sparkles = 0;
+    let apples = 0;
+    let powerups = 0;
+    for (let i = 1; i <= LEVEL_COUNT; i++) {
+      const ld = this.cache.json.get(`level-${i}`);
+      if (!ld) continue;
+      sparkles += (ld.sparkles as unknown[])?.length ?? 0;
+      apples += (ld.apples as unknown[])?.length ?? 0;
+      if (ld.rainbowPowerup) powerups += 1;
+      if (ld.bossMushroom) powerups += 1;
+    }
+    return { sparkles, apples, powerups };
+  }
+
   create(data: WinData): void {
     const levelTimes = data.levelTimes ?? [];
     const menuTimeMs = data.menuTimeMs ?? 0;
     const totalMs = menuTimeMs + levelTimes.reduce((sum, t) => sum + t, 0);
     const difficulty = data.difficulty ?? "normal";
     const cx = GAME_WIDTH / 2;
+
+    const max = this.computeMaxCollectibles();
+    const collectedSparkles = data.totalSparkles ?? 0;
+    const collectedApples = data.totalApples ?? 0;
+    const collectedPowerups = data.totalPowerups ?? 0;
+    const is100Percent =
+      collectedSparkles >= max.sparkles &&
+      collectedApples >= max.apples &&
+      collectedPowerups >= max.powerups;
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x3b1a4f).setOrigin(0, 0);
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT * 0.5, 0x5c2d6e, 0.6).setOrigin(0, 0);
@@ -104,8 +130,9 @@ export class WinScene extends Phaser.Scene {
     }).setOrigin(0, 0.5);
 
     // Share dialog
-    const shareText =
-      `I just beat Unicorn vs Snakes on ${difficulty} difficulty in ${formatTime(totalMs)}!`;
+    const shareText = is100Percent
+      ? `I just had a 100% Unicorn vs Snakes run and beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!!`
+      : `I just beat Unicorn vs Snakes on ${difficulty} difficulty in ${formatTime(totalMs)}!`;
 
     const dialogWidth = GAME_WIDTH - 120;
     const dialogHeight = 66;

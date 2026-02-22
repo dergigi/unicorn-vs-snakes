@@ -40,6 +40,8 @@ export const BOSS_HEALTH_BY_DIFFICULTY: Record<Difficulty, number> = {
   insane: 12
 };
 
+export const LEVEL_COUNT = 4;
+
 export const TOTAL_SPARKLES = 21;
 const REQUIRED_SPARKLES_BY_LEVEL: Record<number, number> = {
   1: 12,

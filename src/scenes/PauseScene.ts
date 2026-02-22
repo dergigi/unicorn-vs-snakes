@@ -9,6 +9,9 @@ interface PauseData {
   hasRainbow: boolean;
   levelTimes: number[];
   menuTimeMs: number;
+  totalSparkles: number;
+  totalApples: number;
+  totalPowerups: number;
 }
 
 type PauseView = "menu" | "controls" | "credits";
@@ -270,7 +273,10 @@ export class PauseScene extends Phaser.Scene {
       difficulty: this.pauseData.difficulty,
       levelNumber: this.pauseData.levelNumber,
       levelTimes: this.pauseData.levelTimes,
-      menuTimeMs: this.pauseData.menuTimeMs
+      menuTimeMs: this.pauseData.menuTimeMs,
+      totalSparkles: this.pauseData.totalSparkles,
+      totalApples: this.pauseData.totalApples,
+      totalPowerups: this.pauseData.totalPowerups
     });
     this.scene.stop();
     gameScene.scene.launch("UIScene", {

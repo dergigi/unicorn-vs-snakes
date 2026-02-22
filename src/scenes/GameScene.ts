@@ -7,6 +7,7 @@ import {
   DEFAULT_DIFFICULTY,
   GAME_HEIGHT,
   GAME_WIDTH,
+  LEVEL_COUNT,
   PLAYER_MOVE_SPEED,
   PLAYER_HIT_INVULNERABILITY_MS,
   TOTAL_SPARKLES,
@@ -21,7 +22,6 @@ import type { LevelData } from "../types/LevelData";
 import { spawnRainbowTrail } from "../utils/rainbowTrail";
 import { beep } from "../utils/sfx";
 
-const LEVEL_COUNT = 4;
 
 type CritterMover = {
   hitbox: Phaser.GameObjects.Rectangle;
@@ -93,6 +93,10 @@ export class GameScene extends Phaser.Scene {
   private levelTimes: number[] = [];
   private menuTimeMs = 0;
   private totalSparkles = 0;
+  private totalApples = 0;
+  private totalPowerups = 0;
+  private levelApples = 0;
+  private levelPowerups = 0;
 
   constructor() {
     super("GameScene");
@@ -107,6 +111,8 @@ export class GameScene extends Phaser.Scene {
     levelTimes?: number[];
     menuTimeMs?: number;
     totalSparkles?: number;
+    totalApples?: number;
+    totalPowerups?: number;
   }): void {
     this.maxLives = data?.maxLives ?? 5;
     this.difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
@@ -114,6 +120,10 @@ export class GameScene extends Phaser.Scene {
     this.levelTimes = data?.levelTimes ?? [];
     this.menuTimeMs = data?.menuTimeMs ?? 0;
     this.totalSparkles = data?.totalSparkles ?? 0;
+    this.totalApples = data?.totalApples ?? 0;
+    this.totalPowerups = data?.totalPowerups ?? 0;
+    this.levelApples = 0;
+    this.levelPowerups = 0;
     this.timerStartMs = Date.now();
     this.levelComplete = false;
     this.lives = data?.currentLives ?? this.maxLives;
@@ -349,7 +359,10 @@ export class GameScene extends Phaser.Scene {
       currentLives: this.lives,
       hasRainbow: this.player?.hasRainbowPower() ?? false,
       levelTimes: [...this.levelTimes],
-      menuTimeMs: this.menuTimeMs
+      menuTimeMs: this.menuTimeMs,
+      totalSparkles: this.totalSparkles,
+      totalApples: this.totalApples,
+      totalPowerups: this.totalPowerups
     });
   }
 
@@ -404,7 +417,9 @@ export class GameScene extends Phaser.Scene {
       hasRainbow: this.player?.hasRainbowPower() ?? false,
       levelTimes: [...this.levelTimes],
       menuTimeMs: this.menuTimeMs,
-      totalSparkles: this.totalSparkles + this.collectibleSystem.getCollectedCount()
+      totalSparkles: this.totalSparkles + this.collectibleSystem.getCollectedCount(),
+      totalApples: this.totalApples + this.levelApples,
+      totalPowerups: this.totalPowerups + this.levelPowerups
     };
     this.scene.stop("UIScene");
     this.scene.restart(sceneData);
@@ -863,6 +878,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     apple.destroy();
+    this.levelApples += 1;
 
     const previousLives = this.lives;
     this.lives = Math.min(this.maxLives, this.lives + 1);
@@ -1147,6 +1163,7 @@ export class GameScene extends Phaser.Scene {
     this.mushroomPickup.destroy();
     this.mushroomPickup = undefined;
     this.hasMushroomPower = true;
+    this.levelPowerups += 1;
     this.game.events.emit(GAME_EVENTS.mushroomPowerupCollected);
     if (this.audioContext) {
       beep(this.audioContext, 560, 0.1, "triangle", 0.03);
@@ -1557,6 +1574,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.rainbowPowerup.destroy();
     this.player.setRainbowPowerup(true);
+    this.levelPowerups += 1;
     this.game.events.emit(GAME_EVENTS.rainbowPowerupCollected);
     if (this.audioContext) {
       beep(this.audioContext, 690, 0.08, "triangle", 0.03);
@@ -1806,6 +1824,8 @@ export class GameScene extends Phaser.Scene {
     this.levelTimes.push(Date.now() - this.timerStartMs);
     this.time.delayedCall(500, () => {
       const runningSparkles = this.totalSparkles + collected;
+      const runningApples = this.totalApples + this.levelApples;
+      const runningPowerups = this.totalPowerups + this.levelPowerups;
       if (this.levelNumber < LEVEL_COUNT) {
         const sceneData = {
           maxLives: this.maxLives,
@@ -1815,7 +1835,9 @@ export class GameScene extends Phaser.Scene {
           hasRainbow: this.player.hasRainbowPower(),
           levelTimes: [...this.levelTimes],
           menuTimeMs: this.menuTimeMs,
-          totalSparkles: runningSparkles
+          totalSparkles: runningSparkles,
+          totalApples: runningApples,
+          totalPowerups: runningPowerups
         };
         this.scene.restart(sceneData);
         this.scene.launch("UIScene", sceneData);
@@ -1824,6 +1846,8 @@ export class GameScene extends Phaser.Scene {
 
       this.scene.start("WinScene", {
         totalSparkles: runningSparkles,
+        totalApples: runningApples,
+        totalPowerups: runningPowerups,
         difficulty: this.difficulty,
         levelTimes: [...this.levelTimes],
         menuTimeMs: this.menuTimeMs
