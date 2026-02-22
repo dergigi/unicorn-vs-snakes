@@ -269,7 +269,7 @@ export class HighScoreScene extends Phaser.Scene {
         nameText.setInteractive({ useHandCursor: true });
         nameText.on("pointerover", () => nameText.setColor("#ffffff"));
         nameText.on("pointerout", () => nameText.setColor(color));
-        nameText.on("pointerdown", () => window.open(`https://njump.me/${entry.npub}`, "_blank"));
+        nameText.on("pointerdown", () => window.open(`https://njump.to/${entry.npub}`, "_blank"));
         const timeText = this.add.text(timeX, y, formatTime(entry.totalMs), { ...rowStyle, color }).setOrigin(1, 0.5);
         this.tableContainer.add([rankText, nameText, timeText]);
 
