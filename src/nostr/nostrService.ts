@@ -1,7 +1,8 @@
 import { ExtensionSigner } from "applesauce-signers/signers";
 import { EventFactory } from "applesauce-core";
 import { RelayPool } from "applesauce-relay";
-import { npubEncode } from "nostr-tools/nip19";
+import { npubEncode } from "applesauce-core/helpers/pointers";
+import { type NostrEvent } from "applesauce-core/helpers/event";
 import { type Subscription } from "rxjs";
 import { NOSTR_RELAYS, NOSTR_KIND, NOSTR_GAME_TAG, NOSTR_SCORE_VERSION, type Difficulty } from "../config/gameConfig";
 import { ScoreBlueprint, type ScoreData } from "./scoreBlueprint";
@@ -98,8 +99,8 @@ class NostrService {
       "#d": [NOSTR_GAME_TAG],
     };
 
-    const events = await new Promise<import("nostr-tools").NostrEvent[]>((resolve) => {
-      const collected: import("nostr-tools").NostrEvent[] = [];
+    const events = await new Promise<NostrEvent[]>((resolve) => {
+      const collected: NostrEvent[] = [];
       let sub: Subscription | undefined;
       let resolved = false;
       const done = () => {
