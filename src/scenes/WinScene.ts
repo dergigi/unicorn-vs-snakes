@@ -141,22 +141,17 @@ export class WinScene extends Phaser.Scene {
       strokeThickness: 3
     }).setOrigin(0, 0.5);
 
-    const iconSize = 28;
-    const iconPad = 6;
-    const iconX = dialogX + dialogWidth - 12;
-    const iconY = dialogY + dialogHeight - 12;
+    const iconSize = 16;
+    const pad = 4;
+    const boxSize = iconSize + pad * 2;
+    const boxX = dialogX + dialogWidth - 8 - boxSize;
+    const boxY = dialogY + dialogHeight - 8 - boxSize;
     const borderGfx = this.add.graphics();
-    borderGfx.lineStyle(1.5, 0xffb8e6, 0.7);
-    borderGfx.strokeRoundedRect(
-      iconX - iconSize - iconPad,
-      iconY - iconSize - iconPad,
-      iconSize + iconPad * 2,
-      iconSize + iconPad * 2,
-      6
-    );
+    borderGfx.lineStyle(1, 0xffb8e6, 0.6);
+    borderGfx.strokeRoundedRect(boxX, boxY, boxSize, boxSize, 4);
     const copyIcon = this.add.image(
-      iconX - iconPad, iconY - iconPad, "copy-icon"
-    ).setDisplaySize(iconSize, iconSize).setOrigin(1, 1).setAlpha(0.7);
+      boxX + boxSize / 2, boxY + boxSize / 2, "copy-icon"
+    ).setDisplaySize(iconSize, iconSize).setAlpha(0.7);
     copyIcon.setInteractive({ useHandCursor: true });
     copyIcon.on("pointerdown", () => {
       navigator.clipboard.writeText(shareText).then(() => {
