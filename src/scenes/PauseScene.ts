@@ -130,51 +130,117 @@ export class PauseScene extends Phaser.Scene {
     this.clearView();
     this.currentView = "controls";
 
-    const title = this.add.text(GAME_WIDTH / 2, 80, "CONTROLS", {
+    const isTouch = !!this.sys.game.device.input.touch;
+
+    const title = this.add.text(GAME_WIDTH / 2, isTouch ? 50 : 80, "CONTROLS", {
       fontFamily: "monospace",
-      fontSize: "40px",
+      fontSize: isTouch ? "34px" : "40px",
       color: "#ffffff",
       stroke: "#24133d",
       strokeThickness: 6
     }).setOrigin(0.5);
     this.viewContainer.add(title);
 
+    const fontSize = isTouch ? "16px" : "20px";
+    const strokeThick = isTouch ? 2 : 3;
+    const rowH = isTouch ? 32 : 44;
+    const keyX = GAME_WIDTH / 2 - 20;
+    const descX = GAME_WIDTH / 2 + 20;
+
     const controls = [
       ["Left / Right  or  A / D", "Move"],
       ["Up Arrow  or  W", "Jump"],
       ["Hold Jump", "Jump higher"],
-      ["Space", "Shoot fireball (with mushroom)"],
+      ["Space", "Fireball (with mushroom)"],
       ["R", "Reset to menu"],
       ["ESC", "Pause / Unpause"]
     ];
 
-    const startY = 150;
-    const rowH = 44;
-    const keyX = GAME_WIDTH / 2 - 20;
-    const descX = GAME_WIDTH / 2 + 20;
+    let startY = isTouch ? 95 : 150;
+
+    if (isTouch) {
+      const kbHeader = this.add.text(GAME_WIDTH / 2, startY - 16, "KEYBOARD", {
+        fontFamily: "monospace",
+        fontSize: "14px",
+        color: "#8a7fb0",
+        stroke: "#24133d",
+        strokeThickness: 2
+      }).setOrigin(0.5);
+      this.viewContainer.add(kbHeader);
+    }
 
     for (let i = 0; i < controls.length; i++) {
       const [key, desc] = controls[i];
       const keyText = this.add.text(keyX, startY + i * rowH, key, {
         fontFamily: "monospace",
-        fontSize: "20px",
+        fontSize: fontSize,
         color: "#ffe6a8",
         stroke: "#24133d",
-        strokeThickness: 3
+        strokeThickness: strokeThick
       }).setOrigin(1, 0.5);
 
       const descText = this.add.text(descX, startY + i * rowH, desc, {
         fontFamily: "monospace",
-        fontSize: "20px",
+        fontSize: fontSize,
         color: "#cccccc",
         stroke: "#24133d",
-        strokeThickness: 3
+        strokeThickness: strokeThick
       }).setOrigin(0, 0.5);
 
       this.viewContainer.add([keyText, descText]);
     }
 
-    this.addBackButton(startY + controls.length * rowH + 40);
+    let bottomY = startY + controls.length * rowH;
+
+    if (isTouch) {
+      const touchStartY = bottomY + 20;
+
+      const touchHeader = this.add.text(GAME_WIDTH / 2, touchStartY, "TOUCH", {
+        fontFamily: "monospace",
+        fontSize: "14px",
+        color: "#8a7fb0",
+        stroke: "#24133d",
+        strokeThickness: 2
+      }).setOrigin(0.5);
+      this.viewContainer.add(touchHeader);
+
+      const touchControls = [
+        ["Bottom-left / right", "Move"],
+        ["Tap top half", "Jump"],
+        ["Swipe up", "Jump (from bottom)"],
+        ["Hold jump", "Jump higher"],
+        ["Bottom-middle", "Fireball"],
+        ["Second finger", "Fireball (alt)"],
+      ];
+
+      const touchRowH = 28;
+      const touchY = touchStartY + 18;
+
+      for (let i = 0; i < touchControls.length; i++) {
+        const [key, desc] = touchControls[i];
+        const keyText = this.add.text(keyX, touchY + i * touchRowH, key, {
+          fontFamily: "monospace",
+          fontSize: "15px",
+          color: "#a8d8ff",
+          stroke: "#24133d",
+          strokeThickness: 2
+        }).setOrigin(1, 0.5);
+
+        const descText = this.add.text(descX, touchY + i * touchRowH, desc, {
+          fontFamily: "monospace",
+          fontSize: "15px",
+          color: "#cccccc",
+          stroke: "#24133d",
+          strokeThickness: 2
+        }).setOrigin(0, 0.5);
+
+        this.viewContainer.add([keyText, descText]);
+      }
+
+      bottomY = touchY + touchControls.length * touchRowH;
+    }
+
+    this.addBackButton(bottomY + 20);
   }
 
   private showCredits(): void {

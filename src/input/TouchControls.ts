@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { GAME_WIDTH } from "../config/gameConfig";
+import { GAME_HEIGHT, GAME_WIDTH } from "../config/gameConfig";
 
 export interface TouchInput {
   left: boolean;
@@ -12,6 +12,7 @@ export interface TouchInput {
 
 const ZONE_LEFT_MAX = GAME_WIDTH / 3;
 const ZONE_RIGHT_MIN = (GAME_WIDTH * 2) / 3;
+const TOP_HALF_MAX = GAME_HEIGHT / 2;
 const SWIPE_UP_THRESHOLD = 30;
 
 export class TouchControls {
@@ -29,6 +30,7 @@ export class TouchControls {
   private primaryPointerId: number | null = null;
   private primaryStartY = 0;
   private jumping = false;
+  private topHalfTouch = false;
 
   private onPointerDown: (pointer: Phaser.Input.Pointer) => void;
   private onPointerUp: (pointer: Phaser.Input.Pointer) => void;
@@ -50,9 +52,21 @@ export class TouchControls {
     this.onPointerDown = (pointer: Phaser.Input.Pointer) => {
       if (this.primaryPointerId === null) {
         this.primaryPointerId = pointer.id;
-        this.primaryStartY = pointer.y;
-        this.jumping = false;
-        this.applyZone(pointer.x);
+
+        if (pointer.y < TOP_HALF_MAX) {
+          this.topHalfTouch = true;
+          this.jumping = true;
+          this.state.jumpDown = true;
+          this.state.jumpJustPressed = true;
+        } else {
+          this.topHalfTouch = false;
+          this.primaryStartY = pointer.y;
+          this.jumping = false;
+          this.applyZone(pointer.x);
+          if (pointer.x >= ZONE_LEFT_MAX && pointer.x <= ZONE_RIGHT_MIN) {
+            this.state.fireJustPressed = true;
+          }
+        }
       } else if (pointer.id !== this.primaryPointerId) {
         this.state.fireJustPressed = true;
       }
@@ -61,6 +75,7 @@ export class TouchControls {
     this.onPointerUp = (pointer: Phaser.Input.Pointer) => {
       if (pointer.id === this.primaryPointerId) {
         this.primaryPointerId = null;
+        this.topHalfTouch = false;
         this.state.left = false;
         this.state.right = false;
         if (this.jumping) {
@@ -75,6 +90,11 @@ export class TouchControls {
       if (pointer.id !== this.primaryPointerId || !pointer.isDown) {
         return;
       }
+
+      if (this.topHalfTouch) {
+        return;
+      }
+
       this.applyZone(pointer.x);
 
       const dy = this.primaryStartY - pointer.y;
