@@ -116,7 +116,8 @@ export class WinScene extends Phaser.Scene {
     const dialogWidth = GAME_WIDTH - 220;
     const dialogHeight = 66;
     const dialogX = (GAME_WIDTH - dialogWidth) / 2;
-    const dialogY = totalY + 36;
+    const btnY = GAME_HEIGHT - 52;
+    const dialogY = totalY + (btnY - totalY - dialogHeight) / 2;
     const portraitSize = 38;
     const portraitCenterX = dialogX + 28;
     const portraitCenterY = dialogY + dialogHeight / 2;
@@ -154,7 +155,6 @@ export class WinScene extends Phaser.Scene {
     });
 
     // Play again button — anchored near bottom
-    const btnY = GAME_HEIGHT - 52;
     const again = this.add.rectangle(cx, btnY, 260, 50, 0xff8fd3);
     again.setStrokeStyle(3, 0xffffff);
     again.setInteractive({ useHandCursor: true });
