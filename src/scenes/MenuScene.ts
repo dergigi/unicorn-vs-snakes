@@ -9,7 +9,8 @@ import {
 import { spawnRainbowTrail } from "../utils/rainbowTrail";
 import { type PatrolSnake, spawnPatrolSnakes, updatePatrolSnakes } from "../utils/patrolSnakes";
 import { TouchControls } from "../input/TouchControls";
-import { nostrService } from "../nostr/nostrService";
+import { nostrService, type LeaderboardEntry } from "../nostr/nostrService";
+import { formatTime } from "../utils/formatTime";
 
 const GRASS_TOP = GAME_HEIGHT - 130;
 const GRASS_HEIGHT = 52;
@@ -41,6 +42,8 @@ export class MenuScene extends Phaser.Scene {
   private levelSkipResetTimer?: Phaser.Time.TimerEvent;
   private menuCreatedAt = 0;
   private touchControls?: TouchControls;
+  private bestTimeLabel?: Phaser.GameObjects.Text;
+  private scoreCache = new Map<Difficulty, LeaderboardEntry[]>();
 
   constructor() {
     super("MenuScene");
@@ -83,6 +86,7 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.buildDifficultyButtons();
+    this.buildBestTimeLabel();
 
     this.add
       .image(GATE_X, FLOOR_Y, "finish-gate-open")
@@ -369,9 +373,55 @@ export class MenuScene extends Phaser.Scene {
       for (const d of difficulties) {
         drawButton(d, d === this.selectedDifficulty);
       }
+      this.refreshBestTime();
     };
     this.applyDifficultyStyles = applyStyles;
     applyStyles();
+  }
+
+  private buildBestTimeLabel(): void {
+    this.scoreCache.clear();
+    this.bestTimeLabel = this.add.text(GAME_WIDTH / 2, 306, "", {
+      fontFamily: "monospace",
+      fontSize: "14px",
+      color: "#a090c0",
+      stroke: "#1d1336",
+      strokeThickness: 3
+    }).setOrigin(0.5).setAlpha(0.85);
+  }
+
+  private refreshBestTime(): void {
+    if (!this.bestTimeLabel) return;
+
+    const diff = this.selectedDifficulty;
+    const cached = this.scoreCache.get(diff);
+    if (cached) {
+      this.showBestTime(cached, diff);
+      return;
+    }
+
+    this.bestTimeLabel.setText("Best: ...");
+    nostrService.fetchTopScores(diff, 1).then((entries) => {
+      if (!this.scene.isActive()) return;
+      this.scoreCache.set(diff, entries);
+      if (this.selectedDifficulty === diff) {
+        this.showBestTime(entries, diff);
+      }
+    }).catch(() => {
+      if (!this.scene.isActive()) return;
+      if (this.selectedDifficulty === diff) {
+        this.bestTimeLabel?.setText("");
+      }
+    });
+  }
+
+  private showBestTime(entries: LeaderboardEntry[], diff: Difficulty): void {
+    if (!this.bestTimeLabel || this.selectedDifficulty !== diff) return;
+    if (entries.length === 0) {
+      this.bestTimeLabel.setText(`No ${diff} scores yet`);
+    } else {
+      this.bestTimeLabel.setText(`Best ${diff} time: ${formatTime(entries[0].totalMs)}`);
+    }
   }
 
   private checkButtonOverlap(): void {

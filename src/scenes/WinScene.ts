@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { GAME_HEIGHT, GAME_WIDTH, LEVEL_COUNT, type Difficulty } from "../config/gameConfig";
 import { formatTime } from "../utils/formatTime";
-import { nostrService } from "../nostr/nostrService";
+import { nostrService, type LeaderboardEntry } from "../nostr/nostrService";
 import type { ScoreData } from "../nostr/scoreBlueprint";
 
 interface WinData {
@@ -87,18 +87,20 @@ export class WinScene extends Phaser.Scene {
       strokeThickness: 2
     };
 
-    this.add.text(cx, 122, `Sparkles: ${data.totalSparkles ?? 0}`, statsStyle).setOrigin(0.5);
+    const leftCx = GAME_WIDTH * 0.3;
+    const rightCx = GAME_WIDTH * 0.72;
 
-    // Times table — two columns: label right-aligned, time left-aligned
+    this.add.text(leftCx, 118, `Sparkles: ${data.totalSparkles ?? 0}`, statsStyle).setOrigin(0.5);
+
     const allTimes: [string, number][] = [
       ["Level 0", menuTimeMs],
       ...levelTimes.map((t, i): [string, number] => [`Level ${i + 1}`, t])
     ];
 
-    const tableTop = 152;
+    const tableTop = 146;
     const rowH = 18;
-    const labelX = cx - 10;
-    const valueX = cx + 10;
+    const labelX = leftCx - 10;
+    const valueX = leftCx + 10;
 
     for (let i = 0; i < allTimes.length; i++) {
       const [label, ms] = allTimes[i];
@@ -132,8 +134,8 @@ export class WinScene extends Phaser.Scene {
     const dialogHeight = 73;
     measureText.destroy();
 
-    const dialogX = (GAME_WIDTH - dialogWidth) / 2;
-    const dialogY = totalY + (btnY - totalY - dialogHeight) / 2;
+    const dialogX = leftCx - dialogWidth / 2;
+    const dialogY = totalY + 16;
     const portraitCenterX = dialogX + 32;
     const portraitCenterY = dialogY + dialogHeight / 2;
 
@@ -182,6 +184,9 @@ export class WinScene extends Phaser.Scene {
       };
       this.buildNostrButton(dialogX, dialogY + dialogHeight + 8, dialogWidth, scoreData);
     }
+
+    // Leaderboard panel (right column)
+    this.buildLeaderboard(rightCx, 110, difficulty, totalMs);
 
     // Play again button — anchored near bottom
     const again = this.add.rectangle(cx, btnY, 260, 50, 0xff8fd3);
@@ -251,6 +256,84 @@ export class WinScene extends Phaser.Scene {
         label.setColor("#ff8888");
         posting = false;
       });
+    });
+  }
+
+  private buildLeaderboard(cx: number, top: number, difficulty: Difficulty, playerMs: number): void {
+    const panelW = 280;
+    const panelX = cx - panelW / 2;
+    const headerStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: "monospace",
+      fontSize: "15px",
+      color: "#ffe0f6",
+      stroke: "#3b1a4f",
+      strokeThickness: 3
+    };
+    const rowStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: "monospace",
+      fontSize: "13px",
+      color: "#d8b8f0",
+      stroke: "#2a1040",
+      strokeThickness: 2
+    };
+
+    this.add.text(cx, top, `Best Times (${difficulty})`, headerStyle).setOrigin(0.5);
+
+    const loadingLabel = this.add.text(cx, top + 30, "Loading...", {
+      ...rowStyle, color: "#a090c0"
+    }).setOrigin(0.5);
+
+    nostrService.fetchTopScores(difficulty, 10).then((entries) => {
+      if (!this.scene.isActive()) return;
+      loadingLabel.destroy();
+
+      if (entries.length === 0) {
+        this.add.text(cx, top + 50, "No scores yet!", {
+          ...rowStyle, color: "#a090c0"
+        }).setOrigin(0.5);
+        return;
+      }
+
+      const rowH = 22;
+      const rowTop = top + 30;
+      const rankX = panelX + 8;
+      const nameX = panelX + 36;
+      const timeX = panelX + panelW - 8;
+      const myPubkey = nostrService.getPubkey();
+
+      const bg = this.add.graphics();
+      bg.fillStyle(0x2a1040, 0.5);
+      bg.fillRoundedRect(panelX, rowTop - 8, panelW, entries.length * rowH + 16, 8);
+
+      for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
+        const y = rowTop + i * rowH + 4;
+        const isMe = entry.pubkey === myPubkey;
+        const highlight = isMe ? "#ffb8e6" : rowStyle.color;
+
+        const medal = i === 0 ? "1." : i === 1 ? "2." : i === 2 ? "3." : `${i + 1}.`;
+        this.add.text(rankX, y, medal, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
+
+        const shortNpub = entry.npub.slice(0, 10) + "..." + entry.npub.slice(-4);
+        const nameLabel = isMe ? "You" : shortNpub;
+        this.add.text(nameX, y, nameLabel, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
+
+        this.add.text(timeX, y, formatTime(entry.totalMs), { ...rowStyle, color: highlight }).setOrigin(1, 0.5);
+      }
+
+      if (myPubkey) {
+        const myRank = entries.findIndex(e => e.pubkey === myPubkey);
+        if (myRank === -1) {
+          const belowY = rowTop + entries.length * rowH + 20;
+          this.add.text(cx, belowY, `Your time: ${formatTime(playerMs)}`, {
+            ...rowStyle, color: "#a090c0", fontSize: "12px"
+          }).setOrigin(0.5);
+        }
+      }
+    }).catch(() => {
+      if (!this.scene.isActive()) return;
+      loadingLabel.setText("Could not load scores");
+      loadingLabel.setColor("#ff8888");
     });
   }
 

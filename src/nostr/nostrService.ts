@@ -2,8 +2,18 @@ import { ExtensionSigner } from "applesauce-signers/signers";
 import { EventFactory } from "applesauce-core";
 import { RelayPool } from "applesauce-relay";
 import { npubEncode } from "nostr-tools/nip19";
-import { NOSTR_RELAYS } from "../config/gameConfig";
+import { firstValueFrom, toArray, timeout, catchError, of } from "rxjs";
+import { NOSTR_RELAYS, NOSTR_KIND, NOSTR_GAME_TAG, NOSTR_SCORE_VERSION, type Difficulty } from "../config/gameConfig";
 import { ScoreBlueprint, type ScoreData } from "./scoreBlueprint";
+
+export interface LeaderboardEntry {
+  pubkey: string;
+  npub: string;
+  totalMs: number;
+  sparkles: number;
+  percent100: boolean;
+  createdAt: number;
+}
 
 const STORAGE_KEY = "nostr-pubkey";
 
@@ -80,6 +90,55 @@ class NostrService {
 
     const results = await this.pool.publish(NOSTR_RELAYS, signed);
     return results.some((r) => r.ok);
+  }
+
+  async fetchTopScores(difficulty: Difficulty, limit = 5): Promise<LeaderboardEntry[]> {
+    const filter = {
+      kinds: [NOSTR_KIND],
+      "#d": [NOSTR_GAME_TAG],
+      "#difficulty": [difficulty],
+      "#version": [String(NOSTR_SCORE_VERSION)],
+    };
+
+    const events$ = this.pool.request(NOSTR_RELAYS, filter).pipe(
+      timeout(8000),
+      toArray(),
+      catchError(() => of([] as import("nostr-tools").NostrEvent[])),
+    );
+
+    const events = await firstValueFrom(events$).catch(() => []);
+
+    const entries: LeaderboardEntry[] = [];
+    for (const ev of events) {
+      try {
+        const data = JSON.parse(ev.content);
+        if (data.cheated) continue;
+        if (typeof data.totalMs !== "number" || data.totalMs <= 0) continue;
+        entries.push({
+          pubkey: ev.pubkey,
+          npub: npubEncode(ev.pubkey),
+          totalMs: data.totalMs,
+          sparkles: data.sparkles ?? 0,
+          percent100: data.percent100 ?? false,
+          createdAt: ev.created_at,
+        });
+      } catch {
+        continue;
+      }
+    }
+
+    entries.sort((a, b) => a.totalMs - b.totalMs);
+
+    const seen = new Set<string>();
+    const unique: LeaderboardEntry[] = [];
+    for (const entry of entries) {
+      if (seen.has(entry.pubkey)) continue;
+      seen.add(entry.pubkey);
+      unique.push(entry);
+      if (unique.length >= limit) break;
+    }
+
+    return unique;
   }
 
   private restoreSession(): void {
