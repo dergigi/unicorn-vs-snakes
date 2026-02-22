@@ -33,6 +33,13 @@ export const KNOCKBACK_Y = -260;
 export const SNAKE_SPEED = 70;
 export const SNAKE_SPEED_VARIATION = 25;
 
+export const BOSS_HEALTH_BY_DIFFICULTY: Record<Difficulty, number> = {
+  easy: 4,
+  normal: 6,
+  hard: 8,
+  insane: 12
+};
+
 export const TOTAL_SPARKLES = 21;
 const REQUIRED_SPARKLES_BY_LEVEL: Record<number, number> = {
   1: 12,

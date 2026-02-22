@@ -3,6 +3,7 @@ import { Player, type Cursors } from "../entities/Player";
 import { Snake } from "../entities/Snake";
 import { GAME_EVENTS } from "../config/events";
 import {
+  BOSS_HEALTH_BY_DIFFICULTY,
   DEFAULT_DIFFICULTY,
   GAME_HEIGHT,
   GAME_WIDTH,
@@ -1070,7 +1071,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     this.bossWitch = witch;
-    this.bossHealth = bossData.health ?? 6;
+    this.bossHealth = BOSS_HEALTH_BY_DIFFICULTY[this.difficulty];
     this.bossInvulnerableUntil = 0;
     this.updateBossHealthText();
     this.bossBatSpawnTimer = this.time.addEvent({
