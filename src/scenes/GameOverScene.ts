@@ -1,6 +1,5 @@
 import Phaser from "phaser";
 import { DEFAULT_DIFFICULTY, GAME_HEIGHT, GAME_WIDTH, type Difficulty } from "../config/gameConfig";
-import { formatTime } from "../utils/formatTime";
 
 export class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -11,9 +10,6 @@ export class GameOverScene extends Phaser.Scene {
     const maxLives = data?.maxLives ?? 5;
     const difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
     const levelNumber = data?.levelNumber ?? 1;
-    const levelTimes = data?.levelTimes ?? [];
-    const menuTimeMs = data?.menuTimeMs ?? 0;
-    const totalMs = menuTimeMs + levelTimes.reduce((sum, t) => sum + t, 0);
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1a0f30).setOrigin(0, 0);
     this.add.text(GAME_WIDTH / 2, 90, "Those darn snakes!", {
@@ -27,29 +23,7 @@ export class GameOverScene extends Phaser.Scene {
       color: "#d8f8ff"
     }).setOrigin(0.5);
 
-    let timesY = 205;
-    this.add.text(GAME_WIDTH / 2, timesY, `Menu: ${formatTime(menuTimeMs)}`, {
-      fontFamily: "monospace",
-      fontSize: "18px",
-      color: "#c8c0e8"
-    }).setOrigin(0.5);
-    timesY += 26;
-    for (let i = 0; i < levelTimes.length; i++) {
-      this.add.text(GAME_WIDTH / 2, timesY, `Level ${i + 1}: ${formatTime(levelTimes[i])}`, {
-        fontFamily: "monospace",
-        fontSize: "18px",
-        color: "#c8c0e8"
-      }).setOrigin(0.5);
-      timesY += 26;
-    }
-
-    this.add.text(GAME_WIDTH / 2, timesY + 4, `Total: ${formatTime(totalMs)}`, {
-      fontFamily: "monospace",
-      fontSize: "22px",
-      color: "#e0daf8"
-    }).setOrigin(0.5);
-
-    const btnY = Math.max(timesY + 60, 370);
+    const btnY = 300;
     const retry = this.add.rectangle(GAME_WIDTH / 2, btnY, 280, 72, 0xff8fe3);
     retry.setStrokeStyle(4, 0xffffff);
     retry.setInteractive({ useHandCursor: true });
