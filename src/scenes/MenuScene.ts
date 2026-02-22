@@ -101,9 +101,16 @@ export class MenuScene extends Phaser.Scene {
     this.spawnPatrolSnakes();
 
     this.add
-      .text(GAME_WIDTH / 2, GRASS_TOP + GRASS_HEIGHT + 34, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
-        fontSize: "12px",
-        color: "#d0c7ff",
+      .text(GAME_WIDTH / 2, GRASS_TOP + GRASS_HEIGHT + 26, "Prompted into existence by my daughter.", {
+        fontSize: "13px",
+        color: "#e8d8ff",
+        fontFamily: "monospace"
+      })
+      .setOrigin(0.5);
+    this.add
+      .text(GAME_WIDTH / 2, GRASS_TOP + GRASS_HEIGHT + 46, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
+        fontSize: "11px",
+        color: "#a89cc8",
         fontFamily: "monospace"
       })
       .setOrigin(0.5);
