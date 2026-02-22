@@ -7,5 +7,6 @@ export const GAME_EVENTS = {
   checkpointReached: "checkpointReached",
   playerHit: "playerHit",
   levelWon: "levelWon",
-  gameOver: "gameOver"
+  gameOver: "gameOver",
+  pauseRequested: "pauseRequested"
 } as const;

@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { GAME_EVENTS } from "../config/events";
-import { GAME_WIDTH, getRequiredSparklesToFinish } from "../config/gameConfig";
+import { GAME_HEIGHT, GAME_WIDTH, getRequiredSparklesToFinish } from "../config/gameConfig";
 import { formatTime } from "../utils/formatTime";
 import { beep } from "../utils/sfx";
 
@@ -58,6 +58,21 @@ export class UIScene extends Phaser.Scene {
       stroke: "#24133d",
       strokeThickness: 4
     }).setOrigin(1, 0).setScrollFactor(0);
+
+    if (this.sys.game.device.input.touch) {
+      const pauseBtn = this.add.text(GAME_WIDTH - 16, GAME_HEIGHT - 16, "⏸", {
+        fontFamily: "monospace",
+        fontSize: "28px",
+        color: "#a89cc8",
+        stroke: "#1d1336",
+        strokeThickness: 3,
+      }).setOrigin(1, 1).setScrollFactor(0).setAlpha(0.7);
+
+      pauseBtn.setInteractive({ useHandCursor: true });
+      pauseBtn.on("pointerdown", () => {
+        this.game.events.emit(GAME_EVENTS.pauseRequested);
+      });
+    }
 
     this.game.events.on(GAME_EVENTS.livesChanged, this.onLivesChanged, this);
     this.game.events.on(GAME_EVENTS.sparkleChanged, this.onSparkleChanged, this);
