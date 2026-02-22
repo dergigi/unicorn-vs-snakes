@@ -12,6 +12,7 @@ export interface TouchInput {
 
 const ZONE_LEFT_MAX = GAME_WIDTH / 3;
 const ZONE_RIGHT_MIN = (GAME_WIDTH * 2) / 3;
+const SWIPE_UP_THRESHOLD = 30;
 
 export class TouchControls {
   public readonly state: TouchInput = {
@@ -26,6 +27,8 @@ export class TouchControls {
   private scene: Phaser.Scene;
   private enabled = false;
   private primaryPointerId: number | null = null;
+  private primaryStartY = 0;
+  private jumping = false;
 
   private onPointerDown: (pointer: Phaser.Input.Pointer) => void;
   private onPointerUp: (pointer: Phaser.Input.Pointer) => void;
@@ -47,9 +50,9 @@ export class TouchControls {
     this.onPointerDown = (pointer: Phaser.Input.Pointer) => {
       if (this.primaryPointerId === null) {
         this.primaryPointerId = pointer.id;
+        this.primaryStartY = pointer.y;
+        this.jumping = false;
         this.applyZone(pointer.x);
-        this.state.jumpDown = true;
-        this.state.jumpJustPressed = true;
       } else if (pointer.id !== this.primaryPointerId) {
         this.state.fireJustPressed = true;
       }
@@ -60,14 +63,29 @@ export class TouchControls {
         this.primaryPointerId = null;
         this.state.left = false;
         this.state.right = false;
-        this.state.jumpDown = false;
-        this.state.jumpJustReleased = true;
+        if (this.jumping) {
+          this.jumping = false;
+          this.state.jumpDown = false;
+          this.state.jumpJustReleased = true;
+        }
       }
     };
 
     this.onPointerMove = (pointer: Phaser.Input.Pointer) => {
-      if (pointer.id === this.primaryPointerId && pointer.isDown) {
-        this.applyZone(pointer.x);
+      if (pointer.id !== this.primaryPointerId || !pointer.isDown) {
+        return;
+      }
+      this.applyZone(pointer.x);
+
+      const dy = this.primaryStartY - pointer.y;
+      if (!this.jumping && dy > SWIPE_UP_THRESHOLD) {
+        this.jumping = true;
+        this.state.jumpDown = true;
+        this.state.jumpJustPressed = true;
+      } else if (this.jumping && dy <= SWIPE_UP_THRESHOLD) {
+        this.jumping = false;
+        this.state.jumpDown = false;
+        this.state.jumpJustReleased = true;
       }
     };
 
