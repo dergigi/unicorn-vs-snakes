@@ -125,8 +125,11 @@ class NostrService {
       });
     });
 
+    const seen = new Set<string>();
     const entries: LeaderboardEntry[] = [];
     for (const ev of events) {
+      if (seen.has(ev.id)) continue;
+      seen.add(ev.id);
       try {
         const evDifficulty = ev.tags.find(t => t[0] === "difficulty")?.[1];
         if (evDifficulty !== difficulty) continue;

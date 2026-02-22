@@ -134,8 +134,10 @@ export class WinScene extends Phaser.Scene {
     const dialogHeight = 73;
     measureText.destroy();
 
-    const dialogX = leftCx - dialogWidth / 2;
-    const dialogY = totalY + 16;
+    const contentBottom = Math.max(totalY + 18, 280);
+    const nostrBtnSpace = nostrService.isLoggedIn() ? 36 : 0;
+    const dialogY = contentBottom + (btnY - 25 - contentBottom - dialogHeight - nostrBtnSpace) / 2;
+    const dialogX = cx - dialogWidth / 2;
     const portraitCenterX = dialogX + 32;
     const portraitCenterY = dialogY + dialogHeight / 2;
 
