@@ -306,6 +306,8 @@ export class WinScene extends Phaser.Scene {
       bg.fillStyle(0x2a1040, 0.5);
       bg.fillRoundedRect(panelX, rowTop - 8, panelW, entries.length * rowH + 16, 8);
 
+      const nameTexts: { text: Phaser.GameObjects.Text; pubkey: string; isMe: boolean }[] = [];
+
       for (let i = 0; i < entries.length; i++) {
         const entry = entries[i];
         const y = rowTop + i * rowH + 4;
@@ -315,9 +317,9 @@ export class WinScene extends Phaser.Scene {
         const medal = i === 0 ? "1." : i === 1 ? "2." : i === 2 ? "3." : `${i + 1}.`;
         this.add.text(rankX, y, medal, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
 
-        const shortNpub = entry.npub.slice(0, 10) + "..." + entry.npub.slice(-4);
-        const nameLabel = isMe ? "You" : shortNpub;
-        this.add.text(nameX, y, nameLabel, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
+        const nameLabel = isMe ? "You" : nostrService.getDisplayName(entry.pubkey);
+        const nameText = this.add.text(nameX, y, nameLabel, { ...rowStyle, color: highlight }).setOrigin(0, 0.5);
+        if (!isMe) nameTexts.push({ text: nameText, pubkey: entry.pubkey, isMe });
 
         this.add.text(timeX, y, formatTime(entry.totalMs), { ...rowStyle, color: highlight }).setOrigin(1, 0.5);
       }
@@ -331,6 +333,14 @@ export class WinScene extends Phaser.Scene {
           }).setOrigin(0.5);
         }
       }
+
+      const pubkeys = entries.map(e => e.pubkey);
+      nostrService.fetchProfiles(pubkeys).then(() => {
+        if (!this.scene.isActive()) return;
+        for (const { text, pubkey } of nameTexts) {
+          text.setText(nostrService.getDisplayName(pubkey));
+        }
+      }).catch(() => { /* keep npub fallbacks */ });
     }).catch(() => {
       if (!this.scene.isActive()) return;
       loadingLabel.setText("Could not load scores");

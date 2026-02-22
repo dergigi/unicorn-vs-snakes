@@ -233,7 +233,8 @@ export class MenuScene extends Phaser.Scene {
 
     const updateLabel = (): void => {
       if (nostrService.isLoggedIn()) {
-        nostrBtn.setText(nostrService.getTruncatedNpub() ?? "Connected");
+        const pk = nostrService.getPubkey();
+        nostrBtn.setText(pk ? nostrService.getDisplayName(pk) : "Connected");
         nostrBtn.setColor("#c8b8ff");
       } else {
         nostrBtn.setText("Login with Nostr");
@@ -241,7 +242,18 @@ export class MenuScene extends Phaser.Scene {
       }
     };
 
-    updateLabel();
+    const resolveAndUpdate = (): void => {
+      updateLabel();
+      const pk = nostrService.getPubkey();
+      if (pk) {
+        nostrService.fetchProfiles([pk]).then(() => {
+          if (!this.scene.isActive()) return;
+          updateLabel();
+        }).catch(() => { /* keep fallback */ });
+      }
+    };
+
+    resolveAndUpdate();
     nostrBtn.setInteractive({ useHandCursor: true });
 
     nostrBtn.on("pointerover", () => nostrBtn.setColor("#ffffff"));
@@ -258,7 +270,7 @@ export class MenuScene extends Phaser.Scene {
       nostrBtn.setText("Connecting...");
       nostrBtn.setColor("#8a7fb0");
       nostrService.login().then(() => {
-        updateLabel();
+        resolveAndUpdate();
       }).catch(() => {
         nostrBtn.setText("Login failed");
         nostrBtn.setColor("#ff8888");

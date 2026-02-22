@@ -16,6 +16,12 @@ export interface LeaderboardEntry {
   createdAt: number;
 }
 
+export interface NostrProfile {
+  name?: string;
+  display_name?: string;
+  picture?: string;
+}
+
 const STORAGE_KEY = "nostr-pubkey";
 
 class NostrService {
@@ -25,6 +31,7 @@ class NostrService {
   private factory: EventFactory | null = null;
   private pool: RelayPool;
   private pubkey: string | null = null;
+  private profileCache = new Map<string, NostrProfile>();
 
   private constructor() {
     this.pool = new RelayPool();
@@ -152,6 +159,65 @@ class NostrService {
     }
 
     return unique;
+  }
+
+  async fetchProfiles(pubkeys: string[]): Promise<Map<string, NostrProfile>> {
+    const uncached = pubkeys.filter(pk => !this.profileCache.has(pk));
+
+    if (uncached.length > 0) {
+      const filter = { kinds: [0 as number], authors: uncached };
+
+      const events = await new Promise<NostrEvent[]>((resolve) => {
+        const collected: NostrEvent[] = [];
+        let sub: Subscription | undefined;
+        let resolved = false;
+        const done = () => {
+          if (resolved) return;
+          resolved = true;
+          clearTimeout(timer);
+          sub?.unsubscribe();
+          resolve(collected);
+        };
+        const timer = setTimeout(done, 6000);
+        sub = this.pool.request(NOSTR_RELAYS, filter).subscribe({
+          next: (ev) => collected.push(ev),
+          complete: done,
+          error: () => done(),
+        });
+      });
+
+      const latest = new Map<string, NostrEvent>();
+      for (const ev of events) {
+        const prev = latest.get(ev.pubkey);
+        if (!prev || ev.created_at > prev.created_at) {
+          latest.set(ev.pubkey, ev);
+        }
+      }
+
+      for (const [pk, ev] of latest) {
+        try {
+          const profile = JSON.parse(ev.content) as NostrProfile;
+          this.profileCache.set(pk, profile);
+        } catch {
+          /* skip malformed profiles */
+        }
+      }
+    }
+
+    const result = new Map<string, NostrProfile>();
+    for (const pk of pubkeys) {
+      const cached = this.profileCache.get(pk);
+      if (cached) result.set(pk, cached);
+    }
+    return result;
+  }
+
+  getDisplayName(pubkey: string): string {
+    const profile = this.profileCache.get(pubkey);
+    const name = profile?.display_name || profile?.name;
+    if (name) return name;
+    const npub = npubEncode(pubkey);
+    return npub.slice(0, 10) + "..." + npub.slice(-4);
   }
 
   private restoreSession(): void {
