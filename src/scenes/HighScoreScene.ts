@@ -60,7 +60,7 @@ export class HighScoreScene extends Phaser.Scene {
 
     const cx = GAME_WIDTH / 2;
 
-    this.add.text(cx, 38, "HIGH SCORES", {
+    this.add.text(cx, 38, "FASTEST UNICORNS", {
       fontFamily: "\"Press Start 2P\", \"Courier New\", monospace",
       fontSize: "28px",
       color: "#ffe0f6",
