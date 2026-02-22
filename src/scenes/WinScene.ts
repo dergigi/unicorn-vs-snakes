@@ -15,7 +15,7 @@ export class WinScene extends Phaser.Scene {
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x152744).setOrigin(0, 0);
     this.add.rectangle(0, GAME_HEIGHT - 180, GAME_WIDTH, 180, 0x1f4d78).setOrigin(0, 0);
 
-    this.add.text(GAME_WIDTH / 2, 80, "You Win!", {
+    this.add.text(GAME_WIDTH / 2, 80, "Yaaaay!", {
       fontFamily: "monospace",
       fontSize: "58px",
       color: "#fff1a8"
