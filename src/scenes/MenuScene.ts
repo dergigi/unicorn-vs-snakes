@@ -411,15 +411,18 @@ export class MenuScene extends Phaser.Scene {
     const onThree = (): void => this.handleLevelSkipKey(3);
     const onFour = (): void => this.handleLevelSkipKey(4);
     const onFive = (): void => this.handleLevelSkipKey(5);
+    const onSix = (): void => this.handleLevelSkipKey(6);
     keyboard.on("keydown-TWO", onTwo, this);
     keyboard.on("keydown-THREE", onThree, this);
     keyboard.on("keydown-FOUR", onFour, this);
     keyboard.on("keydown-FIVE", onFive, this);
+    keyboard.on("keydown-SIX", onSix, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       keyboard.off("keydown-TWO", onTwo, this);
       keyboard.off("keydown-THREE", onThree, this);
       keyboard.off("keydown-FOUR", onFour, this);
       keyboard.off("keydown-FIVE", onFive, this);
+      keyboard.off("keydown-SIX", onSix, this);
       this.levelSkipResetTimer?.remove(false);
       this.levelSkipResetTimer = undefined;
     });
@@ -456,6 +459,16 @@ export class MenuScene extends Phaser.Scene {
         totalPowerups: 3,
         difficulty: this.selectedDifficulty,
         levelTimes: [12345, 23456, 34567, 45678],
+        menuTimeMs: 6789
+      });
+      return;
+    }
+    if (targetLevel === 6) {
+      this.scene.start("GameOverScene", {
+        maxLives: 5,
+        difficulty: this.selectedDifficulty,
+        levelNumber: 3,
+        levelTimes: [12345, 23456],
         menuTimeMs: 6789
       });
       return;
