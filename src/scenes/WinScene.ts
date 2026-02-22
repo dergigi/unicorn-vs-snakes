@@ -141,10 +141,10 @@ export class WinScene extends Phaser.Scene {
     }).setOrigin(0, 0.5);
 
     const copyIcon = this.add.image(
-      dialogX + dialogWidth - 14,
-      dialogY + dialogHeight - 14,
+      dialogX + dialogWidth - 18,
+      dialogY + dialogHeight - 18,
       "copy-icon"
-    ).setDisplaySize(14, 14).setOrigin(1, 1).setAlpha(0.7);
+    ).setDisplaySize(28, 28).setOrigin(1, 1).setAlpha(0.7);
     copyIcon.setInteractive({ useHandCursor: true });
     copyIcon.on("pointerdown", () => {
       navigator.clipboard.writeText(shareText).then(() => {
