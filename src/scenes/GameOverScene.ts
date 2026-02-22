@@ -32,5 +32,47 @@ export class GameOverScene extends Phaser.Scene {
     retry.on("pointerdown", () => {
       this.scene.start("MenuScene");
     });
+
+    this.spawnSnakes();
+  }
+
+  private spawnSnakes(): void {
+    const snakeY = GAME_HEIGHT - 30;
+    const count = 14;
+    for (let i = 0; i < count; i++) {
+      const texture = Phaser.Math.Between(0, 1) === 0 ? "snake-1" : "snake-2";
+      const flipX = Phaser.Math.Between(0, 1) === 1;
+      const scale = Phaser.Math.FloatBetween(1.8, 2.6);
+      const startX = Phaser.Math.Between(-40, GAME_WIDTH + 40);
+      const y = snakeY + Phaser.Math.Between(-12, 12);
+
+      const snake = this.add.image(startX, y, texture)
+        .setScale(scale)
+        .setFlipX(flipX)
+        .setAlpha(0.85);
+
+      const speed = Phaser.Math.FloatBetween(30, 80);
+      const dir = flipX ? -1 : 1;
+
+      this.tweens.add({
+        targets: snake,
+        x: startX + dir * (GAME_WIDTH + 100),
+        duration: ((GAME_WIDTH + 100) / speed) * 1000,
+        repeat: -1,
+        onRepeat: () => {
+          snake.setX(flipX ? GAME_WIDTH + 40 : -40);
+          snake.setY(snakeY + Phaser.Math.Between(-12, 12));
+        }
+      });
+
+      this.tweens.add({
+        targets: snake,
+        y: y + Phaser.Math.Between(-4, 4),
+        duration: Phaser.Math.Between(300, 600),
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut"
+      });
+    }
   }
 }
