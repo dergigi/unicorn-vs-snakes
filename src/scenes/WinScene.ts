@@ -19,119 +19,126 @@ export class WinScene extends Phaser.Scene {
     const menuTimeMs = data.menuTimeMs ?? 0;
     const totalMs = menuTimeMs + levelTimes.reduce((sum, t) => sum + t, 0);
     const difficulty = data.difficulty ?? "normal";
+    const cx = GAME_WIDTH / 2;
 
-    // Dreamy pink/purple gradient background
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x3b1a4f).setOrigin(0, 0);
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT * 0.5, 0x5c2d6e, 0.6).setOrigin(0, 0);
     this.add.rectangle(0, GAME_HEIGHT * 0.5, GAME_WIDTH, GAME_HEIGHT * 0.5, 0x2a1040, 0.5).setOrigin(0, 0);
 
-    // Soft pink glow behind title
-    this.add.ellipse(GAME_WIDTH / 2, 56, 500, 120, 0xff8fd3, 0.12);
+    this.add.ellipse(cx, 48, 500, 120, 0xff8fd3, 0.12);
 
-    // Rainbow arch across the top
     const rainbowColors = [0xff4b5e, 0xff8a3d, 0xffd95e, 0x7de86f, 0x66d8ff, 0x6f8dff, 0xd98cff];
     for (let i = 0; i < rainbowColors.length; i++) {
-      this.add.ellipse(GAME_WIDTH / 2, -60 + i * 6, 700 - i * 30, 180 - i * 8, rainbowColors[i], 0.18);
+      this.add.ellipse(cx, -60 + i * 6, 700 - i * 30, 180 - i * 8, rainbowColors[i], 0.18);
     }
 
-    // Floating sparkle particles
     this.spawnSparkles();
 
-    this.add.text(GAME_WIDTH / 2, 46, "Yaaaay!", {
+    this.add.text(cx, 42, "Yaaaay!", {
       fontFamily: "monospace",
       fontSize: "52px",
       color: "#ffe0f6",
       stroke: "#7b2f72",
       strokeThickness: 6
     }).setOrigin(0.5);
-    this.add.text(GAME_WIDTH / 2, 92, "Rainbow Kingdom is safe!", {
+
+    this.add.text(cx, 86, "Rainbow Kingdom is safe!", {
       fontFamily: "monospace",
-      fontSize: "17px",
+      fontSize: "16px",
       color: "#ffb8e6",
       stroke: "#3b1a4f",
       strokeThickness: 3
     }).setOrigin(0.5);
 
-    this.add.text(
-      GAME_WIDTH / 2, 124,
-      `Total sparkles collected: ${data.totalSparkles ?? 0}`,
-      {
-        fontFamily: "monospace",
-        fontSize: "20px",
-        color: "#ffd1f7",
-        stroke: "#3b1a4f",
-        strokeThickness: 3
-      }
-    ).setOrigin(0.5);
+    // Divider
+    this.add.rectangle(cx, 108, 300, 1, 0xffb8e6, 0.25);
 
-    let timesY = 158;
-    this.add.text(GAME_WIDTH / 2, timesY, `Level 0: ${formatTime(menuTimeMs)}`, {
+    this.add.text(cx, 122, `Total sparkles collected: ${data.totalSparkles ?? 0}`, {
       fontFamily: "monospace",
-      fontSize: "15px",
-      color: "#d8b8f0",
-      stroke: "#2a1040",
-      strokeThickness: 2
-    }).setOrigin(0.5);
-    timesY += 20;
-    for (let i = 0; i < levelTimes.length; i++) {
-      this.add.text(GAME_WIDTH / 2, timesY, `Level ${i + 1}: ${formatTime(levelTimes[i])}`, {
-        fontFamily: "monospace",
-        fontSize: "15px",
-        color: "#d8b8f0",
-        stroke: "#2a1040",
-        strokeThickness: 2
-      }).setOrigin(0.5);
-      timesY += 20;
-    }
-
-    this.add.text(GAME_WIDTH / 2, timesY + 4, `Total: ${formatTime(totalMs)}`, {
-      fontFamily: "monospace",
-      fontSize: "20px",
-      color: "#f0d8ff",
-      stroke: "#2a1040",
+      fontSize: "16px",
+      color: "#ffd1f7",
+      stroke: "#3b1a4f",
       strokeThickness: 3
     }).setOrigin(0.5);
 
+    // Times table — use two columns: label right-aligned, time left-aligned
+    const allTimes: [string, number][] = [
+      ["Level 0", menuTimeMs],
+      ...levelTimes.map((t, i): [string, number] => [`Level ${i + 1}`, t])
+    ];
+
+    const tableTop = 152;
+    const rowH = 18;
+    const labelX = cx - 10;
+    const valueX = cx + 10;
+    const timeStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: "monospace",
+      fontSize: "14px",
+      color: "#d8b8f0",
+      stroke: "#2a1040",
+      strokeThickness: 2
+    };
+
+    for (let i = 0; i < allTimes.length; i++) {
+      const [label, ms] = allTimes[i];
+      const y = tableTop + i * rowH;
+      this.add.text(labelX, y, label, timeStyle).setOrigin(1, 0.5);
+      this.add.text(valueX, y, formatTime(ms), timeStyle).setOrigin(0, 0.5);
+    }
+
+    const totalY = tableTop + allTimes.length * rowH + 8;
+    this.add.rectangle(cx, totalY - 6, 220, 1, 0xd8b8f0, 0.3);
+    this.add.text(labelX, totalY, "Total", {
+      fontFamily: "monospace",
+      fontSize: "16px",
+      color: "#f0d8ff",
+      stroke: "#2a1040",
+      strokeThickness: 3
+    }).setOrigin(1, 0.5);
+    this.add.text(valueX, totalY, formatTime(totalMs), {
+      fontFamily: "monospace",
+      fontSize: "16px",
+      color: "#f0d8ff",
+      stroke: "#2a1040",
+      strokeThickness: 3
+    }).setOrigin(0, 0.5);
+
+    // Share dialog
     const shareText =
       `I just beat Unicorn vs Snakes on ${difficulty} difficulty in ${formatTime(totalMs)}!`;
 
-    const dialogWidth = GAME_WIDTH - 100;
-    const dialogHeight = 72;
-    const dialogX = 50;
-    const dialogY = timesY + 36;
-    const portraitSize = 42;
-    const portraitCenterX = dialogX + 30;
+    const dialogWidth = GAME_WIDTH - 120;
+    const dialogHeight = 66;
+    const dialogX = 60;
+    const dialogY = totalY + 24;
+    const portraitSize = 38;
+    const portraitCenterX = dialogX + 28;
     const portraitCenterY = dialogY + dialogHeight / 2;
 
     const dialog = this.add.graphics();
     dialog.fillStyle(0x4a1850, 0.9);
-    dialog.lineStyle(3, 0xffb8e6, 0.8);
-    dialog.fillRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 14);
-    dialog.strokeRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 14);
+    dialog.lineStyle(2, 0xffb8e6, 0.7);
+    dialog.fillRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 12);
+    dialog.strokeRoundedRect(dialogX, dialogY, dialogWidth, dialogHeight, 12);
 
     this.add.sprite(portraitCenterX, portraitCenterY, "unicorn", 0)
       .setDisplaySize(portraitSize, portraitSize);
 
-    this.add.text(
-      dialogX + 62,
-      portraitCenterY,
-      shareText,
-      {
-        fontFamily: "monospace",
-        fontSize: "13px",
-        color: "#ffe6f8",
-        align: "left",
-        wordWrap: { width: dialogWidth - 100 },
-        stroke: "#2a0e30",
-        strokeThickness: 3
-      }
-    ).setOrigin(0, 0.5);
+    this.add.text(dialogX + 56, portraitCenterY, shareText, {
+      fontFamily: "monospace",
+      fontSize: "12px",
+      color: "#ffe6f8",
+      align: "left",
+      wordWrap: { width: dialogWidth - 96 },
+      stroke: "#2a0e30",
+      strokeThickness: 3
+    }).setOrigin(0, 0.5);
 
     const copyBtn = this.add.text(
-      dialogX + dialogWidth - 14,
-      dialogY + dialogHeight - 14,
+      dialogX + dialogWidth - 12,
+      dialogY + dialogHeight - 12,
       "📋",
-      { fontSize: "16px" }
+      { fontSize: "14px" }
     ).setOrigin(1, 1);
     copyBtn.setInteractive({ useHandCursor: true });
     copyBtn.on("pointerover", () => copyBtn.setScale(1.25));
@@ -143,13 +150,14 @@ export class WinScene extends Phaser.Scene {
       });
     });
 
-    const btnY = Math.max(dialogY + dialogHeight + 50, GAME_HEIGHT - 60);
-    const again = this.add.rectangle(GAME_WIDTH / 2, btnY, 280, 56, 0xff8fd3);
+    // Play again button — anchored near bottom
+    const btnY = GAME_HEIGHT - 52;
+    const again = this.add.rectangle(cx, btnY, 260, 50, 0xff8fd3);
     again.setStrokeStyle(3, 0xffffff);
     again.setInteractive({ useHandCursor: true });
-    this.add.text(GAME_WIDTH / 2, btnY, "PLAY AGAIN", {
+    this.add.text(cx, btnY, "PLAY AGAIN", {
       fontFamily: "monospace",
-      fontSize: "26px",
+      fontSize: "24px",
       color: "#3b0a2e",
       stroke: "#ffcce8",
       strokeThickness: 2
