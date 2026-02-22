@@ -1824,6 +1824,7 @@ export class GameScene extends Phaser.Scene {
 
       this.scene.start("WinScene", {
         totalSparkles: runningSparkles,
+        difficulty: this.difficulty,
         levelTimes: [...this.levelTimes],
         menuTimeMs: this.menuTimeMs
       });
