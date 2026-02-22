@@ -21,6 +21,7 @@ import { CollectibleSystem } from "../systems/CollectibleSystem";
 import type { LevelData } from "../types/LevelData";
 import { spawnRainbowTrail } from "../utils/rainbowTrail";
 import { beep } from "../utils/sfx";
+import { TouchControls } from "../input/TouchControls";
 
 
 type CritterMover = {
@@ -64,6 +65,7 @@ export class GameScene extends Phaser.Scene {
   private hasMushroomPower = false;
   private fireballKey?: Phaser.Input.Keyboard.Key;
   private fireballs?: Phaser.Physics.Arcade.Group;
+  private touchControls?: TouchControls;
   private nextFireballAt = 0;
   private skipRepositionAfterDamage = false;
   private applePickups?: Phaser.Physics.Arcade.StaticGroup;
@@ -153,6 +155,7 @@ export class GameScene extends Phaser.Scene {
     this.mushroomPickup = undefined;
     this.hasMushroomPower = false;
     this.fireballs = undefined;
+    this.touchControls = undefined;
     this.nextFireballAt = 0;
     this.skipRepositionAfterDamage = false;
     this.applePickups = undefined;
@@ -236,6 +239,8 @@ export class GameScene extends Phaser.Scene {
       this.levelData.spawn.y,
       this.cursors
     );
+    this.touchControls = new TouchControls(this);
+    this.player.setTouchInput(this.touchControls.state);
     this.player.setRainbowPowerup(data?.hasRainbow ?? false);
     this.physics.add.collider(this.player, this.platforms);
     this.fireballs = this.physics.add.group({
@@ -341,6 +346,7 @@ export class GameScene extends Phaser.Scene {
       this.levelSkipResetTimer = undefined;
       this.levelSkipPressCount = 0;
       this.levelSkipTargetLevel = undefined;
+      this.touchControls?.destroy();
     });
   }
 
@@ -458,6 +464,7 @@ export class GameScene extends Phaser.Scene {
         this.player as unknown as Phaser.Types.Physics.Arcade.GameObjectWithBody
       );
     }
+    this.touchControls?.resetFrameState();
   }
 
   private drawBackground(): void {
@@ -1171,10 +1178,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   private tryShootFireball(time: number): void {
-    if (!this.hasMushroomPower || !this.fireballKey || !this.fireballs) {
+    if (!this.hasMushroomPower || !this.fireballs) {
       return;
     }
-    if (time < this.nextFireballAt || !Phaser.Input.Keyboard.JustDown(this.fireballKey)) {
+    const keyFired = this.fireballKey && Phaser.Input.Keyboard.JustDown(this.fireballKey);
+    const touchFired = this.touchControls?.state.fireJustPressed;
+    if (time < this.nextFireballAt || (!keyFired && !touchFired)) {
       return;
     }
     this.nextFireballAt = time + 220;

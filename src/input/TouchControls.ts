@@ -1,0 +1,111 @@
+import Phaser from "phaser";
+import { GAME_WIDTH } from "../config/gameConfig";
+
+export interface TouchInput {
+  left: boolean;
+  right: boolean;
+  jumpDown: boolean;
+  jumpJustPressed: boolean;
+  jumpJustReleased: boolean;
+  fireJustPressed: boolean;
+}
+
+const ZONE_LEFT_MAX = GAME_WIDTH / 3;
+const ZONE_RIGHT_MIN = (GAME_WIDTH * 2) / 3;
+
+export class TouchControls {
+  public readonly state: TouchInput = {
+    left: false,
+    right: false,
+    jumpDown: false,
+    jumpJustPressed: false,
+    jumpJustReleased: false,
+    fireJustPressed: false,
+  };
+
+  private scene: Phaser.Scene;
+  private enabled = false;
+  private primaryPointerId: number | null = null;
+
+  private onPointerDown: (pointer: Phaser.Input.Pointer) => void;
+  private onPointerUp: (pointer: Phaser.Input.Pointer) => void;
+  private onPointerMove: (pointer: Phaser.Input.Pointer) => void;
+
+  constructor(scene: Phaser.Scene) {
+    this.scene = scene;
+
+    if (!scene.sys.game.device.input.touch) {
+      this.onPointerDown = () => {};
+      this.onPointerUp = () => {};
+      this.onPointerMove = () => {};
+      return;
+    }
+
+    this.enabled = true;
+    scene.input.addPointer(1);
+
+    this.onPointerDown = (pointer: Phaser.Input.Pointer) => {
+      if (this.primaryPointerId === null) {
+        this.primaryPointerId = pointer.id;
+        this.applyZone(pointer.x);
+        this.state.jumpDown = true;
+        this.state.jumpJustPressed = true;
+      } else if (pointer.id !== this.primaryPointerId) {
+        this.state.fireJustPressed = true;
+      }
+    };
+
+    this.onPointerUp = (pointer: Phaser.Input.Pointer) => {
+      if (pointer.id === this.primaryPointerId) {
+        this.primaryPointerId = null;
+        this.state.left = false;
+        this.state.right = false;
+        this.state.jumpDown = false;
+        this.state.jumpJustReleased = true;
+      }
+    };
+
+    this.onPointerMove = (pointer: Phaser.Input.Pointer) => {
+      if (pointer.id === this.primaryPointerId && pointer.isDown) {
+        this.applyZone(pointer.x);
+      }
+    };
+
+    scene.input.on("pointerdown", this.onPointerDown);
+    scene.input.on("pointerup", this.onPointerUp);
+    scene.input.on("pointermove", this.onPointerMove);
+  }
+
+  private applyZone(x: number): void {
+    const scale = this.scene.scale;
+    const gameX = (x - scale.canvasBounds.left) / scale.displayScale.x;
+
+    if (gameX < ZONE_LEFT_MAX) {
+      this.state.left = true;
+      this.state.right = false;
+    } else if (gameX > ZONE_RIGHT_MIN) {
+      this.state.left = false;
+      this.state.right = true;
+    } else {
+      this.state.left = false;
+      this.state.right = false;
+    }
+  }
+
+  public resetFrameState(): void {
+    this.state.jumpJustPressed = false;
+    this.state.jumpJustReleased = false;
+    this.state.fireJustPressed = false;
+  }
+
+  public isEnabled(): boolean {
+    return this.enabled;
+  }
+
+  public destroy(): void {
+    if (!this.enabled) return;
+    this.scene.input.off("pointerdown", this.onPointerDown);
+    this.scene.input.off("pointerup", this.onPointerUp);
+    this.scene.input.off("pointermove", this.onPointerMove);
+  }
+}

@@ -8,6 +8,7 @@ import {
 } from "../config/gameConfig";
 import { spawnRainbowTrail } from "../utils/rainbowTrail";
 import { type PatrolSnake, spawnPatrolSnakes, updatePatrolSnakes } from "../utils/patrolSnakes";
+import { TouchControls } from "../input/TouchControls";
 
 const GRASS_TOP = GAME_HEIGHT - 130;
 const GRASS_HEIGHT = 52;
@@ -38,6 +39,7 @@ export class MenuScene extends Phaser.Scene {
   private levelSkipTargetLevel?: number;
   private levelSkipResetTimer?: Phaser.Time.TimerEvent;
   private menuCreatedAt = 0;
+  private touchControls?: TouchControls;
 
   constructor() {
     super("MenuScene");
@@ -130,6 +132,7 @@ export class MenuScene extends Phaser.Scene {
     this.wasdD = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     this.jumpKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.wasdW = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+    this.touchControls = new TouchControls(this);
     this.setupLevelSkipCheat();
   }
 
@@ -140,8 +143,8 @@ export class MenuScene extends Phaser.Scene {
       return;
     }
 
-    const left = this.cursors?.left?.isDown || this.wasdA?.isDown;
-    const right = this.cursors?.right?.isDown || this.wasdD?.isDown;
+    const left = this.cursors?.left?.isDown || this.wasdA?.isDown || this.touchControls?.state.left;
+    const right = this.cursors?.right?.isDown || this.wasdD?.isDown || this.touchControls?.state.right;
     let moving = false;
 
     if (left && !right) {
@@ -156,11 +159,12 @@ export class MenuScene extends Phaser.Scene {
 
     this.unicorn.x = Phaser.Math.Clamp(this.unicorn.x, 40, GAME_WIDTH - 40);
 
-    const jumpHeld = this.jumpKey?.isDown || this.cursors?.up.isDown || this.wasdW?.isDown;
+    const jumpHeld = this.jumpKey?.isDown || this.cursors?.up.isDown || this.wasdW?.isDown || this.touchControls?.state.jumpDown;
     const jumpJustPressed =
       Phaser.Input.Keyboard.JustDown(this.jumpKey!) ||
       Phaser.Input.Keyboard.JustDown(this.cursors!.up) ||
-      (this.wasdW ? Phaser.Input.Keyboard.JustDown(this.wasdW) : false);
+      (this.wasdW ? Phaser.Input.Keyboard.JustDown(this.wasdW) : false) ||
+      this.touchControls?.state.jumpJustPressed;
     if (jumpJustPressed && this.unicornOnGround) {
       this.unicornVY = -5.5;
       this.unicornOnGround = false;
@@ -202,6 +206,7 @@ export class MenuScene extends Phaser.Scene {
     if (Math.abs(this.unicorn.x - GATE_X) < GATE_OVERLAP_DIST) {
       this.startGame();
     }
+    this.touchControls?.resetFrameState();
   }
 
   private buildDifficultyButtons(): void {
@@ -388,6 +393,7 @@ export class MenuScene extends Phaser.Scene {
       keyboard.off("keydown-SIX", onSix, this);
       this.levelSkipResetTimer?.remove(false);
       this.levelSkipResetTimer = undefined;
+      this.touchControls?.destroy();
     });
   }
 

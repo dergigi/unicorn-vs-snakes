@@ -9,6 +9,7 @@ import {
   PLAYER_MAX_FALL_SPEED,
   PLAYER_MOVE_SPEED
 } from "../config/gameConfig";
+import type { TouchInput } from "../input/TouchControls";
 
 export type Cursors = Phaser.Types.Input.Keyboard.CursorKeys & {
   jump: Phaser.Input.Keyboard.Key;
@@ -20,6 +21,7 @@ export type Cursors = Phaser.Types.Input.Keyboard.CursorKeys & {
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   private cursors: Cursors;
+  private touchInput?: TouchInput;
   private lastGroundedAt = 0;
   private lastJumpPressedAt = -9999;
   private jumpsUsed = 0;
@@ -44,6 +46,10 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     // The source frame has empty padding, so a smaller body prevents hovering.
     body.setSize(12, 10, true);
     body.setOffset(2, 5);
+  }
+
+  public setTouchInput(touch: TouchInput): void {
+    this.touchInput = touch;
   }
 
   public setControlsEnabled(enabled: boolean): void {
@@ -91,17 +97,18 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     if (
       Phaser.Input.Keyboard.JustDown(this.cursors.jump) ||
       Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
-      Phaser.Input.Keyboard.JustDown(this.cursors.w)
+      Phaser.Input.Keyboard.JustDown(this.cursors.w) ||
+      this.touchInput?.jumpJustPressed
     ) {
       this.lastJumpPressedAt = time;
     }
 
     const speed = this.hasRainbowPowerup ? PLAYER_MOVE_SPEED * 1.05 : PLAYER_MOVE_SPEED;
     let velocityX = 0;
-    if (this.cursors.left?.isDown || this.cursors.a.isDown) {
+    if (this.cursors.left?.isDown || this.cursors.a.isDown || this.touchInput?.left) {
       velocityX = -speed;
       this.setFlipX(true);
-    } else if (this.cursors.right?.isDown || this.cursors.d.isDown) {
+    } else if (this.cursors.right?.isDown || this.cursors.d.isDown || this.touchInput?.right) {
       velocityX = speed;
       this.setFlipX(false);
     }
@@ -128,11 +135,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.jumpHoldUntil = time + JUMP_HOLD_MAX_MS;
     }
 
-    const jumpHeld = this.cursors.jump.isDown || this.cursors.up.isDown || this.cursors.w.isDown;
+    const jumpHeld = this.cursors.jump.isDown || this.cursors.up.isDown || this.cursors.w.isDown || !!this.touchInput?.jumpDown;
     const jumpReleased =
       Phaser.Input.Keyboard.JustUp(this.cursors.jump) ||
       Phaser.Input.Keyboard.JustUp(this.cursors.up) ||
-      Phaser.Input.Keyboard.JustUp(this.cursors.w);
+      Phaser.Input.Keyboard.JustUp(this.cursors.w) ||
+      !!this.touchInput?.jumpJustReleased;
 
     if (jumpReleased && body.velocity.y < 0) {
       body.velocity.y *= 0.55;
