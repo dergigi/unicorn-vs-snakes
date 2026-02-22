@@ -1,12 +1,17 @@
 import Phaser from "phaser";
 import { GAME_HEIGHT, GAME_WIDTH } from "../config/gameConfig";
+import { type PatrolSnake, spawnPatrolSnakes, updatePatrolSnakes } from "../utils/patrolSnakes";
 
 export class GameOverScene extends Phaser.Scene {
+  private snakes: PatrolSnake[] = [];
+
   constructor() {
     super("GameOverScene");
   }
 
   create(): void {
+    this.snakes = [];
+
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1a0f30).setOrigin(0, 0);
     this.add.text(GAME_WIDTH / 2, 90, "Those darn snakes!", {
       fontFamily: "monospace",
@@ -33,46 +38,20 @@ export class GameOverScene extends Phaser.Scene {
       this.scene.start("MenuScene");
     });
 
-    this.spawnSnakes();
+    const snakeY = GAME_HEIGHT - 10;
+    this.snakes = spawnPatrolSnakes(this, [
+      { x: 60, patrol: 100, speed: 0.7 },
+      { x: 180, patrol: 110, speed: -0.9 },
+      { x: 300, patrol: 100, speed: 0.8 },
+      { x: 420, patrol: 120, speed: -1.0 },
+      { x: 540, patrol: 100, speed: 0.9 },
+      { x: 660, patrol: 110, speed: -0.75 },
+      { x: 780, patrol: 130, speed: 1.1 },
+      { x: 900, patrol: 90, speed: -0.85 },
+    ], snakeY, 1.3, 0);
   }
 
-  private spawnSnakes(): void {
-    const snakeY = GAME_HEIGHT - 30;
-    const count = 14;
-    for (let i = 0; i < count; i++) {
-      const texture = Phaser.Math.Between(0, 1) === 0 ? "snake-1" : "snake-2";
-      const flipX = Phaser.Math.Between(0, 1) === 1;
-      const scale = Phaser.Math.FloatBetween(1.8, 2.6);
-      const startX = Phaser.Math.Between(-40, GAME_WIDTH + 40);
-      const y = snakeY + Phaser.Math.Between(-12, 12);
-
-      const snake = this.add.image(startX, y, texture)
-        .setScale(scale)
-        .setFlipX(flipX)
-        .setAlpha(0.85);
-
-      const speed = Phaser.Math.FloatBetween(30, 80);
-      const dir = flipX ? -1 : 1;
-
-      this.tweens.add({
-        targets: snake,
-        x: startX + dir * (GAME_WIDTH + 100),
-        duration: ((GAME_WIDTH + 100) / speed) * 1000,
-        repeat: -1,
-        onRepeat: () => {
-          snake.setX(flipX ? GAME_WIDTH + 40 : -40);
-          snake.setY(snakeY + Phaser.Math.Between(-12, 12));
-        }
-      });
-
-      this.tweens.add({
-        targets: snake,
-        y: y + Phaser.Math.Between(-4, 4),
-        duration: Phaser.Math.Between(300, 600),
-        yoyo: true,
-        repeat: -1,
-        ease: "Sine.easeInOut"
-      });
-    }
+  update(time: number): void {
+    updatePatrolSnakes(this.snakes, time);
   }
 }

@@ -7,6 +7,7 @@ import {
   type Difficulty
 } from "../config/gameConfig";
 import { spawnRainbowTrail } from "../utils/rainbowTrail";
+import { type PatrolSnake, spawnPatrolSnakes, updatePatrolSnakes } from "../utils/patrolSnakes";
 
 const GRASS_TOP = GAME_HEIGHT - 130;
 const GRASS_HEIGHT = 52;
@@ -15,12 +16,6 @@ const UNICORN_SPEED = 3.2;
 const GATE_X = GAME_WIDTH - 100;
 const GATE_OVERLAP_DIST = 28;
 
-type MenuSnake = {
-  sprite: Phaser.GameObjects.Image;
-  minX: number;
-  maxX: number;
-  speed: number;
-};
 
 export class MenuScene extends Phaser.Scene {
   private selectedDifficulty: Difficulty = DEFAULT_DIFFICULTY;
@@ -32,7 +27,7 @@ export class MenuScene extends Phaser.Scene {
   private wasdW?: Phaser.Input.Keyboard.Key;
   private nextTrailAt = 0;
   private started = false;
-  private menuSnakes: MenuSnake[] = [];
+  private menuSnakes: PatrolSnake[] = [];
   private unicornVY = 0;
   private unicornBaseY = 0;
   private unicornOnGround = true;
@@ -99,7 +94,7 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5, 1)
       .setScale(3);
 
-    this.spawnPatrolSnakes();
+    this.spawnMenuSnakes();
 
     const footerTop = GRASS_TOP + 64 + 10;
     const footerStyle: Phaser.Types.GameObjects.Text.TextStyle = {
@@ -139,7 +134,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   update(time: number): void {
-    this.updateMenuSnakes(time);
+    updatePatrolSnakes(this.menuSnakes, time);
 
     if (this.started) {
       return;
@@ -340,47 +335,15 @@ export class MenuScene extends Phaser.Scene {
     }
   }
 
-  private spawnPatrolSnakes(): void {
-    this.menuSnakes = [];
-    const snakeY = GRASS_TOP + GRASS_HEIGHT;
-    const snakeDefs = [
+  private spawnMenuSnakes(): void {
+    this.menuSnakes = spawnPatrolSnakes(this, [
       { x: 80, patrol: 100, speed: 0.8 },
       { x: 260, patrol: 120, speed: -1.0 },
       { x: 420, patrol: 110, speed: 0.9 },
       { x: 560, patrol: 100, speed: -0.7 },
       { x: 700, patrol: 130, speed: 1.1 },
       { x: 860, patrol: 90, speed: -0.85 },
-    ];
-
-    for (const def of snakeDefs) {
-      const sprite = this.add
-        .image(def.x, snakeY, "snake-1")
-        .setOrigin(0.5, 1)
-        .setScale(1.3)
-        .setFlipX(def.speed < 0)
-        .setDepth(2);
-      this.menuSnakes.push({
-        sprite,
-        minX: def.x - def.patrol / 2,
-        maxX: def.x + def.patrol / 2,
-        speed: def.speed,
-      });
-    }
-  }
-
-  private updateMenuSnakes(time: number): void {
-    for (const snake of this.menuSnakes) {
-      snake.sprite.x += snake.speed;
-      if (snake.sprite.x < snake.minX) {
-        snake.sprite.x = snake.minX;
-        snake.speed = Math.abs(snake.speed);
-      } else if (snake.sprite.x > snake.maxX) {
-        snake.sprite.x = snake.maxX;
-        snake.speed = -Math.abs(snake.speed);
-      }
-      snake.sprite.setFlipX(snake.speed < 0);
-      snake.sprite.setTexture((time >> 7) % 2 === 0 ? "snake-1" : "snake-2");
-    }
+    ], GRASS_TOP + GRASS_HEIGHT);
   }
 
   private emitRainbowTrail(time: number): void {
