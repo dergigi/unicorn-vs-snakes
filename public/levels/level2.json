@@ -1,7 +1,7 @@
 {
   "theme": "lava",
   "spawn": { "x": 130, "y": 360 },
-  "rainbowPowerup": { "x": 640, "y": 404 },
+  "rainbowPowerup": { "x": 2520, "y": 284 },
   "finishGate": { "x": 3430, "y": 478 },
   "checkpoints": [
     { "x": 1080, "y": 464 },
