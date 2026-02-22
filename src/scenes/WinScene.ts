@@ -154,6 +154,19 @@ export class WinScene extends Phaser.Scene {
       });
     });
 
+    const tellLink = this.add.text(cx, btnY - 46, "Tell your friends!", {
+      fontFamily: "monospace",
+      fontSize: "14px",
+      color: "#ffb8e6"
+    }).setOrigin(0.5);
+    tellLink.setInteractive({ useHandCursor: true });
+    tellLink.on("pointerdown", () => {
+      navigator.clipboard.writeText(shareText).then(() => {
+        tellLink.setText("Copied!");
+        this.time.delayedCall(1500, () => tellLink.setText("Tell your friends!"));
+      });
+    });
+
     // Play again button — anchored near bottom
     const again = this.add.rectangle(cx, btnY, 260, 50, 0xff8fd3);
     again.setStrokeStyle(3, 0xffffff);
