@@ -84,7 +84,7 @@ export class WinScene extends Phaser.Scene {
       strokeThickness: 2
     };
 
-    this.add.text(cx, 122, `Total sparkles collected: ${data.totalSparkles ?? 0}`, statsStyle).setOrigin(0.5);
+    this.add.text(cx, 122, `Sparkles: ${data.totalSparkles ?? 0}`, statsStyle).setOrigin(0.5);
 
     // Times table — two columns: label right-aligned, time left-aligned
     const allTimes: [string, number][] = [
