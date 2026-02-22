@@ -62,7 +62,7 @@ export class MenuScene extends Phaser.Scene {
     this.add.rectangle(0, GRASS_TOP, GAME_WIDTH, GRASS_HEIGHT, 0x000000, 0.25).setOrigin(0, 0);
 
     this.add
-      .text(GAME_WIDTH / 2, 72, "UNICORNS VS SNAKES", {
+      .text(GAME_WIDTH / 2, 72, "UNICORN VS SNAKES", {
         fontSize: "42px",
         color: "#fff1ff",
         fontFamily: "monospace"
