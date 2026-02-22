@@ -120,7 +120,7 @@ export class MenuScene extends Phaser.Scene {
     gigiLink.on("pointerout", () => gigiLink.setColor("#c88cb8"));
     gigiLink.on("pointerdown", () => window.open("https://dergigi.com", "_blank"));
     this.add
-      .text(GAME_WIDTH / 2, footerTop + 20, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
+      .text(GAME_WIDTH / 2, footerTop + 20, `v${__APP_VERSION__}  ·  Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt`, {
         fontSize: "11px",
         color: "#9b8cb8",
         fontFamily: "monospace"
