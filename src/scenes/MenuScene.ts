@@ -112,7 +112,7 @@ export class MenuScene extends Phaser.Scene {
     this.add
       .text(GAME_WIDTH / 2, footerTop + 20, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
         fontSize: "11px",
-        color: "#a89cc8",
+        color: "#e8d8ff",
         fontFamily: "monospace"
       })
       .setOrigin(0.5, 0);
