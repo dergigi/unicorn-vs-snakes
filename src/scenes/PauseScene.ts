@@ -39,6 +39,15 @@ export class PauseScene extends Phaser.Scene {
     );
 
     this.viewContainer = this.add.container(0, 0);
+
+    this.add.text(GAME_WIDTH - 12, GAME_HEIGHT - 10, `v${__APP_VERSION__}`, {
+      fontFamily: "monospace",
+      fontSize: "12px",
+      color: "#6a5f8a",
+      stroke: "#1d1336",
+      strokeThickness: 2,
+    }).setOrigin(1, 1);
+
     this.showMenu();
 
     this.input.keyboard?.on("keydown-ESC", this.handleEsc, this);
