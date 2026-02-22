@@ -8,7 +8,7 @@ import {
 } from "../config/gameConfig";
 import { spawnRainbowTrail } from "../utils/rainbowTrail";
 
-const GRASS_TOP = GAME_HEIGHT - 98;
+const GRASS_TOP = GAME_HEIGHT - 130;
 const GRASS_HEIGHT = 52;
 const FLOOR_Y = GRASS_TOP + 8;
 const UNICORN_SPEED = 3.2;
@@ -100,20 +100,21 @@ export class MenuScene extends Phaser.Scene {
 
     this.spawnPatrolSnakes();
 
+    const footerTop = GRASS_TOP + 64 + 10;
     this.add
-      .text(GAME_WIDTH / 2, GRASS_TOP + GRASS_HEIGHT + 14, "Prompted into existence by my daughter.", {
+      .text(GAME_WIDTH / 2, footerTop, "Prompted into existence by my daughter.", {
         fontSize: "13px",
         color: "#e8d8ff",
         fontFamily: "monospace"
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5, 0);
     this.add
-      .text(GAME_WIDTH / 2, GRASS_TOP + GRASS_HEIGHT + 32, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
+      .text(GAME_WIDTH / 2, footerTop + 20, "Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt", {
         fontSize: "11px",
         color: "#a89cc8",
         fontFamily: "monospace"
       })
-      .setOrigin(0.5);
+      .setOrigin(0.5, 0);
 
     this.cursors = this.input.keyboard?.createCursorKeys();
     this.wasdA = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.A);
