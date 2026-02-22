@@ -1,7 +1,7 @@
 import type { EventTemplate } from "applesauce-core/helpers/event";
 import type { EventBlueprint } from "applesauce-core/event-factory";
 import type { Difficulty } from "../config/gameConfig";
-import { NOSTR_KIND, NOSTR_GAME_TAG, NOSTR_SCORE_VERSION } from "../config/gameConfig";
+import { NOSTR_KIND, NOSTR_HASHTAG, NOSTR_SCORE_VERSION } from "../config/gameConfig";
 
 export interface ScoreData {
   difficulty: Difficulty;
@@ -30,11 +30,9 @@ export function ScoreBlueprint(data: ScoreData): EventBlueprint<EventTemplate> {
     });
 
     const tags: string[][] = [
-      ["d", NOSTR_GAME_TAG],
       ["difficulty", data.difficulty],
       ["time", String(data.totalMs)],
-      ["t", NOSTR_GAME_TAG],
-      ["t", "UvS"],
+      ["t", NOSTR_HASHTAG],
       ["t", "gaming"],
       ["version", String(NOSTR_SCORE_VERSION)],
     ];

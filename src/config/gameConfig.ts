@@ -60,5 +60,5 @@ export const NOSTR_RELAYS = [
   "wss://nos.lol",
   "wss://wot.dergigi.com"
 ];
-export const NOSTR_GAME_TAG = "unicorn-vs-snakes";
+export const NOSTR_HASHTAG = "UvS";
 export const NOSTR_SCORE_VERSION = 2;

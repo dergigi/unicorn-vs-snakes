@@ -4,7 +4,7 @@ import { RelayPool } from "applesauce-relay";
 import { npubEncode } from "applesauce-core/helpers/pointers";
 import { type NostrEvent } from "applesauce-core/helpers/event";
 import { type Subscription } from "rxjs";
-import { NOSTR_RELAYS, NOSTR_KIND, NOSTR_GAME_TAG, NOSTR_SCORE_VERSION, type Difficulty } from "../config/gameConfig";
+import { NOSTR_RELAYS, NOSTR_KIND, NOSTR_HASHTAG, NOSTR_SCORE_VERSION, type Difficulty } from "../config/gameConfig";
 import { ScoreBlueprint, type ScoreData } from "./scoreBlueprint";
 
 export interface LeaderboardEntry {
@@ -103,7 +103,7 @@ class NostrService {
   async fetchTopScores(difficulty: Difficulty, limit = 5): Promise<LeaderboardEntry[]> {
     const filter = {
       kinds: [NOSTR_KIND],
-      "#d": [NOSTR_GAME_TAG],
+      "#t": [NOSTR_HASHTAG],
     };
 
     const events = await new Promise<NostrEvent[]>((resolve) => {
