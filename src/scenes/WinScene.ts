@@ -185,7 +185,8 @@ export class WinScene extends Phaser.Scene {
         percent100: is100Percent,
         cheated: data.cheated ?? false,
       };
-      this.buildNostrButton(dialogX, dialogY + dialogHeight + 8, dialogWidth, scoreData);
+      nostrService.publishScore(scoreData).catch(() => {});
+      this.buildNostrButton(dialogX, dialogY + dialogHeight + 8, dialogWidth, shareText);
     }
 
     // Leaderboard panel (right column)
@@ -208,7 +209,7 @@ export class WinScene extends Phaser.Scene {
     });
   }
 
-  private buildNostrButton(x: number, y: number, width: number, scoreData: ScoreData): void {
+  private buildNostrButton(x: number, y: number, width: number, noteText: string): void {
     const btnH = 28;
     const btnCx = x + width / 2;
     const btnCy = y + btnH / 2;
@@ -244,7 +245,7 @@ export class WinScene extends Phaser.Scene {
       label.setText("Signing...");
       label.setColor("#b8a0d8");
 
-      nostrService.publishScore(scoreData).then((ok) => {
+      nostrService.publishNote(noteText).then((ok) => {
         if (ok) {
           label.setText("Posted!");
           label.setColor("#9fffb8");

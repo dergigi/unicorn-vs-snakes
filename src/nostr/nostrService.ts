@@ -94,6 +94,25 @@ class NostrService {
     return results.some((r) => r.ok);
   }
 
+  async publishNote(text: string): Promise<boolean> {
+    if (!this.factory || !this.signer) {
+      throw new Error("Not logged in");
+    }
+
+    const template = await this.factory.sign({
+      kind: 1,
+      created_at: Math.floor(Date.now() / 1000),
+      content: text,
+      tags: [
+        ["t", NOSTR_HASHTAG],
+        ["t", "gaming"],
+      ],
+    });
+
+    const results = await this.pool.publish(NOSTR_RELAYS, template);
+    return results.some((r) => r.ok);
+  }
+
   async fetchTopScores(difficulty: Difficulty, limit = 5): Promise<LeaderboardEntry[]> {
     const filter = {
       kinds: [NOSTR_KIND],
