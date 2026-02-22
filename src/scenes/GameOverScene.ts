@@ -16,7 +16,7 @@ export class GameOverScene extends Phaser.Scene {
     const totalMs = menuTimeMs + levelTimes.reduce((sum, t) => sum + t, 0);
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1a0f30).setOrigin(0, 0);
-    this.add.text(GAME_WIDTH / 2, 90, "Oops! Try Again", {
+    this.add.text(GAME_WIDTH / 2, 90, "Those darn snakes!", {
       fontFamily: "monospace",
       fontSize: "52px",
       color: "#ffacc9"
