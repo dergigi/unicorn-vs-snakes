@@ -118,7 +118,7 @@ export class WinScene extends Phaser.Scene {
 
     const btnY = GAME_HEIGHT - 52;
     const portraitSize = 38;
-    const leftPad = 56;
+    const leftPad = 60;
     const rightPad = 40;
 
     const measureText = this.add.text(0, 0, displayText, {
@@ -126,12 +126,12 @@ export class WinScene extends Phaser.Scene {
       fontSize: "12px"
     });
     const dialogWidth = Math.ceil((leftPad + measureText.width + rightPad) * 1.2);
-    const dialogHeight = 66;
+    const dialogHeight = 73;
     measureText.destroy();
 
     const dialogX = (GAME_WIDTH - dialogWidth) / 2;
     const dialogY = totalY + (btnY - totalY - dialogHeight) / 2;
-    const portraitCenterX = dialogX + 28;
+    const portraitCenterX = dialogX + 32;
     const portraitCenterY = dialogY + dialogHeight / 2;
 
     const dialog = this.add.graphics();
