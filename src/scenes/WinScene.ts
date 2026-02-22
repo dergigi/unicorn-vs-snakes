@@ -76,9 +76,6 @@ export class WinScene extends Phaser.Scene {
       strokeThickness: 3
     }).setOrigin(0.5);
 
-    // Divider
-    this.add.rectangle(cx, 108, 300, 1, 0xffb8e6, 0.25);
-
     const statsStyle: Phaser.Types.GameObjects.Text.TextStyle = {
       fontFamily: "monospace",
       fontSize: "14px",
@@ -108,7 +105,6 @@ export class WinScene extends Phaser.Scene {
     }
 
     const totalY = tableTop + allTimes.length * rowH + 8;
-    this.add.rectangle(cx, totalY - 6, 220, 1, 0xd8b8f0, 0.3);
     this.add.text(labelX, totalY, "Total", statsStyle).setOrigin(1, 0.5);
     this.add.text(valueX, totalY, formatTime(totalMs), statsStyle).setOrigin(0, 0.5);
 
