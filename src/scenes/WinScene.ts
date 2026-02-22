@@ -116,12 +116,21 @@ export class WinScene extends Phaser.Scene {
       ? `I just had a 100% Unicorn vs Snakes run\nand beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!!`
       : `I just beat Unicorn vs Snakes\non ${difficulty} difficulty in ${formatTime(totalMs)}!`;
 
-    const dialogWidth = GAME_WIDTH - 220;
-    const dialogHeight = 66;
-    const dialogX = (GAME_WIDTH - dialogWidth) / 2;
     const btnY = GAME_HEIGHT - 52;
-    const dialogY = totalY + (btnY - totalY - dialogHeight) / 2;
     const portraitSize = 38;
+    const leftPad = 56;
+    const rightPad = 40;
+
+    const measureText = this.add.text(0, 0, displayText, {
+      fontFamily: "monospace",
+      fontSize: "12px"
+    });
+    const dialogWidth = leftPad + measureText.width + rightPad;
+    const dialogHeight = 66;
+    measureText.destroy();
+
+    const dialogX = (GAME_WIDTH - dialogWidth) / 2;
+    const dialogY = totalY + (btnY - totalY - dialogHeight) / 2;
     const portraitCenterX = dialogX + 28;
     const portraitCenterY = dialogY + dialogHeight / 2;
 
@@ -134,7 +143,7 @@ export class WinScene extends Phaser.Scene {
     this.add.sprite(portraitCenterX, portraitCenterY, "unicorn", 0)
       .setDisplaySize(portraitSize, portraitSize);
 
-    this.add.text(dialogX + 56, portraitCenterY, displayText, {
+    this.add.text(dialogX + leftPad, portraitCenterY, displayText, {
       fontFamily: "monospace",
       fontSize: "12px",
       color: "#ffe6f8",
