@@ -3,7 +3,7 @@ import { EventFactory } from "applesauce-core";
 import { RelayPool } from "applesauce-relay";
 import { npubEncode } from "applesauce-core/helpers/pointers";
 import { type NostrEvent } from "applesauce-core/helpers/event";
-import { lastValueFrom, toArray } from "rxjs";
+import { catchError, lastValueFrom, of, toArray } from "rxjs";
 import { NOSTR_RELAYS, NOSTR_KIND, NOSTR_HASHTAG, NOSTR_SCORE_VERSION, type Difficulty } from "../config/gameConfig";
 import { ScoreBlueprint, type ScoreData } from "./scoreBlueprint";
 
@@ -101,7 +101,10 @@ class NostrService {
     };
 
     const events = await lastValueFrom(
-      this.pool.request(NOSTR_RELAYS, filter).pipe(toArray()),
+      this.pool.request(NOSTR_RELAYS, filter).pipe(
+        toArray(),
+        catchError(() => of([] as NostrEvent[])),
+      ),
       { defaultValue: [] as NostrEvent[] },
     );
 
@@ -139,7 +142,10 @@ class NostrService {
       const filter = { kinds: [0 as number], authors: uncached };
 
       const events = await lastValueFrom(
-        this.pool.request(NOSTR_RELAYS, filter).pipe(toArray()),
+        this.pool.request(NOSTR_RELAYS, filter).pipe(
+          toArray(),
+          catchError(() => of([] as NostrEvent[])),
+        ),
         { defaultValue: [] as NostrEvent[] },
       );
 
