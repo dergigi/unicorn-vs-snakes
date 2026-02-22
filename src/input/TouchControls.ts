@@ -77,13 +77,10 @@ export class TouchControls {
   }
 
   private applyZone(x: number): void {
-    const scale = this.scene.scale;
-    const gameX = (x - scale.canvasBounds.left) / scale.displayScale.x;
-
-    if (gameX < ZONE_LEFT_MAX) {
+    if (x < ZONE_LEFT_MAX) {
       this.state.left = true;
       this.state.right = false;
-    } else if (gameX > ZONE_RIGHT_MIN) {
+    } else if (x > ZONE_RIGHT_MIN) {
       this.state.left = false;
       this.state.right = true;
     } else {
