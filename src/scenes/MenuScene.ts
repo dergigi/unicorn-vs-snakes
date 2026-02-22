@@ -29,6 +29,7 @@ export class MenuScene extends Phaser.Scene {
   private wasdA?: Phaser.Input.Keyboard.Key;
   private wasdD?: Phaser.Input.Keyboard.Key;
   private jumpKey?: Phaser.Input.Keyboard.Key;
+  private wasdW?: Phaser.Input.Keyboard.Key;
   private nextTrailAt = 0;
   private started = false;
   private menuSnakes: MenuSnake[] = [];
@@ -120,6 +121,7 @@ export class MenuScene extends Phaser.Scene {
     this.wasdA = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     this.wasdD = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     this.jumpKey = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.wasdW = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.W);
     this.setupLevelSkipCheat();
   }
 
@@ -146,10 +148,11 @@ export class MenuScene extends Phaser.Scene {
 
     this.unicorn.x = Phaser.Math.Clamp(this.unicorn.x, 40, GAME_WIDTH - 40);
 
-    const jumpHeld = this.jumpKey?.isDown || this.cursors?.up.isDown;
+    const jumpHeld = this.jumpKey?.isDown || this.cursors?.up.isDown || this.wasdW?.isDown;
     const jumpJustPressed =
       Phaser.Input.Keyboard.JustDown(this.jumpKey!) ||
-      Phaser.Input.Keyboard.JustDown(this.cursors!.up);
+      Phaser.Input.Keyboard.JustDown(this.cursors!.up) ||
+      (this.wasdW ? Phaser.Input.Keyboard.JustDown(this.wasdW) : false);
     if (jumpJustPressed && this.unicornOnGround) {
       this.unicornVY = -5.5;
       this.unicornOnGround = false;
