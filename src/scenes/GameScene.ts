@@ -99,6 +99,7 @@ export class GameScene extends Phaser.Scene {
   private totalPowerups = 0;
   private levelApples = 0;
   private levelPowerups = 0;
+  private cheated = false;
 
   constructor() {
     super("GameScene");
@@ -115,6 +116,7 @@ export class GameScene extends Phaser.Scene {
     totalSparkles?: number;
     totalApples?: number;
     totalPowerups?: number;
+    cheated?: boolean;
   }): void {
     this.maxLives = data?.maxLives ?? 5;
     this.difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
@@ -124,6 +126,7 @@ export class GameScene extends Phaser.Scene {
     this.totalSparkles = data?.totalSparkles ?? 0;
     this.totalApples = data?.totalApples ?? 0;
     this.totalPowerups = data?.totalPowerups ?? 0;
+    this.cheated = data?.cheated ?? false;
     this.levelApples = 0;
     this.levelPowerups = 0;
     this.timerStartMs = Date.now();
@@ -414,6 +417,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    this.cheated = true;
     this.levelComplete = true;
     this.player?.setControlsEnabled(false);
     this.levelTimes.push(Date.now() - this.timerStartMs);
@@ -427,7 +431,8 @@ export class GameScene extends Phaser.Scene {
       menuTimeMs: this.menuTimeMs,
       totalSparkles: this.totalSparkles + this.collectibleSystem.getCollectedCount(),
       totalApples: this.totalApples + this.levelApples,
-      totalPowerups: this.totalPowerups + this.levelPowerups
+      totalPowerups: this.totalPowerups + this.levelPowerups,
+      cheated: true
     };
     this.scene.stop("UIScene");
     this.scene.restart(sceneData);
@@ -1848,7 +1853,8 @@ export class GameScene extends Phaser.Scene {
           menuTimeMs: this.menuTimeMs,
           totalSparkles: runningSparkles,
           totalApples: runningApples,
-          totalPowerups: runningPowerups
+          totalPowerups: runningPowerups,
+          cheated: this.cheated
         };
         this.scene.restart(sceneData);
         this.scene.launch("UIScene", sceneData);
@@ -1861,7 +1867,8 @@ export class GameScene extends Phaser.Scene {
         totalPowerups: runningPowerups,
         difficulty: this.difficulty,
         levelTimes: [...this.levelTimes],
-        menuTimeMs: this.menuTimeMs
+        menuTimeMs: this.menuTimeMs,
+        cheated: this.cheated
       });
     });
   }

@@ -11,6 +11,7 @@ interface WinData {
   difficulty?: Difficulty;
   levelTimes?: number[];
   menuTimeMs?: number;
+  cheated?: boolean;
 }
 
 export class WinScene extends Phaser.Scene {
@@ -177,6 +178,7 @@ export class WinScene extends Phaser.Scene {
         menuTimeMs,
         totalMs,
         percent100: is100Percent,
+        cheated: data.cheated ?? false,
       };
       this.buildNostrButton(dialogX, dialogY + dialogHeight + 8, dialogWidth, scoreData);
     }

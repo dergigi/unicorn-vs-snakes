@@ -12,6 +12,7 @@ export interface ScoreData {
   menuTimeMs: number;
   totalMs: number;
   percent100: boolean;
+  cheated: boolean;
 }
 
 export function ScoreBlueprint(data: ScoreData): EventBlueprint<EventTemplate> {
@@ -24,20 +25,26 @@ export function ScoreBlueprint(data: ScoreData): EventBlueprint<EventTemplate> {
       menuTimeMs: data.menuTimeMs,
       totalMs: data.totalMs,
       percent100: data.percent100,
+      cheated: data.cheated,
       version: 1,
     });
+
+    const tags: string[][] = [
+      ["d", NOSTR_GAME_TAG],
+      ["difficulty", data.difficulty],
+      ["time", String(data.totalMs)],
+      ["t", NOSTR_GAME_TAG],
+      ["t", "gaming"],
+    ];
+    if (data.cheated) {
+      tags.push(["cheated", "true"]);
+    }
 
     return {
       kind: NOSTR_KIND,
       created_at: Math.floor(Date.now() / 1000),
       content,
-      tags: [
-        ["d", NOSTR_GAME_TAG],
-        ["difficulty", data.difficulty],
-        ["time", String(data.totalMs)],
-        ["t", NOSTR_GAME_TAG],
-        ["t", "gaming"],
-      ],
+      tags,
     };
   };
 }

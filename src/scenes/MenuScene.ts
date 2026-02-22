@@ -481,7 +481,8 @@ export class MenuScene extends Phaser.Scene {
         totalPowerups: 3,
         difficulty: this.selectedDifficulty,
         levelTimes: [12345, 23456, 34567, 45678],
-        menuTimeMs: 6789
+        menuTimeMs: 6789,
+        cheated: true
       });
       return;
     }
@@ -510,7 +511,8 @@ export class MenuScene extends Phaser.Scene {
       maxLives,
       levelNumber,
       currentLives: maxLives,
-      menuTimeMs: Date.now() - this.menuCreatedAt
+      menuTimeMs: Date.now() - this.menuCreatedAt,
+      cheated: levelNumber > 1
     };
     this.scene.start("GameScene", sceneData);
     this.scene.launch("UIScene", sceneData);
