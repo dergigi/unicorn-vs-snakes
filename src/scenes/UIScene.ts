@@ -62,12 +62,12 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(1, 0).setScrollFactor(0);
 
     if (isTouch) {
-      const pauseBtn = this.add.text(GAME_WIDTH - 16, 16, "⏸", {
+      const pauseBtn = this.add.text(GAME_WIDTH - 16, 16, "II", {
         fontFamily: "monospace",
-        fontSize: "28px",
+        fontSize: "24px",
         color: "#a89cc8",
         stroke: "#1d1336",
-        strokeThickness: 3,
+        strokeThickness: 4,
       }).setOrigin(1, 0).setScrollFactor(0).setAlpha(0.7);
 
       pauseBtn.setInteractive({ useHandCursor: true });
