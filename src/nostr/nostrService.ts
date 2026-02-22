@@ -148,17 +148,7 @@ class NostrService {
     }
 
     entries.sort((a, b) => a.totalMs - b.totalMs);
-
-    const seen = new Set<string>();
-    const unique: LeaderboardEntry[] = [];
-    for (const entry of entries) {
-      if (seen.has(entry.pubkey)) continue;
-      seen.add(entry.pubkey);
-      unique.push(entry);
-      if (unique.length >= limit) break;
-    }
-
-    return unique;
+    return entries.slice(0, limit);
   }
 
   async fetchProfiles(pubkeys: string[]): Promise<Map<string, NostrProfile>> {
