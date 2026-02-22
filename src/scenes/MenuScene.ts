@@ -397,13 +397,16 @@ export class MenuScene extends Phaser.Scene {
     const onTwo = (): void => this.handleLevelSkipKey(2);
     const onThree = (): void => this.handleLevelSkipKey(3);
     const onFour = (): void => this.handleLevelSkipKey(4);
+    const onFive = (): void => this.handleLevelSkipKey(5);
     keyboard.on("keydown-TWO", onTwo, this);
     keyboard.on("keydown-THREE", onThree, this);
     keyboard.on("keydown-FOUR", onFour, this);
+    keyboard.on("keydown-FIVE", onFive, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       keyboard.off("keydown-TWO", onTwo, this);
       keyboard.off("keydown-THREE", onThree, this);
       keyboard.off("keydown-FOUR", onFour, this);
+      keyboard.off("keydown-FIVE", onFive, this);
       this.levelSkipResetTimer?.remove(false);
       this.levelSkipResetTimer = undefined;
     });
@@ -433,6 +436,15 @@ export class MenuScene extends Phaser.Scene {
     this.levelSkipResetTimer?.remove(false);
     this.levelSkipResetTimer = undefined;
 
+    if (targetLevel === 5) {
+      this.scene.start("WinScene", {
+        totalSparkles: 42,
+        difficulty: this.selectedDifficulty,
+        levelTimes: [12345, 23456, 34567, 45678],
+        menuTimeMs: 6789
+      });
+      return;
+    }
     this.startGame(targetLevel);
   }
 
