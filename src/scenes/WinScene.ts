@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import { GAME_HEIGHT, GAME_WIDTH, LEVEL_COUNT, type Difficulty } from "../config/gameConfig";
 import { formatTime } from "../utils/formatTime";
+import { nostrService } from "../nostr/nostrService";
+import type { ScoreData } from "../nostr/scoreBlueprint";
 
 interface WinData {
   totalSparkles?: number;
@@ -165,6 +167,20 @@ export class WinScene extends Phaser.Scene {
       });
     });
 
+    if (nostrService.isLoggedIn()) {
+      const scoreData: ScoreData = {
+        difficulty,
+        sparkles: collectedSparkles,
+        apples: collectedApples,
+        powerups: collectedPowerups,
+        levelTimes,
+        menuTimeMs,
+        totalMs,
+        percent100: is100Percent,
+      };
+      this.buildNostrButton(dialogX, dialogY + dialogHeight + 8, dialogWidth, scoreData);
+    }
+
     // Play again button — anchored near bottom
     const again = this.add.rectangle(cx, btnY, 260, 50, 0xff8fd3);
     again.setStrokeStyle(3, 0xffffff);
@@ -179,6 +195,60 @@ export class WinScene extends Phaser.Scene {
 
     again.on("pointerdown", () => {
       this.scene.start("MenuScene");
+    });
+  }
+
+  private buildNostrButton(x: number, y: number, width: number, scoreData: ScoreData): void {
+    const btnH = 28;
+    const btnCx = x + width / 2;
+    const btnCy = y + btnH / 2;
+
+    const bg = this.add.graphics();
+    bg.fillStyle(0x6a2f80, 0.85);
+    bg.lineStyle(1, 0xc88cff, 0.6);
+    bg.fillRoundedRect(x, y, width, btnH, 8);
+    bg.strokeRoundedRect(x, y, width, btnH, 8);
+
+    const label = this.add.text(btnCx, btnCy, "Post to Nostr", {
+      fontFamily: "monospace",
+      fontSize: "13px",
+      color: "#e8d0ff",
+      stroke: "#2a1040",
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    const hitArea = this.add.rectangle(btnCx, btnCy, width, btnH, 0, 0);
+    hitArea.setInteractive({ useHandCursor: true });
+
+    let posting = false;
+    hitArea.on("pointerover", () => {
+      if (!posting) label.setColor("#ffffff");
+    });
+    hitArea.on("pointerout", () => {
+      if (!posting) label.setColor("#e8d0ff");
+    });
+
+    hitArea.on("pointerdown", () => {
+      if (posting) return;
+      posting = true;
+      label.setText("Signing...");
+      label.setColor("#b8a0d8");
+
+      nostrService.publishScore(scoreData).then((ok) => {
+        if (ok) {
+          label.setText("Posted!");
+          label.setColor("#9fffb8");
+          hitArea.disableInteractive();
+        } else {
+          label.setText("Relay error — tap to retry");
+          label.setColor("#ff8888");
+          posting = false;
+        }
+      }).catch(() => {
+        label.setText("Failed — tap to retry");
+        label.setColor("#ff8888");
+        posting = false;
+      });
     });
   }
 

@@ -53,3 +53,11 @@ const REQUIRED_SPARKLES_BY_LEVEL: Record<number, number> = {
 export function getRequiredSparklesToFinish(levelNumber: number): number {
   return REQUIRED_SPARKLES_BY_LEVEL[levelNumber] ?? REQUIRED_SPARKLES_BY_LEVEL[3];
 }
+
+export const NOSTR_KIND = 5555;
+export const NOSTR_RELAYS = [
+  "wss://relay.damus.io",
+  "wss://nos.lol",
+  "wss://wot.dergigi.com"
+];
+export const NOSTR_GAME_TAG = "unicorn-vs-snakes";

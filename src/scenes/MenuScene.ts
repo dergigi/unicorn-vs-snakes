@@ -9,6 +9,7 @@ import {
 import { spawnRainbowTrail } from "../utils/rainbowTrail";
 import { type PatrolSnake, spawnPatrolSnakes, updatePatrolSnakes } from "../utils/patrolSnakes";
 import { TouchControls } from "../input/TouchControls";
+import { nostrService } from "../nostr/nostrService";
 
 const GRASS_TOP = GAME_HEIGHT - 130;
 const GRASS_HEIGHT = 52;
@@ -134,6 +135,7 @@ export class MenuScene extends Phaser.Scene {
     this.wasdW = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.W);
     this.touchControls = new TouchControls(this);
     this.setupLevelSkipCheat();
+    this.buildNostrButton();
   }
 
   update(time: number): void {
@@ -207,6 +209,57 @@ export class MenuScene extends Phaser.Scene {
       this.startGame();
     }
     this.touchControls?.resetFrameState();
+  }
+
+  private buildNostrButton(): void {
+    if (!nostrService.isExtensionAvailable()) return;
+
+    const btnX = GAME_WIDTH - 16;
+    const btnY = 16;
+    const style: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: "monospace",
+      fontSize: "13px",
+      color: "#b8a0d8",
+      stroke: "#1d1336",
+      strokeThickness: 3,
+    };
+
+    const nostrBtn = this.add.text(btnX, btnY, "", style).setOrigin(1, 0);
+
+    const updateLabel = (): void => {
+      if (nostrService.isLoggedIn()) {
+        nostrBtn.setText(nostrService.getTruncatedNpub() ?? "Connected");
+        nostrBtn.setColor("#c8b8ff");
+      } else {
+        nostrBtn.setText("Login with Nostr");
+        nostrBtn.setColor("#b8a0d8");
+      }
+    };
+
+    updateLabel();
+    nostrBtn.setInteractive({ useHandCursor: true });
+
+    nostrBtn.on("pointerover", () => nostrBtn.setColor("#ffffff"));
+    nostrBtn.on("pointerout", () => {
+      nostrBtn.setColor(nostrService.isLoggedIn() ? "#c8b8ff" : "#b8a0d8");
+    });
+
+    nostrBtn.on("pointerdown", () => {
+      if (nostrService.isLoggedIn()) {
+        nostrService.logout();
+        updateLabel();
+        return;
+      }
+      nostrBtn.setText("Connecting...");
+      nostrBtn.setColor("#8a7fb0");
+      nostrService.login().then(() => {
+        updateLabel();
+      }).catch(() => {
+        nostrBtn.setText("Login failed");
+        nostrBtn.setColor("#ff8888");
+        this.time.delayedCall(2000, updateLabel);
+      });
+    });
   }
 
   private buildDifficultyButtons(): void {
