@@ -79,15 +79,17 @@ export class WinScene extends Phaser.Scene {
     // Divider
     this.add.rectangle(cx, 108, 300, 1, 0xffb8e6, 0.25);
 
-    this.add.text(cx, 122, `Total sparkles collected: ${data.totalSparkles ?? 0}`, {
+    const statsStyle: Phaser.Types.GameObjects.Text.TextStyle = {
       fontFamily: "monospace",
-      fontSize: "16px",
-      color: "#ffd1f7",
-      stroke: "#3b1a4f",
-      strokeThickness: 3
-    }).setOrigin(0.5);
+      fontSize: "14px",
+      color: "#d8b8f0",
+      stroke: "#2a1040",
+      strokeThickness: 2
+    };
 
-    // Times table — use two columns: label right-aligned, time left-aligned
+    this.add.text(cx, 122, `Total sparkles collected: ${data.totalSparkles ?? 0}`, statsStyle).setOrigin(0.5);
+
+    // Times table — two columns: label right-aligned, time left-aligned
     const allTimes: [string, number][] = [
       ["Level 0", menuTimeMs],
       ...levelTimes.map((t, i): [string, number] => [`Level ${i + 1}`, t])
@@ -97,47 +99,28 @@ export class WinScene extends Phaser.Scene {
     const rowH = 18;
     const labelX = cx - 10;
     const valueX = cx + 10;
-    const timeStyle: Phaser.Types.GameObjects.Text.TextStyle = {
-      fontFamily: "monospace",
-      fontSize: "14px",
-      color: "#d8b8f0",
-      stroke: "#2a1040",
-      strokeThickness: 2
-    };
 
     for (let i = 0; i < allTimes.length; i++) {
       const [label, ms] = allTimes[i];
       const y = tableTop + i * rowH;
-      this.add.text(labelX, y, label, timeStyle).setOrigin(1, 0.5);
-      this.add.text(valueX, y, formatTime(ms), timeStyle).setOrigin(0, 0.5);
+      this.add.text(labelX, y, label, statsStyle).setOrigin(1, 0.5);
+      this.add.text(valueX, y, formatTime(ms), statsStyle).setOrigin(0, 0.5);
     }
 
     const totalY = tableTop + allTimes.length * rowH + 8;
     this.add.rectangle(cx, totalY - 6, 220, 1, 0xd8b8f0, 0.3);
-    this.add.text(labelX, totalY, "Total", {
-      fontFamily: "monospace",
-      fontSize: "16px",
-      color: "#f0d8ff",
-      stroke: "#2a1040",
-      strokeThickness: 3
-    }).setOrigin(1, 0.5);
-    this.add.text(valueX, totalY, formatTime(totalMs), {
-      fontFamily: "monospace",
-      fontSize: "16px",
-      color: "#f0d8ff",
-      stroke: "#2a1040",
-      strokeThickness: 3
-    }).setOrigin(0, 0.5);
+    this.add.text(labelX, totalY, "Total", statsStyle).setOrigin(1, 0.5);
+    this.add.text(valueX, totalY, formatTime(totalMs), statsStyle).setOrigin(0, 0.5);
 
     // Share dialog
     const shareText = is100Percent
       ? `I just had a 100% Unicorn vs Snakes run and beat it on ${difficulty} difficulty in ${formatTime(totalMs)}!!!`
       : `I just beat Unicorn vs Snakes on ${difficulty} difficulty in ${formatTime(totalMs)}!`;
 
-    const dialogWidth = GAME_WIDTH - 120;
+    const dialogWidth = GAME_WIDTH - 220;
     const dialogHeight = 66;
-    const dialogX = 60;
-    const dialogY = totalY + 24;
+    const dialogX = (GAME_WIDTH - dialogWidth) / 2;
+    const dialogY = totalY + 36;
     const portraitSize = 38;
     const portraitCenterX = dialogX + 28;
     const portraitCenterY = dialogY + dialogHeight / 2;
