@@ -141,35 +141,16 @@ export class WinScene extends Phaser.Scene {
       strokeThickness: 3
     }).setOrigin(0, 0.5);
 
-    const iconSize = 16;
-    const pad = 4;
-    const boxSize = iconSize + pad * 2;
-    const boxX = dialogX + dialogWidth - 8 - boxSize;
-    const boxY = dialogY + dialogHeight - 8 - boxSize;
-    const borderGfx = this.add.graphics();
-    borderGfx.lineStyle(1, 0xffb8e6, 0.6);
-    borderGfx.strokeRoundedRect(boxX, boxY, boxSize, boxSize, 4);
     const copyIcon = this.add.image(
-      boxX + boxSize / 2, boxY + boxSize / 2, "copy-icon"
-    ).setDisplaySize(iconSize, iconSize).setAlpha(0.7);
+      dialogX + dialogWidth - 18,
+      dialogY + dialogHeight - 18,
+      "copy-icon"
+    ).setDisplaySize(28, 28).setOrigin(1, 1).setAlpha(0.7);
     copyIcon.setInteractive({ useHandCursor: true });
     copyIcon.on("pointerdown", () => {
       navigator.clipboard.writeText(shareText).then(() => {
         copyIcon.setTexture("clipboard-check");
         this.time.delayedCall(1500, () => copyIcon.setTexture("copy-icon"));
-      });
-    });
-
-    const tellLink = this.add.text(cx, btnY - 46, "Tell your friends!", {
-      fontFamily: "monospace",
-      fontSize: "14px",
-      color: "#ffb8e6"
-    }).setOrigin(0.5);
-    tellLink.setInteractive({ useHandCursor: true });
-    tellLink.on("pointerdown", () => {
-      navigator.clipboard.writeText(shareText).then(() => {
-        tellLink.setText("Copied!");
-        this.time.delayedCall(1500, () => tellLink.setText("Tell your friends!"));
       });
     });
 
