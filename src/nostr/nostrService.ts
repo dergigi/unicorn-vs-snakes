@@ -97,7 +97,7 @@ class NostrService {
   async fetchTopScores(difficulty: Difficulty, limit = 5): Promise<LeaderboardEntry[]> {
     const filter = {
       kinds: [NOSTR_KIND],
-      "#t": [NOSTR_HASHTAG],
+      "#t": [NOSTR_HASHTAG, "unicorn-vs-snakes"],
     };
 
     const events = await lastValueFrom(
