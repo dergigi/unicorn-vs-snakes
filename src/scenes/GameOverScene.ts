@@ -21,7 +21,7 @@ export class GameOverScene extends Phaser.Scene {
       fontSize: "52px",
       color: "#ffacc9"
     }).setOrigin(0.5);
-    this.add.text(GAME_WIDTH / 2, 160, "The unicorn can always bounce back.", {
+    this.add.text(GAME_WIDTH / 2, 160, "But unicorns are known to bounce back.", {
       fontFamily: "monospace",
       fontSize: "24px",
       color: "#d8f8ff"
