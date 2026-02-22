@@ -37,16 +37,23 @@ export class WinScene extends Phaser.Scene {
     // Floating sparkle particles
     this.spawnSparkles();
 
-    this.add.text(GAME_WIDTH / 2, 52, "Yaaaay!", {
+    this.add.text(GAME_WIDTH / 2, 46, "Yaaaay!", {
       fontFamily: "monospace",
       fontSize: "52px",
       color: "#ffe0f6",
       stroke: "#7b2f72",
       strokeThickness: 6
     }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 92, "Rainbow Kingdom is safe!", {
+      fontFamily: "monospace",
+      fontSize: "17px",
+      color: "#ffb8e6",
+      stroke: "#3b1a4f",
+      strokeThickness: 3
+    }).setOrigin(0.5);
 
     this.add.text(
-      GAME_WIDTH / 2, 112,
+      GAME_WIDTH / 2, 124,
       `Total sparkles collected: ${data.totalSparkles ?? 0}`,
       {
         fontFamily: "monospace",
@@ -56,16 +63,9 @@ export class WinScene extends Phaser.Scene {
         strokeThickness: 3
       }
     ).setOrigin(0.5);
-    this.add.text(GAME_WIDTH / 2, 142, "Rainbow Kingdom is safe!", {
-      fontFamily: "monospace",
-      fontSize: "17px",
-      color: "#ffb8e6",
-      stroke: "#3b1a4f",
-      strokeThickness: 3
-    }).setOrigin(0.5);
 
-    let timesY = 172;
-    this.add.text(GAME_WIDTH / 2, timesY, `Menu: ${formatTime(menuTimeMs)}`, {
+    let timesY = 158;
+    this.add.text(GAME_WIDTH / 2, timesY, `Level 0: ${formatTime(menuTimeMs)}`, {
       fontFamily: "monospace",
       fontSize: "15px",
       color: "#d8b8f0",
@@ -143,7 +143,7 @@ export class WinScene extends Phaser.Scene {
       });
     });
 
-    const btnY = dialogY + dialogHeight + 40;
+    const btnY = Math.max(dialogY + dialogHeight + 50, GAME_HEIGHT - 60);
     const again = this.add.rectangle(GAME_WIDTH / 2, btnY, 280, 56, 0xff8fd3);
     again.setStrokeStyle(3, 0xffffff);
     again.setInteractive({ useHandCursor: true });
