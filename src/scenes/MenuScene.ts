@@ -54,6 +54,7 @@ export class MenuScene extends Phaser.Scene {
     this.menuCreatedAt = Date.now();
     this.nextTrailAt = 0;
     this.menuSnakes = [];
+    this.bestTimeLabel = undefined;
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1d1336).setOrigin(0, 0);
     for (let tx = 0; tx < GAME_WIDTH; tx += 32) {
@@ -388,6 +389,7 @@ export class MenuScene extends Phaser.Scene {
       stroke: "#1d1336",
       strokeThickness: 3
     }).setOrigin(0.5).setAlpha(0.85);
+    this.refreshBestTime();
   }
 
   private refreshBestTime(): void {
