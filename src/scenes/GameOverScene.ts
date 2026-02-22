@@ -1,16 +1,12 @@
 import Phaser from "phaser";
-import { DEFAULT_DIFFICULTY, GAME_HEIGHT, GAME_WIDTH, type Difficulty } from "../config/gameConfig";
+import { GAME_HEIGHT, GAME_WIDTH } from "../config/gameConfig";
 
 export class GameOverScene extends Phaser.Scene {
   constructor() {
     super("GameOverScene");
   }
 
-  create(data?: { maxLives?: number; difficulty?: Difficulty; levelNumber?: number; levelTimes?: number[]; menuTimeMs?: number }): void {
-    const maxLives = data?.maxLives ?? 5;
-    const difficulty = data?.difficulty ?? DEFAULT_DIFFICULTY;
-    const levelNumber = data?.levelNumber ?? 1;
-
+  create(): void {
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1a0f30).setOrigin(0, 0);
     this.add.text(GAME_WIDTH / 2, 90, "Those darn snakes!", {
       fontFamily: "monospace",
@@ -34,9 +30,7 @@ export class GameOverScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     retry.on("pointerdown", () => {
-      const sceneData = { maxLives, difficulty, levelNumber, currentLives: maxLives };
-      this.scene.start("GameScene", sceneData);
-      this.scene.launch("UIScene", sceneData);
+      this.scene.start("MenuScene");
     });
   }
 }
