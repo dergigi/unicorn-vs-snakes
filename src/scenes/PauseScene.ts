@@ -200,6 +200,7 @@ export class PauseScene extends Phaser.Scene {
       ["Large Mushroom", "Digiflower", "CC0"],
       ["Mold Brick Wall", "TexturePalace", "CC-BY 4.0"],
       ["Castle Tower", "Eikester", "CC0"],
+      ["Ice Sparkles", "AntumDeluge", "CC-BY 3.0"],
       ["Castle Background", "vnitti", "CC-BY 3.0"],
     ];
 

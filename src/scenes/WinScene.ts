@@ -161,23 +161,36 @@ export class WinScene extends Phaser.Scene {
   }
 
   private spawnSparkles(): void {
-    const sparkleColors = [0xfff2a8, 0xffb8e6, 0xb8ecff, 0xd98cff, 0xffd1ff, 0xffffff];
+    if (!this.anims.exists("ice-sparkle")) {
+      this.anims.create({
+        key: "ice-sparkle",
+        frames: this.anims.generateFrameNumbers("ice-sparkles", { start: 0, end: 4 }),
+        frameRate: 8,
+        repeat: -1
+      });
+    }
 
-    for (let i = 0; i < 30; i++) {
+    const tints = [0xfff2a8, 0xffb8e6, 0xb8ecff, 0xd98cff, 0xffd1ff, 0xffffff];
+
+    for (let i = 0; i < 24; i++) {
       const x = Phaser.Math.Between(20, GAME_WIDTH - 20);
       const y = Phaser.Math.Between(10, GAME_HEIGHT - 10);
-      const size = Phaser.Math.Between(2, 5);
-      const color = sparkleColors[i % sparkleColors.length];
+      const scale = 0.5 + Math.random() * 0.8;
 
-      const sparkle = this.add.star(x, y, 4, size * 0.4, size, color, 0.7);
-      sparkle.setDepth(0);
+      const sparkle = this.add.sprite(x, y, "ice-sparkles", 0)
+        .setScale(scale)
+        .setAlpha(0.6)
+        .setTint(tints[i % tints.length])
+        .setDepth(0);
+
+      sparkle.play({ key: "ice-sparkle", startFrame: Phaser.Math.Between(0, 4) });
 
       this.tweens.add({
         targets: sparkle,
-        alpha: { from: 0.3, to: 0.9 },
-        scaleX: { from: 0.6, to: 1.2 },
-        scaleY: { from: 0.6, to: 1.2 },
-        duration: Phaser.Math.Between(800, 2000),
+        alpha: { from: 0.25, to: 0.85 },
+        scaleX: { from: scale * 0.7, to: scale * 1.2 },
+        scaleY: { from: scale * 0.7, to: scale * 1.2 },
+        duration: Phaser.Math.Between(900, 2200),
         yoyo: true,
         repeat: -1,
         delay: Phaser.Math.Between(0, 1500),
@@ -186,8 +199,8 @@ export class WinScene extends Phaser.Scene {
 
       this.tweens.add({
         targets: sparkle,
-        y: y - Phaser.Math.Between(8, 24),
-        duration: Phaser.Math.Between(2000, 4000),
+        y: y - Phaser.Math.Between(10, 28),
+        duration: Phaser.Math.Between(2000, 4500),
         yoyo: true,
         repeat: -1,
         delay: Phaser.Math.Between(0, 2000),

@@ -79,6 +79,10 @@ export class BootScene extends Phaser.Scene {
       frameWidth: 512,
       frameHeight: 512
     });
+    this.load.spritesheet("ice-sparkles", "assets/sprites/ice-sparkles.png", {
+      frameWidth: 48,
+      frameHeight: 64
+    });
   }
 
   create(): void {
