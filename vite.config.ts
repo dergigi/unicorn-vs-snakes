@@ -23,7 +23,7 @@ export default defineConfig({
         short_name: "UvS",
         description: "Collect sparkles, dodge snakes, reach the rainbow gate!",
         start_url: "/",
-        display: "standalone",
+        display: "fullscreen",
         orientation: "landscape",
         background_color: "#1d1336",
         theme_color: "#1d1336",
