@@ -3,7 +3,7 @@ import { EventFactory } from "applesauce-core";
 import { RelayPool } from "applesauce-relay";
 import { npubEncode } from "applesauce-core/helpers/pointers";
 import { type NostrEvent } from "applesauce-core/helpers/event";
-import { type Subscription } from "rxjs";
+import { lastValueFrom, toArray } from "rxjs";
 import { NOSTR_RELAYS, NOSTR_KIND, NOSTR_HASHTAG, NOSTR_SCORE_VERSION, type Difficulty } from "../config/gameConfig";
 import { ScoreBlueprint, type ScoreData } from "./scoreBlueprint";
 
@@ -106,30 +106,13 @@ class NostrService {
       "#t": [NOSTR_HASHTAG],
     };
 
-    const events = await new Promise<NostrEvent[]>((resolve) => {
-      const collected: NostrEvent[] = [];
-      let sub: Subscription | undefined;
-      let resolved = false;
-      const done = () => {
-        if (resolved) return;
-        resolved = true;
-        clearTimeout(timer);
-        sub?.unsubscribe();
-        resolve(collected);
-      };
-      const timer = setTimeout(done, 8000);
-      sub = this.pool.request(NOSTR_RELAYS, filter).subscribe({
-        next: (ev) => collected.push(ev),
-        complete: done,
-        error: () => done(),
-      });
-    });
+    const events = await lastValueFrom(
+      this.pool.request(NOSTR_RELAYS, filter).pipe(toArray()),
+      { defaultValue: [] as NostrEvent[] },
+    );
 
-    const seen = new Set<string>();
-    const entries: LeaderboardEntry[] = [];
+    const best = new Map<string, LeaderboardEntry>();
     for (const ev of events) {
-      if (seen.has(ev.id)) continue;
-      seen.add(ev.id);
       try {
         const evDifficulty = ev.tags.find(t => t[0] === "difficulty")?.[1];
         if (evDifficulty !== difficulty) continue;
@@ -137,7 +120,9 @@ class NostrService {
         if (data.version !== NOSTR_SCORE_VERSION) continue;
         if (data.cheated) continue;
         if (typeof data.totalMs !== "number" || data.totalMs <= 0) continue;
-        entries.push({
+        const prev = best.get(ev.pubkey);
+        if (prev && prev.totalMs <= data.totalMs) continue;
+        best.set(ev.pubkey, {
           pubkey: ev.pubkey,
           npub: npubEncode(ev.pubkey),
           totalMs: data.totalMs,
@@ -150,8 +135,7 @@ class NostrService {
       }
     }
 
-    entries.sort((a, b) => a.totalMs - b.totalMs);
-    return entries.slice(0, limit);
+    return [...best.values()].sort((a, b) => a.totalMs - b.totalMs).slice(0, limit);
   }
 
   async fetchProfiles(pubkeys: string[]): Promise<Map<string, NostrProfile>> {
@@ -160,24 +144,10 @@ class NostrService {
     if (uncached.length > 0) {
       const filter = { kinds: [0 as number], authors: uncached };
 
-      const events = await new Promise<NostrEvent[]>((resolve) => {
-        const collected: NostrEvent[] = [];
-        let sub: Subscription | undefined;
-        let resolved = false;
-        const done = () => {
-          if (resolved) return;
-          resolved = true;
-          clearTimeout(timer);
-          sub?.unsubscribe();
-          resolve(collected);
-        };
-        const timer = setTimeout(done, 6000);
-        sub = this.pool.request(NOSTR_RELAYS, filter).subscribe({
-          next: (ev) => collected.push(ev),
-          complete: done,
-          error: () => done(),
-        });
-      });
+      const events = await lastValueFrom(
+        this.pool.request(NOSTR_RELAYS, filter).pipe(toArray()),
+        { defaultValue: [] as NostrEvent[] },
+      );
 
       const latest = new Map<string, NostrEvent>();
       for (const ev of events) {
