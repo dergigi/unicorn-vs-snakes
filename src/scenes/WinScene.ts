@@ -141,19 +141,13 @@ export class WinScene extends Phaser.Scene {
     }).setOrigin(0, 0.5);
 
     const copyIcon = this.add.image(
-      dialogX + dialogWidth - 16,
-      dialogY + dialogHeight - 16,
+      dialogX + dialogWidth - 14,
+      dialogY + dialogHeight - 14,
       "copy-icon"
-    ).setDisplaySize(16, 16).setOrigin(1, 1).setAlpha(0.7);
+    ).setDisplaySize(14, 14).setOrigin(1, 1).setAlpha(0.7);
     copyIcon.setInteractive({ useHandCursor: true });
-    copyIcon.on("pointerover", () => { copyIcon.setScale(1.25); copyIcon.setAlpha(1); });
-    copyIcon.on("pointerout", () => { copyIcon.setScale(1); copyIcon.setAlpha(0.7); });
     copyIcon.on("pointerdown", () => {
-      navigator.clipboard.writeText(shareText).then(() => {
-        copyIcon.setAlpha(0.4);
-        this.time.delayedCall(150, () => copyIcon.setAlpha(1));
-        this.time.delayedCall(1500, () => copyIcon.setAlpha(0.7));
-      });
+      navigator.clipboard.writeText(shareText);
     });
 
     // Play again button — anchored near bottom
