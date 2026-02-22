@@ -417,12 +417,17 @@ export class MenuScene extends Phaser.Scene {
     });
   }
 
+  private static readonly DIFFICULTY_LABELS: Record<Difficulty, string> = {
+    easy: "easy", normal: "normal", hard: "hard", insane: "insane-o"
+  };
+
   private showBestTime(entries: LeaderboardEntry[], diff: Difficulty): void {
     if (!this.bestTimeLabel || this.selectedDifficulty !== diff) return;
+    const label = MenuScene.DIFFICULTY_LABELS[diff];
     if (entries.length === 0) {
-      this.bestTimeLabel.setText(`No ${diff} scores yet`);
+      this.bestTimeLabel.setText(`No ${label} scores yet`);
     } else {
-      this.bestTimeLabel.setText(`Best ${diff} time: ${formatTime(entries[0].totalMs)}`);
+      this.bestTimeLabel.setText(`Best ${label} time: ${formatTime(entries[0].totalMs)}`);
     }
   }
 

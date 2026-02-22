@@ -277,7 +277,8 @@ export class WinScene extends Phaser.Scene {
       strokeThickness: 2
     };
 
-    this.add.text(cx, top, `Best Times (${difficulty})`, headerStyle).setOrigin(0.5);
+    const diffLabel = difficulty === "insane" ? "insane-o" : difficulty;
+    this.add.text(cx, top, `Best Times (${diffLabel})`, headerStyle).setOrigin(0.5);
 
     const loadingLabel = this.add.text(cx, top + 30, "Loading...", {
       ...rowStyle, color: "#a090c0"
