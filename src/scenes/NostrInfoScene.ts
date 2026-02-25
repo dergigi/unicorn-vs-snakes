@@ -67,7 +67,7 @@ export class NostrInfoScene extends Phaser.Scene {
       },
       {
         heading: "WHY USE IT FOR THIS GAME",
-        body: "Logging in with Nostr lets you claim your spot on the leaderboard. Your score is cryptographically tied to your identity \u2014 no fake accounts, no cheating.",
+        body: "Nostr is a fun little protocol, and this is a fun little game. I wanted to have a highscore mechanism that doesn\u2019t force people to sign up via email or via some platform, so nostr was the obvious choice.",
       },
     ];
 
