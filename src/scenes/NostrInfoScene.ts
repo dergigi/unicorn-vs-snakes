@@ -66,7 +66,7 @@ export class NostrInfoScene extends Phaser.Scene {
         body: "Your identity is a cryptographic key pair. You own it, you control it, and no one can take it away. Your posts are signed, so they can\u2019t be forged or tampered with.",
       },
       {
-        heading: "WHY IT MATTERS FOR THIS GAME",
+        heading: "WHY USE IT FOR THIS GAME",
         body: "Logging in with Nostr lets you claim your spot on the leaderboard. Your score is cryptographically tied to your identity \u2014 no fake accounts, no cheating.",
       },
     ];
