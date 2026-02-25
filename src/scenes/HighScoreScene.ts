@@ -80,8 +80,36 @@ export class HighScoreScene extends Phaser.Scene {
       strokeThickness: 2,
     }).setOrigin(0.5);
 
+    this.buildHashtagButton();
     this.buildBackButton(cx);
     this.fetchAllScores();
+  }
+
+  private buildHashtagButton(): void {
+    const iconSize = 18;
+    const gap = 8;
+    const x = GAME_WIDTH - 16;
+    const y = 16;
+
+    const left = 16;
+
+    const searchBtn = this.add.image(left, y, "magnifying-glass")
+      .setOrigin(0, 0)
+      .setDisplaySize(iconSize, iconSize)
+      .setAlpha(0.6);
+    searchBtn.setInteractive({ useHandCursor: true });
+    searchBtn.on("pointerover", () => searchBtn.setAlpha(1));
+    searchBtn.on("pointerout", () => searchBtn.setAlpha(0.6));
+    searchBtn.on("pointerdown", () => window.open("https://ants.sh/?q=kind%3A5555", "_blank"));
+
+    const hashBtn = this.add.image(left + iconSize + gap, y, "hashtag")
+      .setOrigin(0, 0)
+      .setDisplaySize(iconSize, iconSize)
+      .setAlpha(0.6);
+    hashBtn.setInteractive({ useHandCursor: true });
+    hashBtn.on("pointerover", () => hashBtn.setAlpha(1));
+    hashBtn.on("pointerout", () => hashBtn.setAlpha(0.6));
+    hashBtn.on("pointerdown", () => window.open("https://ants.sh/t/UvS", "_blank"));
   }
 
   private buildTabs(cx: number): void {

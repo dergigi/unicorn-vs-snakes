@@ -8,6 +8,8 @@ import { UIScene } from "./scenes/UIScene";
 import { PauseScene } from "./scenes/PauseScene";
 import { WinScene } from "./scenes/WinScene";
 import { HighScoreScene } from "./scenes/HighScoreScene";
+import { NostrInfoScene } from "./scenes/NostrInfoScene";
+import { CreditsScene } from "./scenes/CreditsScene";
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -27,7 +29,7 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: false
     }
   },
-  scene: [BootScene, MenuScene, GameScene, UIScene, PauseScene, GameOverScene, WinScene, HighScoreScene]
+  scene: [BootScene, MenuScene, GameScene, UIScene, PauseScene, GameOverScene, WinScene, HighScoreScene, NostrInfoScene, CreditsScene]
 };
 
 new Phaser.Game(config);

@@ -126,13 +126,38 @@ export class MenuScene extends Phaser.Scene {
     gigiLink.on("pointerover", () => gigiLink.setColor("#ffffff"));
     gigiLink.on("pointerout", () => gigiLink.setColor("#c88cb8"));
     gigiLink.on("pointerdown", () => window.open("https://dergigi.com", "_blank"));
-    this.add
-      .text(GAME_WIDTH / 2, footerTop + 20, `v${__APP_VERSION__}  ·  Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt`, {
-        fontSize: "11px",
-        color: "#9b8cb8",
-        fontFamily: "monospace"
-      })
-      .setOrigin(0.5, 0);
+    const creditY = footerTop + 20;
+    const creditStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontSize: "11px",
+      color: "#9b8cb8",
+      fontFamily: "monospace",
+    };
+    const versionText = this.add.text(0, creditY, `v${__APP_VERSION__}`, {
+      ...creditStyle,
+      color: "#c88cb8",
+    }).setOrigin(0, 0);
+    const sepText = this.add.text(0, creditY, "  ·  ", creditStyle).setOrigin(0, 0);
+    const creditText = this.add.text(0, creditY, "Sprites via OpenGameArt", {
+      ...creditStyle,
+      color: "#c88cb8",
+    }).setOrigin(0, 0);
+    const creditTotalW = versionText.width + sepText.width + creditText.width;
+    const creditStartX = (GAME_WIDTH - creditTotalW) / 2;
+    versionText.setX(creditStartX);
+    sepText.setX(creditStartX + versionText.width);
+    creditText.setX(creditStartX + versionText.width + sepText.width);
+
+    versionText.setInteractive({ useHandCursor: true });
+    versionText.on("pointerover", () => versionText.setColor("#ffffff"));
+    versionText.on("pointerout", () => versionText.setColor("#c88cb8"));
+    versionText.on("pointerdown", () => window.open("https://github.com/dergigi/unicorn-vs-snakes/tags", "_blank"));
+
+    creditText.setInteractive({ useHandCursor: true });
+    creditText.on("pointerover", () => creditText.setColor("#ffffff"));
+    creditText.on("pointerout", () => creditText.setColor("#c88cb8"));
+    creditText.on("pointerdown", () => {
+      this.scene.start("CreditsScene", { returnTo: "MenuScene" });
+    });
 
     this.cursors = this.input.keyboard?.createCursorKeys();
     this.wasdA = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.A);
@@ -141,7 +166,7 @@ export class MenuScene extends Phaser.Scene {
     this.wasdW = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.W);
     this.touchControls = new TouchControls(this);
     this.setupLevelSkipCheat();
-    this.buildNostrButton();
+    this.buildTopRightIcons();
   }
 
   update(time: number): void {
@@ -217,23 +242,42 @@ export class MenuScene extends Phaser.Scene {
     this.touchControls?.resetFrameState();
   }
 
-  private buildNostrButton(): void {
-    if (!nostrService.isExtensionAvailable()) return;
-
+  private buildTopRightIcons(): void {
     const btnX = GAME_WIDTH - 16;
     const btnY = 16;
-    const style: Phaser.Types.GameObjects.Text.TextStyle = {
+    const iconSize = 16;
+    const iconGap = 6;
+    const iconStep = iconSize + iconGap;
+
+    const nostrBtn = this.add.text(btnX, btnY, "", {
       fontFamily: "monospace",
       fontSize: "13px",
       color: "#b8a0d8",
       stroke: "#1d1336",
       strokeThickness: 3,
-    };
+    }).setOrigin(1, 0);
 
-    const nostrBtn = this.add.text(btnX, btnY, "", style).setOrigin(1, 0);
+    const crownBtn = this.add.image(0, btnY + 1, "crown")
+      .setOrigin(1, 0).setDisplaySize(iconSize, iconSize).setAlpha(0.6);
+    crownBtn.setInteractive({ useHandCursor: true });
+    crownBtn.on("pointerover", () => crownBtn.setAlpha(1));
+    crownBtn.on("pointerout", () => crownBtn.setAlpha(0.6));
+    crownBtn.on("pointerdown", () => {
+      this.scene.start("HighScoreScene", { returnTo: "MenuScene" });
+    });
 
-    const updateLabel = (): void => {
-      if (nostrService.isLoggedIn()) {
+    const helpBtn = this.add.image(0, btnY + 1, "circle-question")
+      .setOrigin(1, 0).setDisplaySize(iconSize, iconSize).setAlpha(0.6);
+    helpBtn.setInteractive({ useHandCursor: true });
+    helpBtn.on("pointerover", () => helpBtn.setAlpha(1));
+    helpBtn.on("pointerout", () => helpBtn.setAlpha(0.6));
+    helpBtn.on("pointerdown", () => {
+      this.scene.start("NostrInfoScene", { returnTo: "MenuScene" });
+    });
+
+    const layoutIcons = (): void => {
+      const loggedIn = nostrService.isLoggedIn();
+      if (loggedIn) {
         const pk = nostrService.getPubkey();
         nostrBtn.setText(pk ? nostrService.getDisplayName(pk) : "Connected");
         nostrBtn.setColor("#c8b8ff");
@@ -241,41 +285,52 @@ export class MenuScene extends Phaser.Scene {
         nostrBtn.setText("Login with Nostr");
         nostrBtn.setColor("#b8a0d8");
       }
+      const left = nostrBtn.x - nostrBtn.width;
+      crownBtn.setVisible(true);
+      crownBtn.setX(left - iconGap);
+      helpBtn.setVisible(!loggedIn);
+      if (!loggedIn) helpBtn.setX(left - iconGap - iconStep);
     };
 
-    const resolveAndUpdate = (): void => {
-      updateLabel();
+    const resolveAndLayout = (): void => {
+      layoutIcons();
       const pk = nostrService.getPubkey();
       if (pk) {
         nostrService.fetchProfiles([pk]).then(() => {
-          if (!this.scene.isActive()) return;
-          updateLabel();
-        }).catch(() => { /* keep fallback */ });
+          if (this.scene.isActive()) layoutIcons();
+        }).catch(() => {});
       }
     };
 
-    resolveAndUpdate();
-    nostrBtn.setInteractive({ useHandCursor: true });
+    resolveAndLayout();
 
+    nostrBtn.setInteractive({ useHandCursor: true });
     nostrBtn.on("pointerover", () => nostrBtn.setColor("#ffffff"));
     nostrBtn.on("pointerout", () => {
       nostrBtn.setColor(nostrService.isLoggedIn() ? "#c8b8ff" : "#b8a0d8");
     });
-
     nostrBtn.on("pointerdown", () => {
       if (nostrService.isLoggedIn()) {
         nostrService.logout();
-        updateLabel();
+        layoutIcons();
+        return;
+      }
+      if (!nostrService.isExtensionAvailable()) {
+        nostrBtn.setText("Extension required");
+        nostrBtn.setColor("#ff8888");
+        crownBtn.setVisible(false);
+        helpBtn.setVisible(false);
+        this.time.delayedCall(2500, layoutIcons);
         return;
       }
       nostrBtn.setText("Connecting...");
       nostrBtn.setColor("#8a7fb0");
       nostrService.login().then(() => {
-        resolveAndUpdate();
+        resolveAndLayout();
       }).catch(() => {
         nostrBtn.setText("Login failed");
         nostrBtn.setColor("#ff8888");
-        this.time.delayedCall(2000, updateLabel);
+        this.time.delayedCall(2000, layoutIcons);
       });
     });
   }
