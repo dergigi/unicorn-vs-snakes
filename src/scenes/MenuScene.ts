@@ -238,13 +238,17 @@ export class MenuScene extends Phaser.Scene {
     const iconSize = 16;
     const iconGap = 6;
     const iconStep = iconSize + iconGap;
-    const hasExtension = nostrService.isExtensionAvailable();
+
+    const nostrBtn = this.add.text(btnX, btnY, "", {
+      fontFamily: "monospace",
+      fontSize: "13px",
+      color: "#b8a0d8",
+      stroke: "#1d1336",
+      strokeThickness: 3,
+    }).setOrigin(1, 0);
 
     const crownBtn = this.add.image(0, btnY + 1, "crown")
-      .setOrigin(1, 0)
-      .setDisplaySize(iconSize, iconSize)
-      .setAlpha(0.6);
-
+      .setOrigin(1, 0).setDisplaySize(iconSize, iconSize).setAlpha(0.6);
     crownBtn.setInteractive({ useHandCursor: true });
     crownBtn.on("pointerover", () => crownBtn.setAlpha(1));
     crownBtn.on("pointerout", () => crownBtn.setAlpha(0.6));
@@ -253,10 +257,7 @@ export class MenuScene extends Phaser.Scene {
     });
 
     const helpBtn = this.add.image(0, btnY + 1, "circle-question")
-      .setOrigin(1, 0)
-      .setDisplaySize(iconSize, iconSize)
-      .setAlpha(0.6);
-
+      .setOrigin(1, 0).setDisplaySize(iconSize, iconSize).setAlpha(0.6);
     helpBtn.setInteractive({ useHandCursor: true });
     helpBtn.on("pointerover", () => helpBtn.setAlpha(1));
     helpBtn.on("pointerout", () => helpBtn.setAlpha(0.6));
@@ -264,73 +265,53 @@ export class MenuScene extends Phaser.Scene {
       this.scene.start("NostrInfoScene", { returnTo: "MenuScene" });
     });
 
-    if (!hasExtension) {
-      crownBtn.setX(btnX);
-      helpBtn.setX(btnX - iconStep);
-      return;
-    }
-
-    const style: Phaser.Types.GameObjects.Text.TextStyle = {
-      fontFamily: "monospace",
-      fontSize: "13px",
-      color: "#b8a0d8",
-      stroke: "#1d1336",
-      strokeThickness: 3,
-    };
-
-    const nostrBtn = this.add.text(btnX, btnY, "", style).setOrigin(1, 0);
-
-    const updateLabel = (): void => {
-      if (nostrService.isLoggedIn()) {
+    const layoutIcons = (): void => {
+      const loggedIn = nostrService.isLoggedIn();
+      if (loggedIn) {
         const pk = nostrService.getPubkey();
         nostrBtn.setText(pk ? nostrService.getDisplayName(pk) : "Connected");
         nostrBtn.setColor("#c8b8ff");
-        helpBtn.setVisible(false);
-        const left = nostrBtn.x - nostrBtn.width;
-        crownBtn.setX(left - iconGap);
       } else {
         nostrBtn.setText("Login with Nostr");
         nostrBtn.setColor("#b8a0d8");
-        helpBtn.setVisible(true);
-        const left = nostrBtn.x - nostrBtn.width;
-        crownBtn.setX(left - iconGap);
-        helpBtn.setX(left - iconGap - iconStep);
       }
+      const left = nostrBtn.x - nostrBtn.width;
+      crownBtn.setX(left - iconGap);
+      helpBtn.setVisible(!loggedIn);
+      if (!loggedIn) helpBtn.setX(left - iconGap - iconStep);
     };
 
-    const resolveAndUpdate = (): void => {
-      updateLabel();
+    const resolveAndLayout = (): void => {
+      layoutIcons();
       const pk = nostrService.getPubkey();
       if (pk) {
         nostrService.fetchProfiles([pk]).then(() => {
-          if (!this.scene.isActive()) return;
-          updateLabel();
-        }).catch(() => { /* keep fallback */ });
+          if (this.scene.isActive()) layoutIcons();
+        }).catch(() => {});
       }
     };
 
-    resolveAndUpdate();
-    nostrBtn.setInteractive({ useHandCursor: true });
+    resolveAndLayout();
 
+    nostrBtn.setInteractive({ useHandCursor: true });
     nostrBtn.on("pointerover", () => nostrBtn.setColor("#ffffff"));
     nostrBtn.on("pointerout", () => {
       nostrBtn.setColor(nostrService.isLoggedIn() ? "#c8b8ff" : "#b8a0d8");
     });
-
     nostrBtn.on("pointerdown", () => {
       if (nostrService.isLoggedIn()) {
         nostrService.logout();
-        updateLabel();
+        layoutIcons();
         return;
       }
       nostrBtn.setText("Connecting...");
       nostrBtn.setColor("#8a7fb0");
       nostrService.login().then(() => {
-        resolveAndUpdate();
+        resolveAndLayout();
       }).catch(() => {
         nostrBtn.setText("Login failed");
         nostrBtn.setColor("#ff8888");
-        this.time.delayedCall(2000, updateLabel);
+        this.time.delayedCall(2000, layoutIcons);
       });
     });
   }
