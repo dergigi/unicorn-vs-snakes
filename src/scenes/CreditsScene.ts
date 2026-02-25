@@ -61,7 +61,7 @@ export class CreditsScene extends Phaser.Scene {
     subtitle.on("pointerdown", () => window.open("https://opengameart.org", "_blank"));
 
     this.buildTable();
-    this.buildBackButton(cx);
+    this.buildCloseButton();
   }
 
   private buildTable(): void {
@@ -112,20 +112,19 @@ export class CreditsScene extends Phaser.Scene {
     }
   }
 
-  private buildBackButton(cx: number): void {
-    const btnY = GAME_HEIGHT - 42;
-    const back = this.add.text(cx, btnY, "\u2190 Back", {
+  private buildCloseButton(): void {
+    const close = this.add.text(GAME_WIDTH - 16, 16, "\u2715", {
       fontFamily: "monospace",
-      fontSize: "24px",
-      color: "#cccccc",
-      stroke: "#24133d",
-      strokeThickness: 4,
-    }).setOrigin(0.5);
+      fontSize: "22px",
+      color: "#8a7fb0",
+      stroke: "#1d1336",
+      strokeThickness: 3,
+    }).setOrigin(1, 0);
 
-    back.setInteractive({ useHandCursor: true });
-    back.on("pointerover", () => { back.setColor("#ffffff"); back.setScale(1.08); });
-    back.on("pointerout", () => { back.setColor("#cccccc"); back.setScale(1); });
-    back.on("pointerdown", () => this.goBack());
+    close.setInteractive({ useHandCursor: true });
+    close.on("pointerover", () => close.setColor("#ffffff"));
+    close.on("pointerout", () => close.setColor("#8a7fb0"));
+    close.on("pointerdown", () => this.goBack());
 
     this.input.keyboard?.on("keydown-ESC", () => this.goBack(), this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
