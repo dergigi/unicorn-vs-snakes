@@ -126,13 +126,28 @@ export class MenuScene extends Phaser.Scene {
     gigiLink.on("pointerover", () => gigiLink.setColor("#ffffff"));
     gigiLink.on("pointerout", () => gigiLink.setColor("#c88cb8"));
     gigiLink.on("pointerdown", () => window.open("https://dergigi.com", "_blank"));
-    this.add
-      .text(GAME_WIDTH / 2, footerTop + 20, `v${__APP_VERSION__}  ·  Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt`, {
-        fontSize: "11px",
-        color: "#9b8cb8",
-        fontFamily: "monospace"
-      })
-      .setOrigin(0.5, 0);
+    const creditY = footerTop + 20;
+    const creditStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontSize: "11px",
+      color: "#9b8cb8",
+      fontFamily: "monospace",
+    };
+    const versionText = this.add.text(0, creditY, `v${__APP_VERSION__}`, {
+      ...creditStyle,
+      color: "#c88cb8",
+    }).setOrigin(0, 0);
+    const creditText = this.add.text(0, creditY,
+      "  ·  Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt",
+      creditStyle,
+    ).setOrigin(0, 0);
+    const creditTotalW = versionText.width + creditText.width;
+    const creditStartX = (GAME_WIDTH - creditTotalW) / 2;
+    versionText.setX(creditStartX);
+    creditText.setX(creditStartX + versionText.width);
+    versionText.setInteractive({ useHandCursor: true });
+    versionText.on("pointerover", () => versionText.setColor("#ffffff"));
+    versionText.on("pointerout", () => versionText.setColor("#c88cb8"));
+    versionText.on("pointerdown", () => window.open("https://github.com/dergigi/unicorn-vs-snakes/tags", "_blank"));
 
     this.cursors = this.input.keyboard?.createCursorKeys();
     this.wasdA = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.A);
