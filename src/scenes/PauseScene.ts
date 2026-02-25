@@ -101,7 +101,7 @@ export class PauseScene extends Phaser.Scene {
       { label: "Resume", action: () => this.resumeGame() },
       { label: "Restart Level", action: () => this.restartLevel() },
       { label: "Controls", action: () => this.showControls() },
-      { label: "Fastest Unicorns", action: () => this.showHighScores() },
+      { label: "Highscore", action: () => this.showHighScores() },
       { label: "Credits", action: () => this.showCredits() },
       { label: "Quit to Menu", action: () => this.quitToMenu() }
     ];
