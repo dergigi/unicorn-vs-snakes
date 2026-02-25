@@ -156,7 +156,7 @@ export class MenuScene extends Phaser.Scene {
     this.wasdW = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.W);
     this.touchControls = new TouchControls(this);
     this.setupLevelSkipCheat();
-    this.buildNostrButton();
+    this.buildTopRightIcons();
   }
 
   update(time: number): void {
@@ -232,29 +232,18 @@ export class MenuScene extends Phaser.Scene {
     this.touchControls?.resetFrameState();
   }
 
-  private buildNostrButton(): void {
-    if (!nostrService.isExtensionAvailable()) return;
-
+  private buildTopRightIcons(): void {
     const btnX = GAME_WIDTH - 16;
     const btnY = 16;
-    const style: Phaser.Types.GameObjects.Text.TextStyle = {
-      fontFamily: "monospace",
-      fontSize: "13px",
-      color: "#b8a0d8",
-      stroke: "#1d1336",
-      strokeThickness: 3,
-    };
-
-    const nostrBtn = this.add.text(btnX, btnY, "", style).setOrigin(1, 0);
-
     const iconSize = 16;
     const iconGap = 6;
+    const iconStep = iconSize + iconGap;
+    const hasExtension = nostrService.isExtensionAvailable();
 
     const crownBtn = this.add.image(0, btnY + 1, "crown")
       .setOrigin(1, 0)
       .setDisplaySize(iconSize, iconSize)
-      .setAlpha(0.6)
-      .setVisible(false);
+      .setAlpha(0.6);
 
     crownBtn.setInteractive({ useHandCursor: true });
     crownBtn.on("pointerover", () => crownBtn.setAlpha(1));
@@ -266,8 +255,7 @@ export class MenuScene extends Phaser.Scene {
     const helpBtn = this.add.image(0, btnY + 1, "circle-question")
       .setOrigin(1, 0)
       .setDisplaySize(iconSize, iconSize)
-      .setAlpha(0.6)
-      .setVisible(false);
+      .setAlpha(0.6);
 
     helpBtn.setInteractive({ useHandCursor: true });
     helpBtn.on("pointerover", () => helpBtn.setAlpha(1));
@@ -276,7 +264,22 @@ export class MenuScene extends Phaser.Scene {
       this.scene.start("NostrInfoScene", { returnTo: "MenuScene" });
     });
 
-    const iconStep = iconSize + iconGap;
+    if (!hasExtension) {
+      crownBtn.setX(btnX);
+      helpBtn.setX(btnX - iconStep);
+      return;
+    }
+
+    const style: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: "monospace",
+      fontSize: "13px",
+      color: "#b8a0d8",
+      stroke: "#1d1336",
+      strokeThickness: 3,
+    };
+
+    const nostrBtn = this.add.text(btnX, btnY, "", style).setOrigin(1, 0);
+
     const updateLabel = (): void => {
       if (nostrService.isLoggedIn()) {
         const pk = nostrService.getPubkey();
@@ -284,15 +287,13 @@ export class MenuScene extends Phaser.Scene {
         nostrBtn.setColor("#c8b8ff");
         helpBtn.setVisible(false);
         const left = nostrBtn.x - nostrBtn.width;
-        crownBtn.setVisible(true);
         crownBtn.setX(left - iconGap);
       } else {
         nostrBtn.setText("Login with Nostr");
         nostrBtn.setColor("#b8a0d8");
-        const left = nostrBtn.x - nostrBtn.width;
-        crownBtn.setVisible(true);
-        crownBtn.setX(left - iconGap);
         helpBtn.setVisible(true);
+        const left = nostrBtn.x - nostrBtn.width;
+        crownBtn.setX(left - iconGap);
         helpBtn.setX(left - iconGap - iconStep);
       }
     };
