@@ -283,7 +283,9 @@ export class MenuScene extends Phaser.Scene {
     helpBtn.setInteractive({ useHandCursor: true });
     helpBtn.on("pointerover", () => helpBtn.setAlpha(1));
     helpBtn.on("pointerout", () => helpBtn.setAlpha(0.6));
-    helpBtn.on("pointerdown", () => window.open("https://nstart.me", "_blank"));
+    helpBtn.on("pointerdown", () => {
+      this.scene.start("NostrInfoScene", { returnTo: "MenuScene" });
+    });
 
     const iconStep = iconSize + iconGap;
     const updateLabel = (): void => {
