@@ -2,7 +2,6 @@ import Phaser from "phaser";
 import {
   DEFAULT_DIFFICULTY,
   DIFFICULTY_HEARTS,
-  DIFFICULTY_LABELS,
   GAME_HEIGHT,
   GAME_WIDTH,
   type Difficulty
@@ -43,7 +42,7 @@ export class MenuScene extends Phaser.Scene {
   private levelSkipResetTimer?: Phaser.Time.TimerEvent;
   private menuCreatedAt = 0;
   private touchControls?: TouchControls;
-  private bestTimeLabel?: Phaser.GameObjects.Text;
+  private bestTimeLabels = new Map<Difficulty, { timeTxt: Phaser.GameObjects.Text; nameTxt: Phaser.GameObjects.Text }>();
   private scoreCache = new Map<Difficulty, LeaderboardEntry[]>();
 
   constructor() {
@@ -55,7 +54,7 @@ export class MenuScene extends Phaser.Scene {
     this.menuCreatedAt = Date.now();
     this.nextTrailAt = 0;
     this.menuSnakes = [];
-    this.bestTimeLabel = undefined;
+    this.bestTimeLabels.clear();
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x1d1336).setOrigin(0, 0);
     for (let tx = 0; tx < GAME_WIDTH; tx += 32) {
@@ -88,7 +87,7 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.buildDifficultyButtons();
-    this.buildBestTimeLabel();
+    this.buildBestTimeLabels();
 
     this.add
       .image(GATE_X, FLOOR_Y, "finish-gate-open")
@@ -442,79 +441,104 @@ export class MenuScene extends Phaser.Scene {
       for (const d of difficulties) {
         drawButton(d, d === this.selectedDifficulty);
       }
-      this.refreshBestTime();
     };
     this.applyDifficultyStyles = applyStyles;
     applyStyles();
   }
 
-  private buildBestTimeLabel(): void {
+  private buildBestTimeLabels(): void {
     this.scoreCache.clear();
-    this.bestTimeLabel = this.add.text(GAME_WIDTH / 2, 306, "", {
-      fontFamily: "monospace",
-      fontSize: "14px",
-      color: "#a090c0",
-      stroke: "#1d1336",
-      strokeThickness: 3
-    }).setOrigin(0.5).setAlpha(0.85);
+    const difficulties: Difficulty[] = ["easy", "normal", "hard", "insane"];
 
-    this.bestTimeLabel.setInteractive({ useHandCursor: true });
-    this.bestTimeLabel.on("pointerover", () => this.bestTimeLabel?.setColor("#ffffff"));
-    this.bestTimeLabel.on("pointerout", () => this.bestTimeLabel?.setColor("#a090c0"));
-    this.bestTimeLabel.on("pointerdown", () => {
-      if (this.started) return;
-      this.scene.start("HighScoreScene", {
-        difficulty: this.selectedDifficulty,
-        returnTo: "MenuScene",
-      });
-    });
+    for (let i = 0; i < difficulties.length; i++) {
+      const diff = difficulties[i];
+      const cx = 222 + i * 172;
 
-    this.refreshBestTime();
-  }
+      const timeTxt = this.add.text(cx, 296, "", {
+        fontFamily: "monospace",
+        fontSize: "11px",
+        color: "#a090c0",
+        stroke: "#1d1336",
+        strokeThickness: 2,
+      }).setOrigin(0.5).setAlpha(0.85);
 
-  private refreshBestTime(): void {
-    if (!this.bestTimeLabel) return;
+      const nameTxt = this.add.text(cx, 311, "", {
+        fontFamily: "monospace",
+        fontSize: "10px",
+        color: "#8878a8",
+        stroke: "#1d1336",
+        strokeThickness: 2,
+      }).setOrigin(0.5).setAlpha(0.75);
 
-    const diff = this.selectedDifficulty;
-    const cached = this.scoreCache.get(diff);
-    if (cached) {
-      this.showBestTime(cached, diff);
-      return;
+      for (const txt of [timeTxt, nameTxt]) {
+        const baseColor = txt === timeTxt ? "#a090c0" : "#8878a8";
+        txt.setInteractive({ useHandCursor: true });
+        txt.on("pointerover", () => txt.setColor("#ffffff"));
+        txt.on("pointerout", () => txt.setColor(baseColor));
+        txt.on("pointerdown", () => {
+          if (this.started) return;
+          this.scene.start("HighScoreScene", {
+            difficulty: diff,
+            returnTo: "MenuScene",
+          });
+        });
+      }
+
+      this.bestTimeLabels.set(diff, { timeTxt, nameTxt });
     }
 
-    this.bestTimeLabel.setText("Best: ...");
-    nostrService.fetchTopScores(diff, 1).then((entries) => {
-      if (!this.scene.isActive()) return;
-      this.scoreCache.set(diff, entries);
-      if (this.selectedDifficulty === diff) {
-        this.showBestTime(entries, diff);
-      }
-    }).catch(() => {
-      if (!this.scene.isActive()) return;
-      if (this.selectedDifficulty === diff) {
-        this.bestTimeLabel?.setText("");
-      }
-    });
+    this.fetchAllBestTimes();
   }
 
-  private showBestTime(entries: LeaderboardEntry[], diff: Difficulty): void {
-    if (!this.bestTimeLabel || this.selectedDifficulty !== diff) return;
-    const label = DIFFICULTY_LABELS[diff];
+  private fetchAllBestTimes(): void {
+    const difficulties: Difficulty[] = ["easy", "normal", "hard", "insane"];
+    const allPubkeys = new Set<string>();
+
+    for (const diff of difficulties) {
+      const labels = this.bestTimeLabels.get(diff);
+      if (!labels) continue;
+      labels.timeTxt.setText("...");
+      labels.nameTxt.setText("");
+
+      nostrService.fetchTopScores(diff, 1).then((entries) => {
+        if (!this.scene.isActive()) return;
+        this.scoreCache.set(diff, entries);
+        this.showBestTimeForDifficulty(diff, entries);
+
+        if (entries.length > 0) {
+          const pk = entries[0].pubkey;
+          if (!allPubkeys.has(pk)) {
+            allPubkeys.add(pk);
+            nostrService.fetchProfiles([pk]).then(() => {
+              if (!this.scene.isActive()) return;
+              this.showBestTimeForDifficulty(diff, entries);
+            }).catch(() => {});
+          }
+        }
+      }).catch(() => {
+        if (!this.scene.isActive()) return;
+        const lbl = this.bestTimeLabels.get(diff);
+        if (lbl) {
+          lbl.timeTxt.setText("");
+          lbl.nameTxt.setText("");
+        }
+      });
+    }
+  }
+
+  private showBestTimeForDifficulty(diff: Difficulty, entries: LeaderboardEntry[]): void {
+    const labels = this.bestTimeLabels.get(diff);
+    if (!labels) return;
+
     if (entries.length === 0) {
-      this.bestTimeLabel.setText(`No ${label} scores yet`);
+      labels.timeTxt.setText("—");
+      labels.nameTxt.setText("");
       return;
     }
 
     const best = entries[0];
-    const name = nostrService.getDisplayName(best.pubkey);
-    this.bestTimeLabel.setText(`Best ${label} time: ${formatTime(best.totalMs)} by ${name}`);
-
-    nostrService.fetchProfiles([best.pubkey]).then(() => {
-      if (!this.scene.isActive()) return;
-      if (this.selectedDifficulty !== diff) return;
-      const resolved = nostrService.getDisplayName(best.pubkey);
-      this.bestTimeLabel?.setText(`Best ${label} time: ${formatTime(best.totalMs)} by ${resolved}`);
-    }).catch(() => { /* keep fallback */ });
+    labels.timeTxt.setText(formatTime(best.totalMs));
+    labels.nameTxt.setText(nostrService.getDisplayName(best.pubkey));
   }
 
   private checkButtonOverlap(): void {
