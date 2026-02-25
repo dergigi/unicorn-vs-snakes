@@ -307,6 +307,8 @@ export class MenuScene extends Phaser.Scene {
       if (!nostrService.isExtensionAvailable()) {
         nostrBtn.setText("Extension required");
         nostrBtn.setColor("#ff8888");
+        crownBtn.setVisible(false);
+        helpBtn.setVisible(false);
         this.time.delayedCall(2500, layoutIcons);
         return;
       }
