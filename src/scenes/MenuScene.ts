@@ -272,10 +272,10 @@ export class MenuScene extends Phaser.Scene {
         nostrBtn.setText("Login with Nostr");
         nostrBtn.setColor("#b8a0d8");
         const left = nostrBtn.x - nostrBtn.width;
-        helpBtn.setVisible(true);
-        helpBtn.setX(left - iconGap);
         crownBtn.setVisible(true);
-        crownBtn.setX(left - iconGap - iconSize - iconGap);
+        crownBtn.setX(left - iconGap);
+        helpBtn.setVisible(true);
+        helpBtn.setX(left - iconGap - iconSize - iconGap);
       }
     };
 
