@@ -245,94 +245,10 @@ export class PauseScene extends Phaser.Scene {
   }
 
   private showCredits(): void {
-    this.clearView();
-    this.currentView = "credits";
-
-    const title = this.add.text(GAME_WIDTH / 2, 36, "CREDITS", {
-      fontFamily: "monospace",
-      fontSize: "36px",
-      color: "#ffffff",
-      stroke: "#24133d",
-      strokeThickness: 6
-    }).setOrigin(0.5);
-    this.viewContainer.add(title);
-
-    const subtitle = this.add.text(GAME_WIDTH / 2, 68, "All assets from OpenGameArt.org", {
-      fontFamily: "monospace",
-      fontSize: "13px",
-      color: "#a89cc8",
-      stroke: "#24133d",
-      strokeThickness: 2
-    }).setOrigin(0.5);
-    this.viewContainer.add(subtitle);
-
-    const credits = [
-      ["Unicorn sprite", "magdum", "CC-BY-SA 3.0"],
-      ["A Cat (idle sprite)", "Elthen", "CC0"],
-      ["Chestnut Trees", "Yar / AntumDeluge", "CC-BY 3.0"],
-      ["Gnarled Tree", "geloescht", "CC-BY 3.0"],
-      ["LPC Tree Recolors", "C. Nilsson", "CC-BY 3.0"],
-      ["Krook Tree", "FunwithPixels", "CC-BY 3.0"],
-      ["Bat Sprite", "bagzie", "CC-BY-SA 3.0"],
-      ["Pixel Torch", "PixelMist", "CC0"],
-      ["Little Witch", "ansimuz", "CC0"],
-      ["Large Mushroom", "Digiflower", "CC0"],
-      ["Mold Brick Wall", "TexturePalace", "CC-BY 4.0"],
-      ["Castle Tower", "Eikester", "CC0"],
-      ["Ice Sparkles", "AntumDeluge", "CC-BY 3.0"],
-      ["Castle Background", "vnitti", "CC-BY 3.0"],
-    ];
-
-    const startY = 96;
-    const rowH = 30;
-    const nameX = 60;
-    const authorX = 520;
-    const licenseX = 780;
-
-    const headerStyle: Phaser.Types.GameObjects.Text.TextStyle = {
-      fontFamily: "monospace",
-      fontSize: "13px",
-      color: "#8a7fb0",
-      stroke: "#24133d",
-      strokeThickness: 2
-    };
-    const hAsset = this.add.text(nameX, startY, "Asset", headerStyle).setOrigin(0, 0.5);
-    const hAuthor = this.add.text(authorX, startY, "Author", headerStyle).setOrigin(0, 0.5);
-    const hLicense = this.add.text(licenseX, startY, "License", headerStyle).setOrigin(0, 0.5);
-    this.viewContainer.add([hAsset, hAuthor, hLicense]);
-
-    for (let i = 0; i < credits.length; i++) {
-      const [asset, author, license] = credits[i];
-      const y = startY + 22 + i * rowH;
-
-      const assetText = this.add.text(nameX, y, asset, {
-        fontFamily: "monospace",
-        fontSize: "14px",
-        color: "#ffe6a8",
-        stroke: "#24133d",
-        strokeThickness: 2
-      }).setOrigin(0, 0.5);
-
-      const authorText = this.add.text(authorX, y, author, {
-        fontFamily: "monospace",
-        fontSize: "14px",
-        color: "#cccccc",
-        stroke: "#24133d",
-        strokeThickness: 2
-      }).setOrigin(0, 0.5);
-
-      const licenseText = this.add.text(licenseX, y, license, {
-        fontFamily: "monospace",
-        fontSize: "14px",
-        color: "#9bdfb8",
-        stroke: "#24133d",
-        strokeThickness: 2
-      }).setOrigin(0, 0.5);
-
-      this.viewContainer.add([assetText, authorText, licenseText]);
-    }
-
-    this.addBackButton(startY + 22 + credits.length * rowH + 20);
+    this.scene.start("CreditsScene", {
+      returnTo: "PauseScene",
+      pauseData: this.pauseData,
+    });
   }
 
   private showHighScores(): void {

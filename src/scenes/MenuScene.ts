@@ -155,7 +155,9 @@ export class MenuScene extends Phaser.Scene {
     creditText.setInteractive({ useHandCursor: true });
     creditText.on("pointerover", () => creditText.setColor("#ffffff"));
     creditText.on("pointerout", () => creditText.setColor("#c88cb8"));
-    creditText.on("pointerdown", () => window.open("https://opengameart.org", "_blank"));
+    creditText.on("pointerdown", () => {
+      this.scene.start("CreditsScene", { returnTo: "MenuScene" });
+    });
 
     this.cursors = this.input.keyboard?.createCursorKeys();
     this.wasdA = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.A);
