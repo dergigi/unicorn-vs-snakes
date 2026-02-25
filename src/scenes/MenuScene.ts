@@ -232,17 +232,16 @@ export class MenuScene extends Phaser.Scene {
 
     const nostrBtn = this.add.text(btnX, btnY, "", style).setOrigin(1, 0);
 
-    const helpBtn = this.add.text(0, btnY, "(?)", {
-      fontFamily: "monospace",
-      fontSize: "13px",
-      color: "#8a7fb0",
-      stroke: "#1d1336",
-      strokeThickness: 3,
-    }).setOrigin(1, 0).setVisible(false);
+    const iconSize = 16;
+    const helpBtn = this.add.image(0, btnY + 1, "circle-question")
+      .setOrigin(1, 0)
+      .setDisplaySize(iconSize, iconSize)
+      .setAlpha(0.6)
+      .setVisible(false);
 
     helpBtn.setInteractive({ useHandCursor: true });
-    helpBtn.on("pointerover", () => helpBtn.setColor("#ffffff"));
-    helpBtn.on("pointerout", () => helpBtn.setColor("#8a7fb0"));
+    helpBtn.on("pointerover", () => helpBtn.setAlpha(1));
+    helpBtn.on("pointerout", () => helpBtn.setAlpha(0.6));
     helpBtn.on("pointerdown", () => window.open("https://nstart.me", "_blank"));
 
     const updateLabel = (): void => {
