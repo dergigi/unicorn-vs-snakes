@@ -233,6 +233,21 @@ export class MenuScene extends Phaser.Scene {
     const nostrBtn = this.add.text(btnX, btnY, "", style).setOrigin(1, 0);
 
     const iconSize = 16;
+    const iconGap = 6;
+
+    const crownBtn = this.add.image(0, btnY + 1, "crown")
+      .setOrigin(1, 0)
+      .setDisplaySize(iconSize, iconSize)
+      .setAlpha(0.6)
+      .setVisible(false);
+
+    crownBtn.setInteractive({ useHandCursor: true });
+    crownBtn.on("pointerover", () => crownBtn.setAlpha(1));
+    crownBtn.on("pointerout", () => crownBtn.setAlpha(0.6));
+    crownBtn.on("pointerdown", () => {
+      this.scene.start("HighScoreScene", { returnTo: "MenuScene" });
+    });
+
     const helpBtn = this.add.image(0, btnY + 1, "circle-question")
       .setOrigin(1, 0)
       .setDisplaySize(iconSize, iconSize)
@@ -245,16 +260,21 @@ export class MenuScene extends Phaser.Scene {
     helpBtn.on("pointerdown", () => window.open("https://nstart.me", "_blank"));
 
     const updateLabel = (): void => {
+      const afterBtn = nostrBtn.x - nostrBtn.width;
       if (nostrService.isLoggedIn()) {
         const pk = nostrService.getPubkey();
         nostrBtn.setText(pk ? nostrService.getDisplayName(pk) : "Connected");
         nostrBtn.setColor("#c8b8ff");
         helpBtn.setVisible(false);
+        crownBtn.setVisible(true);
+        crownBtn.setX(afterBtn - iconGap);
       } else {
         nostrBtn.setText("Login with Nostr");
         nostrBtn.setColor("#b8a0d8");
         helpBtn.setVisible(true);
-        helpBtn.setX(nostrBtn.x - nostrBtn.width - 6);
+        helpBtn.setX(afterBtn - iconGap);
+        crownBtn.setVisible(true);
+        crownBtn.setX(afterBtn - iconGap - iconSize - iconGap);
       }
     };
 
