@@ -136,18 +136,26 @@ export class MenuScene extends Phaser.Scene {
       ...creditStyle,
       color: "#c88cb8",
     }).setOrigin(0, 0);
-    const creditText = this.add.text(0, creditY,
-      "  ·  Unicorn sprite by magdum (CC-BY-SA 3.0) via OpenGameArt",
-      creditStyle,
-    ).setOrigin(0, 0);
-    const creditTotalW = versionText.width + creditText.width;
+    const sepText = this.add.text(0, creditY, "  ·  ", creditStyle).setOrigin(0, 0);
+    const creditText = this.add.text(0, creditY, "Sprites via OpenGameArt", {
+      ...creditStyle,
+      color: "#c88cb8",
+    }).setOrigin(0, 0);
+    const creditTotalW = versionText.width + sepText.width + creditText.width;
     const creditStartX = (GAME_WIDTH - creditTotalW) / 2;
     versionText.setX(creditStartX);
-    creditText.setX(creditStartX + versionText.width);
+    sepText.setX(creditStartX + versionText.width);
+    creditText.setX(creditStartX + versionText.width + sepText.width);
+
     versionText.setInteractive({ useHandCursor: true });
     versionText.on("pointerover", () => versionText.setColor("#ffffff"));
     versionText.on("pointerout", () => versionText.setColor("#c88cb8"));
     versionText.on("pointerdown", () => window.open("https://github.com/dergigi/unicorn-vs-snakes/tags", "_blank"));
+
+    creditText.setInteractive({ useHandCursor: true });
+    creditText.on("pointerover", () => creditText.setColor("#ffffff"));
+    creditText.on("pointerout", () => creditText.setColor("#c88cb8"));
+    creditText.on("pointerdown", () => window.open("https://opengameart.org", "_blank"));
 
     this.cursors = this.input.keyboard?.createCursorKeys();
     this.wasdA = this.input.keyboard?.addKey(Phaser.Input.Keyboard.KeyCodes.A);
