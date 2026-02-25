@@ -100,8 +100,8 @@ export class HighScoreScene extends Phaser.Scene {
     hashBtn.on("pointerout", () => hashBtn.setAlpha(0.6));
     hashBtn.on("pointerdown", () => window.open("https://ants.sh/t/UvS", "_blank"));
 
-    const searchBtn = this.add.image(x - iconSize - gap, y, "magnifying-glass")
-      .setOrigin(1, 0)
+    const searchBtn = this.add.image(16, y, "magnifying-glass")
+      .setOrigin(0, 0)
       .setDisplaySize(iconSize, iconSize)
       .setAlpha(0.6);
     searchBtn.setInteractive({ useHandCursor: true });
