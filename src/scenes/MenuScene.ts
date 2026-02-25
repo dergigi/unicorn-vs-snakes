@@ -260,21 +260,22 @@ export class MenuScene extends Phaser.Scene {
     helpBtn.on("pointerdown", () => window.open("https://nstart.me", "_blank"));
 
     const updateLabel = (): void => {
-      const afterBtn = nostrBtn.x - nostrBtn.width;
       if (nostrService.isLoggedIn()) {
         const pk = nostrService.getPubkey();
         nostrBtn.setText(pk ? nostrService.getDisplayName(pk) : "Connected");
         nostrBtn.setColor("#c8b8ff");
         helpBtn.setVisible(false);
+        const left = nostrBtn.x - nostrBtn.width;
         crownBtn.setVisible(true);
-        crownBtn.setX(afterBtn - iconGap);
+        crownBtn.setX(left - iconGap);
       } else {
         nostrBtn.setText("Login with Nostr");
         nostrBtn.setColor("#b8a0d8");
+        const left = nostrBtn.x - nostrBtn.width;
         helpBtn.setVisible(true);
-        helpBtn.setX(afterBtn - iconGap);
+        helpBtn.setX(left - iconGap);
         crownBtn.setVisible(true);
-        crownBtn.setX(afterBtn - iconGap - iconSize - iconGap);
+        crownBtn.setX(left - iconGap - iconSize - iconGap);
       }
     };
 
