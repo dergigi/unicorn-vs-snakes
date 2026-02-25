@@ -58,6 +58,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image("clipboard-check", "assets/ui/clipboard-check.png");
     this.load.svg("circle-question", "assets/ui/circle-question.svg", { width: 32, height: 32 });
     this.load.svg("crown", "assets/ui/crown.svg", { width: 32, height: 32 });
+    this.load.svg("hashtag", "assets/ui/hashtag.svg", { width: 32, height: 32 });
     this.load.image("moldy-wall-tile", "assets/sprites/moldy-wall-tile.png");
     this.load.image("castle-tower", "assets/sprites/towers/tower-drawing/Tower.png");
     this.load.image("castle-tower-damaged", "assets/sprites/towers/tower-drawing/Tower_damage3.png");

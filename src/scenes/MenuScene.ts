@@ -263,6 +263,17 @@ export class MenuScene extends Phaser.Scene {
       this.scene.start("HighScoreScene", { returnTo: "MenuScene" });
     });
 
+    const hashtagBtn = this.add.image(0, btnY + 1, "hashtag")
+      .setOrigin(1, 0)
+      .setDisplaySize(iconSize, iconSize)
+      .setAlpha(0.6)
+      .setVisible(false);
+
+    hashtagBtn.setInteractive({ useHandCursor: true });
+    hashtagBtn.on("pointerover", () => hashtagBtn.setAlpha(1));
+    hashtagBtn.on("pointerout", () => hashtagBtn.setAlpha(0.6));
+    hashtagBtn.on("pointerdown", () => window.open("https://ants.sh/t/UvS", "_blank"));
+
     const helpBtn = this.add.image(0, btnY + 1, "circle-question")
       .setOrigin(1, 0)
       .setDisplaySize(iconSize, iconSize)
@@ -274,6 +285,7 @@ export class MenuScene extends Phaser.Scene {
     helpBtn.on("pointerout", () => helpBtn.setAlpha(0.6));
     helpBtn.on("pointerdown", () => window.open("https://nstart.me", "_blank"));
 
+    const iconStep = iconSize + iconGap;
     const updateLabel = (): void => {
       if (nostrService.isLoggedIn()) {
         const pk = nostrService.getPubkey();
@@ -283,14 +295,18 @@ export class MenuScene extends Phaser.Scene {
         const left = nostrBtn.x - nostrBtn.width;
         crownBtn.setVisible(true);
         crownBtn.setX(left - iconGap);
+        hashtagBtn.setVisible(true);
+        hashtagBtn.setX(left - iconGap - iconStep);
       } else {
         nostrBtn.setText("Login with Nostr");
         nostrBtn.setColor("#b8a0d8");
         const left = nostrBtn.x - nostrBtn.width;
         crownBtn.setVisible(true);
         crownBtn.setX(left - iconGap);
+        hashtagBtn.setVisible(true);
+        hashtagBtn.setX(left - iconGap - iconStep);
         helpBtn.setVisible(true);
-        helpBtn.setX(left - iconGap - iconSize - iconGap);
+        helpBtn.setX(left - iconGap - iconStep * 2);
       }
     };
 
