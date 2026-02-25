@@ -84,44 +84,33 @@ export class NostrInfoScene extends Phaser.Scene {
   }
 
   private buildGetStartedButton(cx: number, y: number): void {
-    const btnW = 260;
-    const btnH = 40;
-
-    const btnBg = this.add.graphics();
-    btnBg.fillStyle(0x9333ea, 1);
-    btnBg.fillRoundedRect(cx - btnW / 2, y, btnW, btnH, 6);
-
-    const label = this.add.text(cx, y + btnH / 2, "Get started at nstart.me", {
+    const linkStyle: Phaser.Types.GameObjects.Text.TextStyle = {
       fontFamily: "\"Press Start 2P\", \"Courier New\", monospace",
-      fontSize: "10px",
-      color: "#ffffff",
-      stroke: "#4a1080",
-      strokeThickness: 3,
-    }).setOrigin(0.5);
-
-    const hitArea = this.add.rectangle(cx, y + btnH / 2, btnW, btnH).setOrigin(0.5);
-    hitArea.setInteractive({ useHandCursor: true });
-    hitArea.on("pointerover", () => {
-      label.setColor("#ffe0f6");
-      btnBg.clear();
-      btnBg.fillStyle(0xab4efa, 1);
-      btnBg.fillRoundedRect(cx - btnW / 2, y, btnW, btnH, 6);
-    });
-    hitArea.on("pointerout", () => {
-      label.setColor("#ffffff");
-      btnBg.clear();
-      btnBg.fillStyle(0x9333ea, 1);
-      btnBg.fillRoundedRect(cx - btnW / 2, y, btnW, btnH, 6);
-    });
-    hitArea.on("pointerdown", () => window.open("https://nstart.me", "_blank"));
-
-    this.add.text(cx, y + btnH + 16, "nstart.me helps you create your Nostr keys in seconds.", {
-      fontFamily: "monospace",
-      fontSize: "11px",
-      color: "#8a7fb0",
+      fontSize: "13px",
+      color: "#ff7fd9",
       stroke: "#1d1336",
-      strokeThickness: 2,
-    }).setOrigin(0.5);
+      strokeThickness: 3,
+    };
+    const gap = 40;
+
+    const learnMore = this.add.text(cx - gap, y, "Learn More", linkStyle).setOrigin(1, 0);
+    learnMore.setInteractive({ useHandCursor: true });
+    learnMore.on("pointerover", () => learnMore.setColor("#ffffff"));
+    learnMore.on("pointerout", () => learnMore.setColor("#ff7fd9"));
+    learnMore.on("pointerdown", () => window.open("https://njump.me/", "_blank"));
+
+    const sep = this.add.text(cx, y, "|", {
+      ...linkStyle,
+      color: "#6a5a80",
+    }).setOrigin(0.5, 0);
+
+    const getStarted = this.add.text(cx + gap, y, "Get Started", linkStyle).setOrigin(0, 0);
+    getStarted.setInteractive({ useHandCursor: true });
+    getStarted.on("pointerover", () => getStarted.setColor("#ffffff"));
+    getStarted.on("pointerout", () => getStarted.setColor("#ff7fd9"));
+    getStarted.on("pointerdown", () => window.open("https://nstart.me", "_blank"));
+
+    void sep;
   }
 
   private buildBackButton(cx: number): void {
