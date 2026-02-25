@@ -86,15 +86,28 @@ export class HighScoreScene extends Phaser.Scene {
   }
 
   private buildHashtagButton(): void {
-    const btn = this.add.image(GAME_WIDTH - 16, 16, "hashtag")
-      .setOrigin(1, 0)
-      .setDisplaySize(18, 18)
-      .setAlpha(0.6);
+    const iconSize = 18;
+    const gap = 8;
+    const x = GAME_WIDTH - 16;
+    const y = 16;
 
-    btn.setInteractive({ useHandCursor: true });
-    btn.on("pointerover", () => btn.setAlpha(1));
-    btn.on("pointerout", () => btn.setAlpha(0.6));
-    btn.on("pointerdown", () => window.open("https://ants.sh/t/UvS", "_blank"));
+    const hashBtn = this.add.image(x, y, "hashtag")
+      .setOrigin(1, 0)
+      .setDisplaySize(iconSize, iconSize)
+      .setAlpha(0.6);
+    hashBtn.setInteractive({ useHandCursor: true });
+    hashBtn.on("pointerover", () => hashBtn.setAlpha(1));
+    hashBtn.on("pointerout", () => hashBtn.setAlpha(0.6));
+    hashBtn.on("pointerdown", () => window.open("https://ants.sh/t/UvS", "_blank"));
+
+    const searchBtn = this.add.image(x - iconSize - gap, y, "magnifying-glass")
+      .setOrigin(1, 0)
+      .setDisplaySize(iconSize, iconSize)
+      .setAlpha(0.6);
+    searchBtn.setInteractive({ useHandCursor: true });
+    searchBtn.on("pointerover", () => searchBtn.setAlpha(1));
+    searchBtn.on("pointerout", () => searchBtn.setAlpha(0.6));
+    searchBtn.on("pointerdown", () => window.open("https://ants.sh/?q=kind%3A5555", "_blank"));
   }
 
   private buildTabs(cx: number): void {
