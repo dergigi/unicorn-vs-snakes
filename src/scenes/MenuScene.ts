@@ -276,6 +276,7 @@ export class MenuScene extends Phaser.Scene {
         nostrBtn.setColor("#b8a0d8");
       }
       const left = nostrBtn.x - nostrBtn.width;
+      crownBtn.setVisible(true);
       crownBtn.setX(left - iconGap);
       helpBtn.setVisible(!loggedIn);
       if (!loggedIn) helpBtn.setX(left - iconGap - iconStep);
