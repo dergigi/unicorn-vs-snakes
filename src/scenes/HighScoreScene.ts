@@ -50,7 +50,7 @@ export class HighScoreScene extends Phaser.Scene {
   create(data: HighScoreData): void {
     this.returnTo = data.returnTo ?? "MenuScene";
     this.pauseData = data.pauseData;
-    this.activeTab = "all";
+    this.activeTab = data.difficulty ?? "all";
     this.loaded = false;
     this.scoreCache.clear();
     this.tabTexts = [];
