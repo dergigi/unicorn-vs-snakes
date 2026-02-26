@@ -42,7 +42,7 @@ export class HighScoreScene extends Phaser.Scene {
   private tabTexts: { filter: TabFilter; text: Phaser.GameObjects.Text }[] = [];
   private loadingLabel!: Phaser.GameObjects.Text;
   private loaded = false;
-  private expandedIndex: number | null = null;
+  private expandedSet = new Set<number>();
 
   constructor() {
     super("HighScoreScene");
@@ -53,7 +53,7 @@ export class HighScoreScene extends Phaser.Scene {
     this.pauseData = data.pauseData;
     this.activeTab = data.difficulty ?? "all";
     this.loaded = false;
-    this.expandedIndex = null;
+    this.expandedSet.clear();
     this.scoreCache.clear();
     this.tabTexts = [];
 
@@ -157,7 +157,7 @@ export class HighScoreScene extends Phaser.Scene {
 
   private selectTab(filter: TabFilter): void {
     this.activeTab = filter;
-    this.expandedIndex = null;
+    this.expandedSet.clear();
     this.refreshTabStyles();
     if (this.loaded) this.renderTable();
   }
@@ -236,7 +236,11 @@ export class HighScoreScene extends Phaser.Scene {
   }
 
   private toggleExpand(index: number): void {
-    this.expandedIndex = this.expandedIndex === index ? null : index;
+    if (this.expandedSet.has(index)) {
+      this.expandedSet.delete(index);
+    } else {
+      this.expandedSet.add(index);
+    }
     this.renderTable();
   }
 
@@ -289,8 +293,10 @@ export class HighScoreScene extends Phaser.Scene {
     const rowTop = tableTop + 20;
 
     let expandTotalH = 0;
-    if (this.expandedIndex !== null && this.expandedIndex >= 0 && this.expandedIndex < entries.length) {
-      expandTotalH = this.getExpandedSplits(entries[this.expandedIndex]).length * subRowH;
+    for (const idx of this.expandedSet) {
+      if (idx >= 0 && idx < entries.length) {
+        expandTotalH += this.getExpandedSplits(entries[idx]).length * subRowH;
+      }
     }
     const bgH = TOTAL_ROWS * rowH + expandTotalH + 12;
 
@@ -321,7 +327,7 @@ export class HighScoreScene extends Phaser.Scene {
       const entry = entries[i];
       const y = rowTop + i * rowH + rowH / 2 + yOffset;
       const rank = `${i + 1}.`;
-      const isRowExpanded = this.expandedIndex === i && !!entry;
+      const isRowExpanded = this.expandedSet.has(i) && !!entry;
 
       if (entry) {
         const hasSplits = entry.levelTimes.length > 0;
