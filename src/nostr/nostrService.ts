@@ -15,6 +15,8 @@ export interface LeaderboardEntry {
   sparkles: number;
   percent100: boolean;
   createdAt: number;
+  levelTimes: number[];
+  menuTimeMs: number;
 }
 
 const STORAGE_KEY = "nostr-pubkey";
@@ -140,6 +142,8 @@ class NostrService {
           sparkles: data.sparkles ?? 0,
           percent100: data.percent100 ?? false,
           createdAt: ev.created_at,
+          levelTimes: Array.isArray(data.levelTimes) ? data.levelTimes : [],
+          menuTimeMs: typeof data.menuTimeMs === "number" ? data.menuTimeMs : 0,
         });
       } catch {
         continue;
