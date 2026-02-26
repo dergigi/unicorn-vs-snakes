@@ -336,17 +336,15 @@ export class HighScoreScene extends Phaser.Scene {
 
         const rankText = this.add.text(rankX, y, rank, { ...rowStyle, color }).setOrigin(0, 0.5);
         const nameLabel = nostrService.getDisplayName(entry.pubkey);
-        let nameOffset = 0;
-        if (i === 0) {
-          const crown = this.add.image(nameX, y, "crown").setOrigin(0, 0.5).setDisplaySize(14, 14);
-          this.tableContainer.add(crown);
-          nameOffset = 18;
-        }
-        const nameText = this.add.text(nameX + nameOffset, y, nameLabel, { ...rowStyle, color }).setOrigin(0, 0.5);
+        const nameText = this.add.text(nameX, y, nameLabel, { ...rowStyle, color }).setOrigin(0, 0.5);
         nameText.setInteractive({ useHandCursor: true });
         nameText.on("pointerover", () => nameText.setColor("#ffffff"));
         nameText.on("pointerout", () => nameText.setColor(color));
         nameText.on("pointerdown", () => window.open(`https://njump.to/${entry.npub}`, "_blank"));
+        if (i === 0) {
+          const crown = this.add.image(nameX + nameText.width + 6, y, "crown").setOrigin(0, 0.5).setDisplaySize(14, 14);
+          this.tableContainer.add(crown);
+        }
 
         const timeText = this.add.text(timeX, y, formatTime(entry.totalMs), { ...rowStyle, color }).setOrigin(1, 0.5);
         if (hasSplits) {
