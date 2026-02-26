@@ -3,6 +3,7 @@ import { EventFactory } from "applesauce-core";
 import { RelayPool } from "applesauce-relay";
 import { npubEncode } from "applesauce-core/helpers/pointers";
 import { type NostrEvent } from "applesauce-core/helpers/event";
+import { getProfileContent, getDisplayName as resolveDisplayName, type ProfileContent } from "applesauce-core/helpers/profile";
 import { catchError, lastValueFrom, of, toArray } from "rxjs";
 import { NOSTR_RELAYS, NOSTR_KIND, NOSTR_HASHTAG, NOSTR_SCORE_VERSION, type Difficulty } from "../config/gameConfig";
 import { ScoreBlueprint, type ScoreData } from "./scoreBlueprint";
@@ -16,12 +17,6 @@ export interface LeaderboardEntry {
   createdAt: number;
 }
 
-export interface NostrProfile {
-  name?: string;
-  display_name?: string;
-  picture?: string;
-}
-
 const STORAGE_KEY = "nostr-pubkey";
 
 class NostrService {
@@ -31,7 +26,7 @@ class NostrService {
   private factory: EventFactory | null = null;
   private pool: RelayPool;
   private pubkey: string | null = null;
-  private profileCache = new Map<string, NostrProfile>();
+  private profileCache = new Map<string, ProfileContent>();
 
   private constructor() {
     this.pool = new RelayPool();
@@ -154,51 +149,37 @@ class NostrService {
     return [...best.values()].sort((a, b) => a.totalMs - b.totalMs).slice(0, limit);
   }
 
-  async fetchProfiles(pubkeys: string[]): Promise<Map<string, NostrProfile>> {
+  async fetchProfiles(pubkeys: string[]): Promise<void> {
     const uncached = pubkeys.filter(pk => !this.profileCache.has(pk));
+    if (uncached.length === 0) return;
 
-    if (uncached.length > 0) {
-      const filter = { kinds: [0 as number], authors: uncached };
+    const filter = { kinds: [0 as number], authors: uncached };
 
-      const events = await lastValueFrom(
-        this.pool.request(NOSTR_RELAYS, filter).pipe(
-          toArray(),
-          catchError(() => of([] as NostrEvent[])),
-        ),
-        { defaultValue: [] as NostrEvent[] },
-      );
+    const events = await lastValueFrom(
+      this.pool.request(NOSTR_RELAYS, filter).pipe(
+        toArray(),
+        catchError(() => of([] as NostrEvent[])),
+      ),
+      { defaultValue: [] as NostrEvent[] },
+    );
 
-      const latest = new Map<string, NostrEvent>();
-      for (const ev of events) {
-        const prev = latest.get(ev.pubkey);
-        if (!prev || ev.created_at > prev.created_at) {
-          latest.set(ev.pubkey, ev);
-        }
-      }
-
-      for (const [pk, ev] of latest) {
-        try {
-          const profile = JSON.parse(ev.content) as NostrProfile;
-          this.profileCache.set(pk, profile);
-        } catch {
-          /* skip malformed profiles */
-        }
+    const latest = new Map<string, NostrEvent>();
+    for (const ev of events) {
+      const prev = latest.get(ev.pubkey);
+      if (!prev || ev.created_at > prev.created_at) {
+        latest.set(ev.pubkey, ev);
       }
     }
 
-    const result = new Map<string, NostrProfile>();
-    for (const pk of pubkeys) {
-      const cached = this.profileCache.get(pk);
-      if (cached) result.set(pk, cached);
+    for (const [pk, ev] of latest) {
+      const content = getProfileContent(ev);
+      if (content) this.profileCache.set(pk, content);
     }
-    return result;
   }
 
   getDisplayName(pubkey: string): string {
     const profile = this.profileCache.get(pubkey);
-    const name = profile?.display_name || profile?.name;
-    if (name) return name;
-    return this.truncateNpub(pubkey);
+    return resolveDisplayName(profile, this.truncateNpub(pubkey));
   }
 
   private truncateNpub(pubkey: string): string {

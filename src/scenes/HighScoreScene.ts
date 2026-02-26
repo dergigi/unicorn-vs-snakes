@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { GAME_WIDTH, GAME_HEIGHT, DIFFICULTY_LABELS, type Difficulty } from "../config/gameConfig";
 import { nostrService, type LeaderboardEntry } from "../nostr/nostrService";
-import { formatTime } from "../utils/formatTime";
+import { EMPTY_TIME, formatTime } from "../utils/formatTime";
 
 type TabFilter = "all" | Difficulty;
 
@@ -50,7 +50,7 @@ export class HighScoreScene extends Phaser.Scene {
   create(data: HighScoreData): void {
     this.returnTo = data.returnTo ?? "MenuScene";
     this.pauseData = data.pauseData;
-    this.activeTab = "all";
+    this.activeTab = data.difficulty ?? "all";
     this.loaded = false;
     this.scoreCache.clear();
     this.tabTexts = [];
@@ -316,7 +316,7 @@ export class HighScoreScene extends Phaser.Scene {
       } else {
         const rankText = this.add.text(rankX, y, rank, { ...rowStyle, color: dimColor }).setOrigin(0, 0.5);
         const nameText = this.add.text(nameX, y, "---", { ...rowStyle, color: dimColor }).setOrigin(0, 0.5);
-        const timeText = this.add.text(timeX, y, "-:--.-", { ...rowStyle, color: dimColor }).setOrigin(1, 0.5);
+        const timeText = this.add.text(timeX, y, EMPTY_TIME, { ...rowStyle, color: dimColor }).setOrigin(1, 0.5);
         this.tableContainer.add([rankText, nameText, timeText]);
 
         if (showBadge) {
