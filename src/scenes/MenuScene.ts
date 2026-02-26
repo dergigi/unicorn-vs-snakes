@@ -493,11 +493,6 @@ export class MenuScene extends Phaser.Scene {
   private async fetchAllBestTimes(): Promise<void> {
     const difficulties: Difficulty[] = ["easy", "normal", "hard", "insane"];
 
-    for (const labels of this.bestTimeLabels.values()) {
-      labels.timeTxt.setText("...");
-      labels.nameTxt.setText("");
-    }
-
     const results = await Promise.all(
       difficulties.map(d => nostrService.fetchTopScores(d, 1).catch(() => [] as LeaderboardEntry[]))
     );
@@ -526,11 +521,7 @@ export class MenuScene extends Phaser.Scene {
     const labels = this.bestTimeLabels.get(diff);
     if (!labels) return;
 
-    if (entries.length === 0) {
-      labels.timeTxt.setText("—");
-      labels.nameTxt.setText("");
-      return;
-    }
+    if (entries.length === 0) return;
 
     const best = entries[0];
     labels.timeTxt.setText(formatTime(best.totalMs));
