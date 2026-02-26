@@ -42,6 +42,7 @@ export class HighScoreScene extends Phaser.Scene {
   private tabTexts: { filter: TabFilter; text: Phaser.GameObjects.Text }[] = [];
   private loadingLabel!: Phaser.GameObjects.Text;
   private loaded = false;
+  private expandedIndex: number | null = null;
 
   constructor() {
     super("HighScoreScene");
@@ -52,6 +53,7 @@ export class HighScoreScene extends Phaser.Scene {
     this.pauseData = data.pauseData;
     this.activeTab = data.difficulty ?? "all";
     this.loaded = false;
+    this.expandedIndex = null;
     this.scoreCache.clear();
     this.tabTexts = [];
 
@@ -155,6 +157,7 @@ export class HighScoreScene extends Phaser.Scene {
 
   private selectTab(filter: TabFilter): void {
     this.activeTab = filter;
+    this.expandedIndex = null;
     this.refreshTabStyles();
     if (this.loaded) this.renderTable();
   }
@@ -232,6 +235,11 @@ export class HighScoreScene extends Phaser.Scene {
     return entries.slice(0, TOTAL_ROWS).map(e => ({ ...e, difficulty: this.activeTab as Difficulty }));
   }
 
+  private toggleExpand(index: number): void {
+    this.expandedIndex = this.expandedIndex === index ? null : index;
+    this.renderTable();
+  }
+
   private renderTable(): void {
     this.tableContainer.removeAll(true);
 
@@ -240,6 +248,7 @@ export class HighScoreScene extends Phaser.Scene {
     const panelW = 600;
     const panelX = cx - panelW / 2;
     const rowH = 30;
+    const expandH = 24;
     const tableTop = 118;
     const showBadge = this.activeTab === "all";
 
@@ -267,9 +276,14 @@ export class HighScoreScene extends Phaser.Scene {
     }
 
     const rowTop = tableTop + 20;
+    const hasExpansion = this.expandedIndex !== null
+      && this.expandedIndex >= 0
+      && this.expandedIndex < entries.length;
+    const bgH = TOTAL_ROWS * rowH + (hasExpansion ? expandH : 0) + 12;
+
     const bg = this.add.graphics();
     bg.fillStyle(0x2a1040, 0.5);
-    bg.fillRoundedRect(panelX, rowTop - 6, panelW, TOTAL_ROWS * rowH + 12, 8);
+    bg.fillRoundedRect(panelX, rowTop - 6, panelW, bgH, 8);
     this.tableContainer.add(bg);
 
     const rowStyle: Phaser.Types.GameObjects.Text.TextStyle = {
@@ -281,13 +295,16 @@ export class HighScoreScene extends Phaser.Scene {
     };
     const dimColor = "#6a5a80";
     const myPubkey = nostrService.getPubkey();
+    let yOffset = 0;
 
     for (let i = 0; i < TOTAL_ROWS; i++) {
       const entry = entries[i];
-      const y = rowTop + i * rowH + rowH / 2;
+      const y = rowTop + i * rowH + rowH / 2 + yOffset;
       const rank = `${i + 1}.`;
+      const isRowExpanded = this.expandedIndex === i && !!entry;
 
       if (entry) {
+        const hasSplits = entry.levelTimes.length > 0;
         const isMe = entry.pubkey === myPubkey;
         const color = isMe ? "#ffb8e6" : rowStyle.color!;
 
@@ -298,7 +315,15 @@ export class HighScoreScene extends Phaser.Scene {
         nameText.on("pointerover", () => nameText.setColor("#ffffff"));
         nameText.on("pointerout", () => nameText.setColor(color));
         nameText.on("pointerdown", () => window.open(`https://njump.to/${entry.npub}`, "_blank"));
-        const timeText = this.add.text(timeX, y, formatTime(entry.totalMs), { ...rowStyle, color }).setOrigin(1, 0.5);
+
+        const arrow = hasSplits ? (isRowExpanded ? " ▾" : " ▸") : "";
+        const timeText = this.add.text(timeX, y, formatTime(entry.totalMs) + arrow, { ...rowStyle, color }).setOrigin(1, 0.5);
+        if (hasSplits) {
+          timeText.setInteractive({ useHandCursor: true });
+          timeText.on("pointerover", () => timeText.setColor("#ffffff"));
+          timeText.on("pointerout", () => timeText.setColor(color));
+          timeText.on("pointerdown", () => this.toggleExpand(i));
+        }
         this.tableContainer.add([rankText, nameText, timeText]);
 
         if (showBadge) {
@@ -312,6 +337,34 @@ export class HighScoreScene extends Phaser.Scene {
             strokeThickness: 2,
           }).setOrigin(0, 0.5);
           this.tableContainer.add(badge);
+        }
+
+        if (isRowExpanded) {
+          yOffset += expandH;
+          const subY = y + rowH / 2 + expandH / 2 - 2;
+
+          const subBg = this.add.graphics();
+          subBg.fillStyle(0x3d1a5e, 0.35);
+          subBg.fillRoundedRect(panelX + 10, subY - expandH / 2 + 2, panelW - 20, expandH - 2, 4);
+
+          const splits: string[] = [];
+          if (entry.menuTimeMs > 0) {
+            splits.push(`Menu ${formatTime(entry.menuTimeMs)}`);
+          }
+          for (let l = 0; l < entry.levelTimes.length; l++) {
+            splits.push(`L${l + 1} ${formatTime(entry.levelTimes[l])}`);
+          }
+          const splitsStr = splits.join("  │  ");
+
+          const subText = this.add.text(cx, subY, splitsStr, {
+            fontFamily: "monospace",
+            fontSize: "11px",
+            color: "#a898c8",
+            stroke: "#1d1336",
+            strokeThickness: 2,
+          }).setOrigin(0.5);
+
+          this.tableContainer.add([subBg, subText]);
         }
       } else {
         const rankText = this.add.text(rankX, y, rank, { ...rowStyle, color: dimColor }).setOrigin(0, 0.5);
