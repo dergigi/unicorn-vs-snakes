@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.5] - 2026-02-26
+
+### Added
+
+- Fastest time and player name shown below each difficulty button on menu
+- Placeholder "-:--.-" displayed while best times are loading
+- High score screen opens on the matching difficulty tab instead of "all"
+
+### Changed
+
+- Use applesauce-core profile helpers instead of hand-rolled NostrProfile parsing
+- Extract shared EMPTY_TIME constant to replace duplicated placeholder literals
+- Hide difficulty labels entirely while loading or offline for a cleaner menu
+
+### Fixed
+
+- Batch-resolve all unique pubkeys so every difficulty label shows player names
+
 ## [1.3.4] - 2026-02-26
 
 ### Added
@@ -177,6 +195,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Press R during gameplay to reset to splash screen
 - Separate Phaser chunk for better caching
 
+[1.3.5]: https://github.com/dergigi/unicorns-vs-snakes/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/dergigi/unicorns-vs-snakes/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/dergigi/unicorns-vs-snakes/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/dergigi/unicorns-vs-snakes/compare/v1.3.1...v1.3.2
