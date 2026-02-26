@@ -10,7 +10,7 @@ import { spawnRainbowTrail } from "../utils/rainbowTrail";
 import { type PatrolSnake, spawnPatrolSnakes, updatePatrolSnakes } from "../utils/patrolSnakes";
 import { TouchControls } from "../input/TouchControls";
 import { nostrService, type LeaderboardEntry } from "../nostr/nostrService";
-import { formatTime } from "../utils/formatTime";
+import { EMPTY_TIME, formatTime } from "../utils/formatTime";
 
 const GRASS_TOP = GAME_HEIGHT - 130;
 const GRASS_HEIGHT = 52;
@@ -494,7 +494,7 @@ export class MenuScene extends Phaser.Scene {
     const difficulties: Difficulty[] = ["easy", "normal", "hard", "insane"];
 
     for (const labels of this.bestTimeLabels.values()) {
-      labels.timeTxt.setText("-:--.-");
+      labels.timeTxt.setText(EMPTY_TIME);
     }
 
     const results = await Promise.all(

@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { DIFFICULTY_LABELS, GAME_HEIGHT, GAME_WIDTH, LEVEL_COUNT, NOSTR_HASHTAG, type Difficulty } from "../config/gameConfig";
-import { formatTime } from "../utils/formatTime";
+import { EMPTY_TIME, formatTime } from "../utils/formatTime";
 import { nostrService, type LeaderboardEntry } from "../nostr/nostrService";
 import type { ScoreData } from "../nostr/scoreBlueprint";
 
@@ -326,7 +326,7 @@ export class WinScene extends Phaser.Scene {
         } else {
           this.add.text(rankX, y, medal, { ...rowStyle, color: dimColor }).setOrigin(0, 0.5);
           this.add.text(nameX, y, "TBD", { ...rowStyle, color: dimColor }).setOrigin(0, 0.5);
-          this.add.text(timeX, y, "-:--.-", { ...rowStyle, color: dimColor }).setOrigin(1, 0.5);
+          this.add.text(timeX, y, EMPTY_TIME, { ...rowStyle, color: dimColor }).setOrigin(1, 0.5);
         }
       }
 
