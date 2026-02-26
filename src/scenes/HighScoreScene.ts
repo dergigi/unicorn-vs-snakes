@@ -240,6 +240,17 @@ export class HighScoreScene extends Phaser.Scene {
     this.renderTable();
   }
 
+  private getExpandedSplits(entry: AnnotatedEntry): { label: string; ms: number }[] {
+    const splits: { label: string; ms: number }[] = [];
+    if (entry.menuTimeMs > 0) {
+      splits.push({ label: "Menu", ms: entry.menuTimeMs });
+    }
+    for (let l = 0; l < entry.levelTimes.length; l++) {
+      splits.push({ label: `Level ${l + 1}`, ms: entry.levelTimes[l] });
+    }
+    return splits;
+  }
+
   private renderTable(): void {
     this.tableContainer.removeAll(true);
 
@@ -248,7 +259,7 @@ export class HighScoreScene extends Phaser.Scene {
     const panelW = 600;
     const panelX = cx - panelW / 2;
     const rowH = 30;
-    const expandH = 24;
+    const subRowH = 20;
     const tableTop = 118;
     const showBadge = this.activeTab === "all";
 
@@ -276,10 +287,12 @@ export class HighScoreScene extends Phaser.Scene {
     }
 
     const rowTop = tableTop + 20;
-    const hasExpansion = this.expandedIndex !== null
-      && this.expandedIndex >= 0
-      && this.expandedIndex < entries.length;
-    const bgH = TOTAL_ROWS * rowH + (hasExpansion ? expandH : 0) + 12;
+
+    let expandTotalH = 0;
+    if (this.expandedIndex !== null && this.expandedIndex >= 0 && this.expandedIndex < entries.length) {
+      expandTotalH = this.getExpandedSplits(entries[this.expandedIndex]).length * subRowH;
+    }
+    const bgH = TOTAL_ROWS * rowH + expandTotalH + 12;
 
     const bg = this.add.graphics();
     bg.fillStyle(0x2a1040, 0.5);
@@ -291,6 +304,13 @@ export class HighScoreScene extends Phaser.Scene {
       fontSize: "14px",
       color: "#d8b8f0",
       stroke: "#2a1040",
+      strokeThickness: 2,
+    };
+    const subStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+      fontFamily: "monospace",
+      fontSize: "11px",
+      color: "#a898c8",
+      stroke: "#1d1336",
       strokeThickness: 2,
     };
     const dimColor = "#6a5a80";
@@ -316,8 +336,7 @@ export class HighScoreScene extends Phaser.Scene {
         nameText.on("pointerout", () => nameText.setColor(color));
         nameText.on("pointerdown", () => window.open(`https://njump.to/${entry.npub}`, "_blank"));
 
-        const arrow = hasSplits ? (isRowExpanded ? " ▾" : " ▸") : "";
-        const timeText = this.add.text(timeX, y, formatTime(entry.totalMs) + arrow, { ...rowStyle, color }).setOrigin(1, 0.5);
+        const timeText = this.add.text(timeX, y, formatTime(entry.totalMs), { ...rowStyle, color }).setOrigin(1, 0.5);
         if (hasSplits) {
           timeText.setInteractive({ useHandCursor: true });
           timeText.on("pointerover", () => timeText.setColor("#ffffff"));
@@ -340,31 +359,24 @@ export class HighScoreScene extends Phaser.Scene {
         }
 
         if (isRowExpanded) {
-          yOffset += expandH;
-          const subY = y + rowH / 2 + expandH / 2 - 2;
+          const splits = this.getExpandedSplits(entry);
+          const blockH = splits.length * subRowH;
+          const blockTop = y + rowH / 2;
 
           const subBg = this.add.graphics();
           subBg.fillStyle(0x3d1a5e, 0.35);
-          subBg.fillRoundedRect(panelX + 10, subY - expandH / 2 + 2, panelW - 20, expandH - 2, 4);
+          subBg.fillRoundedRect(panelX + 10, blockTop, panelW - 20, blockH, 4);
+          this.tableContainer.add(subBg);
 
-          const splits: string[] = [];
-          if (entry.menuTimeMs > 0) {
-            splits.push(`Menu ${formatTime(entry.menuTimeMs)}`);
+          const labelX = nameX + 20;
+          for (let s = 0; s < splits.length; s++) {
+            const subY = blockTop + s * subRowH + subRowH / 2;
+            const lbl = this.add.text(labelX, subY, splits[s].label, subStyle).setOrigin(0, 0.5);
+            const val = this.add.text(timeX, subY, formatTime(splits[s].ms), subStyle).setOrigin(1, 0.5);
+            this.tableContainer.add([lbl, val]);
           }
-          for (let l = 0; l < entry.levelTimes.length; l++) {
-            splits.push(`L${l + 1} ${formatTime(entry.levelTimes[l])}`);
-          }
-          const splitsStr = splits.join("  │  ");
 
-          const subText = this.add.text(cx, subY, splitsStr, {
-            fontFamily: "monospace",
-            fontSize: "11px",
-            color: "#a898c8",
-            stroke: "#1d1336",
-            strokeThickness: 2,
-          }).setOrigin(0.5);
-
-          this.tableContainer.add([subBg, subText]);
+          yOffset += blockH;
         }
       } else {
         const rankText = this.add.text(rankX, y, rank, { ...rowStyle, color: dimColor }).setOrigin(0, 0.5);
