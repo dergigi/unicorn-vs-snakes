@@ -490,39 +490,35 @@ export class MenuScene extends Phaser.Scene {
     this.fetchAllBestTimes();
   }
 
-  private fetchAllBestTimes(): void {
+  private async fetchAllBestTimes(): Promise<void> {
     const difficulties: Difficulty[] = ["easy", "normal", "hard", "insane"];
-    const allPubkeys = new Set<string>();
 
-    for (const diff of difficulties) {
-      const labels = this.bestTimeLabels.get(diff);
-      if (!labels) continue;
+    for (const labels of this.bestTimeLabels.values()) {
       labels.timeTxt.setText("...");
       labels.nameTxt.setText("");
+    }
 
-      nostrService.fetchTopScores(diff, 1).then((entries) => {
-        if (!this.scene.isActive()) return;
-        this.scoreCache.set(diff, entries);
-        this.showBestTimeForDifficulty(diff, entries);
+    const results = await Promise.all(
+      difficulties.map(d => nostrService.fetchTopScores(d, 1).catch(() => [] as LeaderboardEntry[]))
+    );
+    if (!this.scene.isActive()) return;
 
-        if (entries.length > 0) {
-          const pk = entries[0].pubkey;
-          if (!allPubkeys.has(pk)) {
-            allPubkeys.add(pk);
-            nostrService.fetchProfiles([pk]).then(() => {
-              if (!this.scene.isActive()) return;
-              this.showBestTimeForDifficulty(diff, entries);
-            }).catch(() => {});
-          }
-        }
-      }).catch(() => {
-        if (!this.scene.isActive()) return;
-        const lbl = this.bestTimeLabels.get(diff);
-        if (lbl) {
-          lbl.timeTxt.setText("");
-          lbl.nameTxt.setText("");
-        }
-      });
+    for (let i = 0; i < difficulties.length; i++) {
+      this.scoreCache.set(difficulties[i], results[i]);
+      this.showBestTimeForDifficulty(difficulties[i], results[i]);
+    }
+
+    const pubkeys = new Set<string>();
+    for (const entries of results) {
+      if (entries.length > 0) pubkeys.add(entries[0].pubkey);
+    }
+    if (pubkeys.size === 0) return;
+
+    await nostrService.fetchProfiles([...pubkeys]).catch(() => {});
+    if (!this.scene.isActive()) return;
+
+    for (let i = 0; i < difficulties.length; i++) {
+      this.showBestTimeForDifficulty(difficulties[i], results[i]);
     }
   }
 
