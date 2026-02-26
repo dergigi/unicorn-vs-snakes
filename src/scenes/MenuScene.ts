@@ -493,6 +493,10 @@ export class MenuScene extends Phaser.Scene {
   private async fetchAllBestTimes(): Promise<void> {
     const difficulties: Difficulty[] = ["easy", "normal", "hard", "insane"];
 
+    for (const labels of this.bestTimeLabels.values()) {
+      labels.timeTxt.setText("-:--.-");
+    }
+
     const results = await Promise.all(
       difficulties.map(d => nostrService.fetchTopScores(d, 1).catch(() => [] as LeaderboardEntry[]))
     );
