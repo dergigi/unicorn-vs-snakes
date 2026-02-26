@@ -295,7 +295,7 @@ export class HighScoreScene extends Phaser.Scene {
     let expandTotalH = 0;
     for (const idx of this.expandedSet) {
       if (idx >= 0 && idx < entries.length) {
-        expandTotalH += this.getExpandedSplits(entries[idx]).length * subRowH;
+        expandTotalH += (this.getExpandedSplits(entries[idx]).length + 1) * subRowH;
       }
     }
     const bgH = TOTAL_ROWS * rowH + expandTotalH + 12;
@@ -369,7 +369,8 @@ export class HighScoreScene extends Phaser.Scene {
           const topEntry = entries[0];
           const topSplits = topEntry ? this.getExpandedSplits(topEntry) : [];
           const isTop = i === 0;
-          const blockH = splits.length * subRowH;
+          const totalRows = splits.length + 1;
+          const blockH = totalRows * subRowH;
           const blockTop = y + rowH / 2;
 
           const subBg = this.add.graphics();
@@ -396,6 +397,24 @@ export class HighScoreScene extends Phaser.Scene {
                 }).setOrigin(1, 0.5);
                 this.tableContainer.add(deltaText);
               }
+            }
+          }
+
+          const totalY = blockTop + splits.length * subRowH + subRowH / 2;
+          const totalLbl = this.add.text(labelX, totalY, "Total", { ...subStyle, color: "#d8b8f0" }).setOrigin(0, 0.5);
+          const totalVal = this.add.text(timeX, totalY, formatTime(entry.totalMs), { ...subStyle, color: "#d8b8f0" }).setOrigin(1, 0.5);
+          this.tableContainer.add([totalLbl, totalVal]);
+
+          if (!isTop && topEntry) {
+            const totalDelta = entry.totalMs - topEntry.totalMs;
+            if (totalDelta !== 0) {
+              const sign = totalDelta > 0 ? "+" : "-";
+              const deltaColor = totalDelta > 0 ? "#ff6666" : "#66ff88";
+              const totalDeltaText = this.add.text(deltaX, totalY, `${sign}${formatTime(Math.abs(totalDelta))}`, {
+                ...subStyle,
+                color: deltaColor,
+              }).setOrigin(1, 0.5);
+              this.tableContainer.add(totalDeltaText);
             }
           }
 
