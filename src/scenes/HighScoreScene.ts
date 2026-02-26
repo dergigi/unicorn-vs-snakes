@@ -243,7 +243,7 @@ export class HighScoreScene extends Phaser.Scene {
   private getExpandedSplits(entry: AnnotatedEntry): { label: string; ms: number }[] {
     const splits: { label: string; ms: number }[] = [];
     if (entry.menuTimeMs > 0) {
-      splits.push({ label: "Menu", ms: entry.menuTimeMs });
+      splits.push({ label: "Level 0 (Menu)", ms: entry.menuTimeMs });
     }
     for (let l = 0; l < entry.levelTimes.length; l++) {
       splits.push({ label: `Level ${l + 1}`, ms: entry.levelTimes[l] });
