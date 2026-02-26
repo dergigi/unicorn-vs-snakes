@@ -136,7 +136,7 @@ export class WinScene extends Phaser.Scene {
     measureText.destroy();
 
     const contentBottom = Math.max(totalY + 18, 280);
-    const nostrBtnSpace = nostrService.isLoggedIn() ? 36 : 0;
+    const nostrBtnSpace = 36;
     const dialogY = contentBottom + (btnY - 25 - contentBottom - dialogHeight - nostrBtnSpace) / 2;
     const dialogX = cx - dialogWidth / 2;
     const portraitCenterX = dialogX + 32;
@@ -173,20 +173,24 @@ export class WinScene extends Phaser.Scene {
       });
     });
 
+    const scoreData: ScoreData = {
+      difficulty,
+      sparkles: collectedSparkles,
+      apples: collectedApples,
+      powerups: collectedPowerups,
+      levelTimes,
+      menuTimeMs,
+      totalMs,
+      percent100: is100Percent,
+      cheated: data.cheated ?? false,
+    };
+    const nostrBtnY = dialogY + dialogHeight + 8;
+
     if (nostrService.isLoggedIn()) {
-      const scoreData: ScoreData = {
-        difficulty,
-        sparkles: collectedSparkles,
-        apples: collectedApples,
-        powerups: collectedPowerups,
-        levelTimes,
-        menuTimeMs,
-        totalMs,
-        percent100: is100Percent,
-        cheated: data.cheated ?? false,
-      };
       nostrService.publishScore(scoreData).catch(() => {});
-      this.buildNostrButton(dialogX, dialogY + dialogHeight + 8, dialogWidth, shareText);
+      this.buildNostrButton(dialogX, nostrBtnY, dialogWidth, shareText);
+    } else {
+      this.buildNostrLoginButton(dialogX, nostrBtnY, dialogWidth, shareText, scoreData);
     }
 
     // Leaderboard panel (right column)
@@ -206,6 +210,70 @@ export class WinScene extends Phaser.Scene {
 
     again.on("pointerdown", () => {
       this.scene.start("MenuScene");
+    });
+  }
+
+  private buildNostrLoginButton(
+    x: number, y: number, width: number,
+    noteText: string, scoreData: ScoreData,
+  ): void {
+    const btnH = 28;
+    const btnCx = x + width / 2;
+    const btnCy = y + btnH / 2;
+
+    const bg = this.add.graphics();
+    bg.fillStyle(0x4a2860, 0.85);
+    bg.lineStyle(1, 0xb88cdd, 0.6);
+    bg.fillRoundedRect(x, y, width, btnH, 8);
+    bg.strokeRoundedRect(x, y, width, btnH, 8);
+
+    const label = this.add.text(btnCx, btnCy, "Login with Nostr to post score", {
+      fontFamily: "monospace",
+      fontSize: "13px",
+      color: "#c8b8e0",
+      stroke: "#2a1040",
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+
+    const hitArea = this.add.rectangle(btnCx, btnCy, width, btnH, 0, 0);
+    hitArea.setInteractive({ useHandCursor: true });
+
+    let busy = false;
+    hitArea.on("pointerover", () => { if (!busy) label.setColor("#ffffff"); });
+    hitArea.on("pointerout", () => { if (!busy) label.setColor("#c8b8e0"); });
+
+    hitArea.on("pointerdown", () => {
+      if (busy) return;
+
+      if (!nostrService.isExtensionAvailable()) {
+        busy = true;
+        label.setText("Nostr extension required");
+        label.setColor("#ff8888");
+        this.time.delayedCall(2500, () => {
+          label.setText("Login with Nostr to post score");
+          label.setColor("#c8b8e0");
+          busy = false;
+        });
+        return;
+      }
+
+      busy = true;
+      label.setText("Connecting...");
+      label.setColor("#8a7fb0");
+
+      nostrService.login().then(() => {
+        if (!this.scene.isActive()) return;
+        nostrService.publishScore(scoreData).catch(() => {});
+        bg.destroy();
+        label.destroy();
+        hitArea.destroy();
+        this.buildNostrButton(x, y, width, noteText);
+      }).catch(() => {
+        if (!this.scene.isActive()) return;
+        label.setText("Login failed — tap to retry");
+        label.setColor("#ff8888");
+        busy = false;
+      });
     });
   }
 
