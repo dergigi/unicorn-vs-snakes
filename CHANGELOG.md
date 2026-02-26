@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.6] - 2026-02-26
+
+### Added
+
+- Expandable level time splits on high score screen
+- Colored delta vs #1 for each level split
+- Total time with delta in expanded splits
+- Crown icon next to the #1 player's name
+
+### Changed
+
+- Show total delta on main row instead of extra sub-row
+- Use one sub-row per level and remove arrow indicator
+- Allow multiple rows to be expanded simultaneously
+
+### Fixed
+
+- Rename Menu split label to Level 0 (Menu)
+- Move crown icon to the right of the #1 player's name
+
 ## [1.3.5] - 2026-02-26
 
 ### Added
@@ -195,6 +215,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Press R during gameplay to reset to splash screen
 - Separate Phaser chunk for better caching
 
+[1.3.6]: https://github.com/dergigi/unicorns-vs-snakes/compare/v1.3.5...v1.3.6
 [1.3.5]: https://github.com/dergigi/unicorns-vs-snakes/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/dergigi/unicorns-vs-snakes/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/dergigi/unicorns-vs-snakes/compare/v1.3.2...v1.3.3
