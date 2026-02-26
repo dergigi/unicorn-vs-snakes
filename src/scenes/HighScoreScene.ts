@@ -366,6 +366,9 @@ export class HighScoreScene extends Phaser.Scene {
 
         if (isRowExpanded) {
           const splits = this.getExpandedSplits(entry);
+          const topEntry = entries[0];
+          const topSplits = topEntry ? this.getExpandedSplits(topEntry) : [];
+          const isTop = i === 0;
           const blockH = splits.length * subRowH;
           const blockTop = y + rowH / 2;
 
@@ -375,11 +378,25 @@ export class HighScoreScene extends Phaser.Scene {
           this.tableContainer.add(subBg);
 
           const labelX = nameX + 20;
+          const deltaX = timeX - 90;
           for (let s = 0; s < splits.length; s++) {
             const subY = blockTop + s * subRowH + subRowH / 2;
             const lbl = this.add.text(labelX, subY, splits[s].label, subStyle).setOrigin(0, 0.5);
             const val = this.add.text(timeX, subY, formatTime(splits[s].ms), subStyle).setOrigin(1, 0.5);
             this.tableContainer.add([lbl, val]);
+
+            if (!isTop && s < topSplits.length && topSplits[s].label === splits[s].label) {
+              const deltaMs = splits[s].ms - topSplits[s].ms;
+              if (deltaMs !== 0) {
+                const sign = deltaMs > 0 ? "+" : "-";
+                const deltaColor = deltaMs > 0 ? "#ff6666" : "#66ff88";
+                const deltaText = this.add.text(deltaX, subY, `${sign}${formatTime(Math.abs(deltaMs))}`, {
+                  ...subStyle,
+                  color: deltaColor,
+                }).setOrigin(1, 0.5);
+                this.tableContainer.add(deltaText);
+              }
+            }
           }
 
           yOffset += blockH;
